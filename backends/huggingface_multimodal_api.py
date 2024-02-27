@@ -61,10 +61,10 @@ class HuggingfaceMultimodalModel(backends.Model):
 
     def __init__(self, model_spec: backends.ModelSpec):
         super().__init__(model_spec)
-        self.processor = load_processor(model_spec)
-        self.multimodal_model = load_model(model_spec)
+        # self.processor = load_processor(model_spec)
+        # self.multimodal_model = load_model(model_spec)
         self.template = load_template(model_spec)
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        # self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def generate_response(self, messages: List[Dict],
                           return_full_text: bool = False,
@@ -82,6 +82,10 @@ class HuggingfaceMultimodalModel(backends.Model):
         :param log_messages: If True, raw and cleaned messages passed will be logged.
         :return: the continuation
         """
+        print("Current Messages: ")
+        for m in messages:
+            print(m)
+
         # log current given messages list:
         if log_messages:
             logger.info(f"Raw messages passed: {messages}")
@@ -91,10 +95,12 @@ class HuggingfaceMultimodalModel(backends.Model):
         template = Template(template_str)
         
         # Temporarily handle only single instance
-        messages = [messages[0]]
+        messages = [messages[-1]] # Take only last image 
         
         prompt_text = template.render(messages=messages)
-        prompt = {"inputs": prompt_text, "max_new_tokens": 20, "temprature": self.get_temperature()}
+        # prompt = {"inputs": prompt_text, "max_new_tokens": 20, "temprature": self.get_temperature()}
+        prompt = {"inputs": prompt_text, "max_new_tokens": 20}
+        
 
         # Get image
         imgs = []
@@ -104,13 +110,15 @@ class HuggingfaceMultimodalModel(backends.Model):
                 del messages[msg_idx]['image']
 
         # load image
-        raw_image = load_image(imgs[0])
+        if imgs:
+            raw_image = load_image(imgs[0])
 
-        inputs = self.processor(prompt_text, images=raw_image, padding=True, return_tensors="pt").to("cuda")
+        # inputs = self.processor(prompt_text, images=raw_image, padding=True, return_tensors="pt").to("cuda")
 
-        model_output = self.multimodal_model.generate(**inputs, max_new_tokens=20)
+        # model_output = self.multimodal_model.generate(**inputs, max_new_tokens=20)
 
-        generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
+        # generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
+        generated_text = ["Yes"]
 
         response = {'response': generated_text}
 

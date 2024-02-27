@@ -23,8 +23,8 @@ class Speaker(Player):
     def __init__(self, model: Model):
         super().__init__(model)
 
-    def _custom_response(self, messages, turn_idx) -> str:
-        return
+    def _custom_response(self) -> str:
+        return "Maybe"
     
 
 class Judge(Player):
@@ -32,7 +32,7 @@ class Judge(Player):
     def __init__(self, model: Model):
         super().__init__(model)
 
-    def _custom_response(self, messages, turn_idx):
+    def _custom_response(self):
         return "That seems right."
 
 class Cloudgame(DialogueGameMaster):
@@ -54,38 +54,35 @@ class Cloudgame(DialogueGameMaster):
     def _on_setup(self, **game_instance):
 
         """" sets the information you specify in instances.json """
-        
+    
         self.game_instance = game_instance
         self.image = game_instance["image"]
         self.prompt_text = game_instance["prompt"]
+        self.general_prompt = "This seems correct."
+        self.prompt_judge = "Do you think this is correct?"
+        self.second_prompt = "Are there any chickens in the picture? Answer with only \"Yes\" or \"No\"."
 
         self.speaker = Speaker(self.player_backends[0])
-        self.judge = Judge(self.experiment) # Argument hier ist relativ arbiträr
+        self.judge = Judge(self.player_backends[0]) # Argument hier ist relativ arbiträr
+        # Change from self.experiment to self.player_backends[0] // from type str to type Model
 
         self.add_player(self.speaker)
         self.add_player(self.judge)
 
 
-    def _on_before_game(self):
-        # add prompt to speaker message history
-        self.add_user_message(self.speaker, self.prompt_text, image = self.image)
-        self.add_user_message(self.judge, "The game starts here.") 
- 
     def _does_game_proceed(self):
-        if not self.aborted and len(self.turns) <= 1:
+        if not self.aborted and len(self.turns) <= 1: # Stop at 2nd Turn (Cloud question + Chickens question)
             return True
         return False
+    
 
-   
     def _on_before_turn(self, turn_idx: int):
-        #Two instances of the same message (First instance is added during _on_before_game)
         if turn_idx == 0:
-            self.add_user_message(self.speaker, self.prompt_text, image = self.image)
-            self.add_user_message(self.judge, "Do you think this is correct?")
-        if turn_idx == 1:
-            self.add_user_message(self.speaker, "Are there any chickens in the picture?")
-            self.add_user_message(self.judge, "Do you think this is correct?")
-
+            self.add_user_message(self.speaker, self.prompt_text, image=self.image)
+            self.add_user_message(self.judge, self.prompt_judge, image=self.image)
+        if turn_idx == 1: # Add chicken question to Player
+            self.add_user_message(self.speaker, self.second_prompt, image=self.image)
+            self.add_user_message(self.judge, self.prompt_judge, image=self.image)
 
     def _validate_player_response(self, player: Player, answer: str) -> bool:
         """Check if the utterance conforms to rules (cloudgame specific)."""
@@ -96,33 +93,37 @@ class Cloudgame(DialogueGameMaster):
         
         if player == self.speaker:
             true_answer = self.experiment
-            split_answer = answer.strip(".").split(" ")
-            # only one word allowed
+            split_answer = answer.split() # Handle blank space
+
+            # Only one word answer allowed
             if len(split_answer) != 1:
                 self.success = False
                 self.aborted = True
                 self.log_to_self("Invalid word count", "Game aborted.")
                 return False
     
-            if answer.lower().strip(".") not in self.allowed_words:
+            # Answer is one word but not yes/no
+            if split_answer[0].lower() not in self.allowed_words:
                 self.success = False
                 self.aborted = True
                 self.log_to_self("Invalid words", "Game aborted.")
                 return False
-            # is anwer correct?
-            elif answer.lower() != true_answer:
-                self.success = False
+
+            # Is answer correct? # SKip for now, get "yes" always
+            # FOr testing UA messages
+            # elif split_answer[0].lower() != true_answer:
+            #     self.success = False
             
+            # Correct Answer
             self.log_to_self("Valid format", "Continue")
 
         return True
 
     
     def _after_add_player_response(self, player: Player, utterance: str):
-        if player == self.speaker:
-            self.add_user_message(self.judge, utterance)
-        if player == self.judge:
-            self.add_user_message(self.speaker, utterance)
+        # Add a general message
+        # if player == self.judge:
+        self.add_user_message(player, self.general_prompt)
         
     def _on_after_turn(self, turn_idx: int):
 
@@ -132,13 +133,11 @@ class Cloudgame(DialogueGameMaster):
         self.turns.append(self.success)
 
 
-    ########## Multimodal specific functions
+    ########## Multimodal specific functions #########
+
     def add_message(self, player: Player, utterance: str, role: str, image = None):
         if image is None:
-            # Use a temporary coco-dataset image to handle system message without image
-            # Taken from, llava example notebook - https://colab.research.google.com/drive/1_q7cOB-jCu3RExrkhrgewBR0qKjZr-Sx#scrollTo=MjlIoxq3u8ef
-            temp_image = "http://images.cocodataset.org/val2017/000000039769.jpg"
-            message = {"role": role, "content": utterance, "image": temp_image}
+            message = {"role": role, "content": utterance}
         else:
             message = {"role": role, "content": utterance, "image": image}
         history = self.messages_by_names[player.descriptor]
@@ -146,7 +145,7 @@ class Cloudgame(DialogueGameMaster):
 
     def add_user_message(self, player: Player, utterance: str, image = None):
         self.add_message(player, utterance, role="user", image= image)
-
+        
 
 class CloudgameScorer(GameScorer):
     def __init__(self, experiment: Dict, game_instance: Dict):
