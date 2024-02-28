@@ -85,35 +85,42 @@ class Cloudgame(DialogueGameMaster):
     def _validate_player_response(self, player: Player, answer: str) -> bool:
         """Check if the utterance conforms to rules (cloudgame specific)."""
 
-        # there should never be a chicken in a picture
-        if len(self.turns) != 0:
-            true_answer = "no"
-        
-        if player == self.speaker:
-            true_answer = self.experiment
-            split_answer = answer.split() # Handle blank space
+        # Always return True for programmatic judge
+        if player == self.judge:
+            return True
 
-            # Only one word answer allowed
-            if len(split_answer) != 1:
-                self.success = False
-                self.aborted = True
-                self.log_to_self("Invalid word count", "Game aborted.")
-                return False
-    
-            # Answer is one word but not yes/no
-            if split_answer[0].lower() not in self.allowed_words:
-                self.success = False
-                self.aborted = True
-                self.log_to_self("Invalid words", "Game aborted.")
-                return False
+        if self.turns:
+            # For second question
+            true_answer = "no" # There should never be a chicken in a picture
+        else:
+            # For first question
+            true_answer = self.experiment 
 
-            # Is answer correct?
-            elif split_answer[0].lower() != true_answer:
-                self.success = False
-            
-            # Correct Answer
-            self.log_to_self("Valid format", "Continue")
+        split_answer = answer.split() # Handle blank space
 
+        # Only one word answer allowed
+        if len(split_answer) != 1:
+            self.success = False
+            self.aborted = True
+            self.log_to_self("Invalid word count", "Game aborted.")
+            return False
+
+        # Answer is one word but not yes/no
+        if split_answer[0].lower() not in self.allowed_words:
+            self.success = False
+            self.aborted = True
+            self.log_to_self("Invalid words", "Game aborted.")
+            return False
+
+        # Is answer correct?
+        if split_answer[0].lower() != true_answer:
+            self.success = False
+            self.aborted = True
+            self.log_to_self("Wrong answer", "Game aborted.")
+            return False
+
+        # Correct Answer
+        self.log_to_self("Valid format", "Continue")
         return True
 
     
@@ -166,14 +173,18 @@ class CloudgameScorer(GameScorer):
                     turn_score_dict["request_count"] += 1
                 if action["type"] == "Valid format":
                     turn_score_dict["parsed_request_count"] += 1
+                    score += 1
                 if action["type"] == "Invalid word count":
                     turn_score_dict["violated_request_count"] += 1
                     aborted = True
                 if action["type"] == "Invalid words":
                     turn_score_dict["violated_request_count"] = 1
                     aborted = True
-                if action["type"] == "judgement":
-                    score = action["content"]
+                if action["type"] == "Wrong answer":
+                    aborted = True
+                    turn_score_dict["violated_request_count"] = 1
+                # if action["type"] == "judgement":
+                #     score = action["content"]
 
          # log turn request scores   
             self.log_turn_score(turn_idx, METRIC_REQUEST_COUNT_VIOLATED, turn_score_dict["violated_request_count"])
