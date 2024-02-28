@@ -1,17 +1,13 @@
 # TODO add to _validate_player_response: do not automatically return True (important for when not mock)
 # TODO add played or aborted metric to compute_scores (see prev. todo)
 
-
-import random
-from typing import List, Dict, Tuple
-from PIL import Image
-import requests
+from typing import List, Dict
 
 import numpy as np
 
 import clemgame.metrics as ms
 from clemgame.clemgame import GameMaster, GameBenchmark, DialogueGameMaster, GameScorer
-from clemgame import get_logger, file_utils
+from clemgame import get_logger
 from clemgame.clemgame import Player
 from clemgame.metrics import METRIC_ABORTED, METRIC_SUCCESS, METRIC_LOSE, BENCH_SCORE, METRIC_REQUEST_COUNT, METRIC_REQUEST_COUNT_PARSED,  METRIC_REQUEST_COUNT_VIOLATED, METRIC_REQUEST_SUCCESS
 from games.cloudgame.instancegenerator import GAME_NAME
@@ -19,6 +15,7 @@ from backends import Model
 
 logger = get_logger(__name__)
 
+# Player1 - Multimodal Model
 class Speaker(Player):
     def __init__(self, model: Model):
         super().__init__(model)
@@ -26,7 +23,7 @@ class Speaker(Player):
     def _custom_response(self) -> str:
         return "Maybe"
     
-
+# Player2 - Programmatic
 class Judge(Player):
 
     def __init__(self, model: Model):
@@ -52,15 +49,16 @@ class Cloudgame(DialogueGameMaster):
        
 
     def _on_setup(self, **game_instance):
+        '''
+        Sets the information specified for each instance, along with some general prompts
+        '''
 
-        """" sets the information you specify in instances.json """
-    
         self.game_instance = game_instance
         self.image = game_instance["image"]
         self.prompt_text = game_instance["prompt"]
         self.general_prompt = "This seems correct."
         self.prompt_judge = "Do you think this is correct?"
-        self.second_prompt = "Are there any chickens in the picture? Answer with only \"Yes\" or \"No\"."
+        self.second_prompt = "Are there any chickens in the image? Answer with only \"Yes\" or \"No\"."
 
         self.speaker = Speaker(self.player_backends[0])
         self.judge = Judge(self.player_backends[0]) # Argument hier ist relativ arbiträr
@@ -77,10 +75,10 @@ class Cloudgame(DialogueGameMaster):
     
 
     def _on_before_turn(self, turn_idx: int):
-        if turn_idx == 0:
+        if turn_idx == 0: # Add cloud question to speaker and programmatic question to judge
             self.add_user_message(self.speaker, self.prompt_text, image=self.image)
             self.add_user_message(self.judge, self.prompt_judge, image=self.image)
-        if turn_idx == 1: # Add chicken question to Player
+        if turn_idx == 1: # Add chicken question to speaker and programmatic question to judge
             self.add_user_message(self.speaker, self.second_prompt, image=self.image)
             self.add_user_message(self.judge, self.prompt_judge, image=self.image)
 
@@ -109,10 +107,9 @@ class Cloudgame(DialogueGameMaster):
                 self.log_to_self("Invalid words", "Game aborted.")
                 return False
 
-            # Is answer correct? # SKip for now, get "yes" always
-            # FOr testing UA messages
-            # elif split_answer[0].lower() != true_answer:
-            #     self.success = False
+            # Is answer correct?
+            elif split_answer[0].lower() != true_answer:
+                self.success = False
             
             # Correct Answer
             self.log_to_self("Valid format", "Continue")
@@ -126,17 +123,19 @@ class Cloudgame(DialogueGameMaster):
         self.add_user_message(player, self.general_prompt)
         
     def _on_after_turn(self, turn_idx: int):
-
         self.log_to_self(type_ = "judgement", value = self.success)
         if self.aborted:
             self.log_to_self(type_ = "aborted", value = self.aborted)
         self.turns.append(self.success)
 
 
-    ########## Multimodal specific functions #########
+    '''
+    Multimodal specific functions 
+    Add image as an argument.
+    '''
 
     def add_message(self, player: Player, utterance: str, role: str, image = None):
-        if image is None:
+        if image is None: # For adding general_prompt to the speaker
             message = {"role": role, "content": utterance}
         else:
             message = {"role": role, "content": utterance, "image": image}
