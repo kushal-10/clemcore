@@ -15,10 +15,8 @@ def load_processor(model_spec: backends.ModelSpec) -> AutoProcessor:
     '''
     Load processor for a specific model (Example - LlavaProcessor, Kosmos2Processor) 
 
-    Args:
-        model_spec - A dictionary that defines the model to be used, loaded from Model Registry
-    Returns:
-        processor - Processor for the specific model
+    :param model_spec: A dictionary that defines the model to be used, loaded from Model Registry
+    :return processor: Processor for the specific model
     '''
     logger.info(f'Loading huggingface model Processor: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id'] # Get the model name
@@ -34,10 +32,8 @@ def load_model(model_spec: backends.ModelSpec) -> AutoModelForVision2Seq:
     '''
     Load a specific model 
 
-    Args:
-        model_spec - A dictionary that defines the model to be used, loaded from Model Registry
-    Returns:
-        model - The specific model
+    :param model_spec: A dictionary that defines the model to be used, loaded from Model Registry
+    :return model: The specific model
     '''
 
     logger.info(f'Start loading huggingface model weights: {model_spec.model_name}')
@@ -49,29 +45,12 @@ def load_model(model_spec: backends.ModelSpec) -> AutoModelForVision2Seq:
     
     return model
 
-def load_template(model_spec: backends.ModelSpec) -> str:
-    '''
-    Load a jinja template specific to the model 
-
-    Args:
-        model_spec - A dictionary that defines the model to be used, loaded from Model Registry
-    Returns:
-        template_str - A jinja template for the model in str format
-    '''
-
-    logger.info(f'Loading custom template for huggingface model: {model_spec.model_name}')
-    template_str = model_spec['custom_chat_template']
-
-    return template_str
-
 def load_image(image_file: str) -> Image:
     '''
     Load an image from a given link/directory
 
-    Args:
-        image_file - A string that defines the link/directory of the image 
-    Returns:
-        image - Loaded image
+    :param image_file: A string that defines the link/directory of the image 
+    :return image: Loaded image
     '''
     if image_file.startswith('http') or image_file.startswith('https'):
         image = Image.open(requests.get(image_file, stream=True).raw).convert('RGB')
@@ -83,12 +62,10 @@ def clean_messages(current_messages: list[Dict]) -> list[Dict]:
     '''
     Flatten double user messages
 
-    Args:
-        current_messages - A list of messages passed to the model
-    Returns:
-        current_messages - Merged double user messages into one, keeping the 'image' key
+    :param current_messages: A list of messages passed to the model
+    :return current_messages: Merged double user messages into one, keeping the 'image' key
 
-    Example - 
+    Example (Cloudgame)- 
     {'role': 'user', 'content': 'This seems correct.'} 
     {'role': 'user', 'content': 'Are there any chickens in the image? Answer with only "Yes" or "No".', 'image': 'games/cloudgame/resources/images/3.jpg'}
     
@@ -103,20 +80,17 @@ def clean_messages(current_messages: list[Dict]) -> list[Dict]:
 
     return current_messages
 
-def get_images(prompt_text: str, messages: list[Dict]) -> list:
+def get_images(prompt_text: str, messages: list[Dict], image_placeholder: str) -> list:
     '''
     Return loaded images from messages
 
-    Args:
-        prompt_text: A string that goes into the input of the Processor
-        messages: A list of messages passed to the model
-    Returns:
-        images - A list of loaded images, that can be directly passed as input to the Processor.
+    :param prompt_text: A string that goes into the input of the Processor
+    :param messages: A list of messages passed to the model
+    :return images: A list of loaded images, that can be directly passed as input to the Processor.
     '''
 
-    # Count number of <image> tokens in the cleaned prompt
-    # Considering only <image> token for now. If some models have a different placeholder, can add them in model registry
-    num_images = prompt_text.count('<image>') 
+    # Count number of image placeholders (<image>, <img>, ...) in the cleaned prompt
+    num_images = prompt_text.count(image_placeholder) 
     
     # Collect image links/file locations mentioned in messages
     imgs = []
@@ -124,7 +98,7 @@ def get_images(prompt_text: str, messages: list[Dict]) -> list:
         if 'image' in message:
             imgs.append(message['image'])
 
-    # Check if number of <image> tokens and number of images passed are valid
+    # Check if number of image placeholders and number of images passed are valid
     if len(imgs) != num_images:
         if len(imgs) == 1:
             # If only one image is available, copy it for num_images times. 
@@ -156,7 +130,9 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.processor = load_processor(model_spec)
         self.multimodal_model = load_model(model_spec).to(self.device)
-        self.template = load_template(model_spec)
+        self.template = model_spec["custom_chat_template"]
+        self.assistant_tag = model_spec["assistant"]
+        self.image_placeholder = model_spec["placeholder"]
 
     def generate_response(self, messages: List[Dict],
                           log_messages: bool = False) -> Tuple[Any, Any, str]:
@@ -186,20 +162,20 @@ class HuggingfaceMultimodalModel(backends.Model):
         prompt_text = template.render(messages=cleaned_messages)
 
         # Get a list of images that will be passed to the Processor
-        images = get_images(prompt_text, messages)
+        images = get_images(prompt_text, messages, self.image_placeholder)
 
         # Store prompt_text
-        prompt = {"inputs": prompt_text, "max_new_tokens": 20, "temprature": self.get_temperature()}
+        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temprature": self.get_temperature()}
         
         # Generate the output
         inputs = self.processor(prompt_text, images=images, padding=True, return_tensors="pt").to("cuda")
-        model_output = self.multimodal_model.generate(**inputs, max_new_tokens=20)
+        model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
         generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
 
         # Store generated text
         response = {'response': generated_text}
 
         for text in generated_text:
-            response_text = text.split("ASSISTANT:")[-1] # Get the last Assistant Response
+            response_text = text.split(self.assistant_tag + ":")[-1] # Get the last assistant response
 
         return prompt, response, response_text
