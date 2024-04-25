@@ -21,9 +21,7 @@ def load_processor(model_spec: backends.ModelSpec) -> AutoProcessor:
     logger.info(f'Loading huggingface model Processor: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id'] # Get the model name
 
-    # Load the processor 
-    # NOTE - Further models may contain Tokenizer instead of Processor
-    processor = AutoProcessor.from_pretrained(hf_model_str, device_map="auto", verbose=False)
+    processor = AutoProcessor.from_pretrained(hf_model_str, use_fast=False, device_map="auto", verbose=False)
 
     return processor
 
@@ -40,22 +38,22 @@ def load_model(model_spec: backends.ModelSpec) -> AutoModelForVision2Seq:
     hf_model_str = model_spec['huggingface_id'] # Get the model name
 
     model = AutoModelForVision2Seq.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto")
+    
     logger.info(f"Finished loading huggingface model: {model_spec.model_name}")
-    logger.info(f"Model device map: {model.hf_device_map}")
     
     return model
 
-def load_image(image_file: str) -> Image:
+def load_image(image_path: str) -> Image:
     '''
     Load an image from a given link/directory
 
-    :param image_file: A string that defines the link/directory of the image 
+    :param image_path: A string that defines the link/directory of the image 
     :return image: Loaded image
     '''
-    if image_file.startswith('http') or image_file.startswith('https'):
-        image = Image.open(requests.get(image_file, stream=True).raw).convert('RGB')
+    if image_path.startswith('http') or image_path.startswith('https'):
+        image = Image.open(requests.get(image_path, stream=True).raw).convert('RGB')
     else:
-        image = Image.open(image_file).convert('RGB')
+        image = Image.open(image_path).convert('RGB')
     return image
 
 def clean_messages(current_messages: list[Dict]) -> list[Dict]:
@@ -79,6 +77,30 @@ def clean_messages(current_messages: list[Dict]) -> list[Dict]:
             del current_messages[msg_idx] 
 
     return current_messages
+
+def pad_images(images):
+    '''
+    Pad the images
+    '''
+    # Determine the maximum width and height among all images
+    max_width = max(image.size[0] for image in images)
+    max_height = max(image.size[1] for image in images)
+
+    # Create and return a list of padded images
+    padded_images = []
+    for image in images:
+        # Create a new image with a black background
+        new_image = Image.new("RGB", (max_width, max_height))
+
+        # Calculate the position to paste the image so that it's centered
+        x = (max_width - image.size[0]) // 2
+        y = (max_height - image.size[1]) // 2
+
+        # Paste the original image onto the new image
+        new_image.paste(image, (x, y))
+        padded_images.append(new_image)
+
+    return padded_images
 
 def get_images(prompt_text: str, messages: list[Dict], image_placeholder: str) -> list:
     '''
@@ -129,10 +151,13 @@ class HuggingfaceMultimodalModel(backends.Model):
         super().__init__(model_spec)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.processor = load_processor(model_spec)
-        self.multimodal_model = load_model(model_spec).to(self.device)
+        self.multimodal_model = load_model(model_spec)
         self.template = model_spec["custom_chat_template"]
         self.assistant_tag = model_spec["assistant"]
         self.image_placeholder = model_spec["placeholder"]
+        self.padding = False
+        if model_spec["padding"]:
+            self.padding = True
 
     def generate_response(self, messages: List[Dict],
                           log_messages: bool = False) -> Tuple[Any, Any, str]:
@@ -163,12 +188,12 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         # Get a list of images that will be passed to the Processor
         images = get_images(prompt_text, messages, self.image_placeholder)
+        if self.padding:
+            images = pad_images(images)
 
-        # Store prompt_text
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temprature": self.get_temperature()}
-        
         # Generate the output
-        inputs = self.processor(prompt_text, images=images, padding=True, return_tensors="pt").to("cuda")
+        inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
         model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
         generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
 
@@ -176,6 +201,6 @@ class HuggingfaceMultimodalModel(backends.Model):
         response = {'response': generated_text}
 
         for text in generated_text:
-            response_text = text.split(self.assistant_tag + ":")[-1] # Get the last assistant response
+            response_text = text.split(self.assistant_tag)[-1] # Get the last assistant response
 
         return prompt, response, response_text
