@@ -174,24 +174,17 @@ class HuggingfaceMultimodalModel(backends.Model):
         :return: the continuation
         """
 
-        # log current given messages list:
-        if log_messages:
-            logger.info(f"Raw messages passed: {messages}")
-
-        # Cleanup double user messages
-        cleaned_messages = clean_messages(messages)
-
         # Get prompt by applying jinja template
         template_str = self.template
         template = Template(template_str)
-        prompt_text = template.render(messages=cleaned_messages)
+        prompt_text = template.render(messages=messages)
 
         # Get a list of images that will be passed to the Processor
         images = get_images(prompt_text, messages, self.image_placeholder)
         if self.padding:
             images = pad_images(images)
 
-        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temprature": self.get_temperature()}
+        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temeprature": self.get_temperature()}
         # Generate the output
         inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
         model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
@@ -200,7 +193,6 @@ class HuggingfaceMultimodalModel(backends.Model):
         # Store generated text
         response = {'response': generated_text}
 
-        for text in generated_text:
-            response_text = text.split(self.assistant_tag)[-1] # Get the last assistant response
+        response_text = generated_text[0].split(self.assistant_tag)[-1] # Get the last assistant response
 
         return prompt, response, response_text
