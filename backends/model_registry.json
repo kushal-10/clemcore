@@ -379,65 +379,75 @@
     "padding": false,
     "premade_chat_template": false,
     "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %} \nUSER: <image>\n{{ message['content'] }}{% else %} ASSISTANT: {{ message['content'] }}{% endif %}{% endfor %} ASSISTANT "
-   },
-   {
-     "model_name": "llava-1.5-13b-hf",
-     "backend": "huggingface_multimodal",
-     "huggingface_id": "llava-hf/llava-1.5-13b-hf",
-     "placeholder": "<image>",
-     "assistant": "ASSISTANT",
-     "padding": false,
-     "premade_chat_template": false,
-     "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %} \nUSER: <image>\n{{ message['content'] }}{% else %} ASSISTANT: {{ message['content'] }}{% endif %}{% endfor %} ASSISTANT "
-   },
-    {
-     "model_name": "vip-llava-7b-hf",
-     "backend": "huggingface_multimodal",
-     "huggingface_id": "llava-hf/vip-llava-7b-hf",
-     "placeholder": "<image>",
-     "assistant": "ASSISTANT",
-     "padding": false,
-     "premade_chat_template": false,
-     "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %} \nUSER: <image>\n{{ message['content'] }}{% else %} ASSISTANT: {{ message['content'] }}{% endif %}{% endfor %} ASSISTANT "
-    },
-   {
+  },
+  {
+    "model_name": "llava-1.5-13b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-1.5-13b-hf",
+    "placeholder": "<image>",
+    "assistant": "ASSISTANT",
+    "padding": false,
+    "premade_chat_template": false,
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %} \nUSER: <image>\n{{ message['content'] }}{% else %} ASSISTANT: {{ message['content'] }}{% endif %}{% endfor %} ASSISTANT "
+  },
+  { 
+    "model_name": "vip-llava-7b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/vip-llava-7b-hf",
+    "placeholder": "<image>",
+    "assistant": "ASSISTANT",
+    "padding": false,
+    "premade_chat_template": false,
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %} \nUSER: <image>\n{{ message['content'] }}{% else %} ASSISTANT: {{ message['content'] }}{% endif %}{% endfor %} ASSISTANT "
+  },
+  {
     "model_name": "llava-v1.6-34b-hf",
-     "backend": "huggingface_multimodal",
-     "huggingface_id": "llava-hf/llava-v1.6-34b-hf",
-     "placeholder": "<image>",
-     "assistant": "assistant",
-     "padding": true,
-     "premade_chat_template": false,
-     "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}<|im_start|>user\n<image>\n<{{ message['content'] }}><|im_end|>{% else %} <|im_start|>assistant\n {{ message['content'] }}{% endif %}{% endfor %}<|im_start|>assistant\n"
-   },
-   {
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-34b-hf",
+    "placeholder": "<image>",
+    "assistant": "assistant",
+    "padding": true,
+    "premade_chat_template": false,
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}<|im_start|>user\n<image>\n<{{ message['content'] }}><|im_end|>{% else %} <|im_start|>assistant\n {{ message['content'] }}{% endif %}{% endfor %}<|im_start|>assistant\n"
+  },
+  {
     "model_name": "llava-v1.6-mistral-7b-hf",
-     "backend": "huggingface_multimodal",
-     "huggingface_id": "llava-hf/llava-v1.6-mistral-7b-hf",
-     "placeholder": "<image>",
-     "assistant": "[/INST]",
-     "padding": true,
-     "premade_chat_template": false,
-     "custom_chat_template": "{% for message in messages %}{% if message['role'] == 'user' %}[INST]  <image>\n{{ message['content']}} [/INST] {% else %}\n{{message['content']}}\n{% endif %}{% endfor %}"
-    },
-   {
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-mistral-7b-hf",
+    "placeholder": "<image>",
+    "assistant": "[/INST]",
+    "padding": true,
+    "premade_chat_template": false,
+    "custom_chat_template": "{% for message in messages %}{% if message['role'] == 'user' %}[INST]  <image>\n{{ message['content']}} [/INST] {% else %}\n{{message['content']}}\n{% endif %}{% endfor %}"
+  },
+  {
     "model_name": "llava-v1.6-vicuna-13b-hf",
-     "backend": "huggingface_multimodal",
-     "huggingface_id": "llava-hf/llava-v1.6-vicuna-13b-hf",
-     "placeholder": "<image>",
-     "assistant": "ASSISTANT",
-     "padding": true,
-     "premade_chat_template": false,
-     "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}\nUSER: <image>\n{{ message['content'] }}{% elif message['role'] == 'assistant' %}ASSISTANT {{ message['content'] }} {% endif %}{% endfor %} ASSISTANT"
-    },
-    {
-     "model_name": "llava-v1.6-vicuna-7b-hf",
-      "backend": "huggingface_multimodal",
-      "huggingface_id": "llava-hf/llava-v1.6-vicuna-7b-hf",
-      "placeholder": "<image>",
-      "assistant": "ASSISTANT",
-      "padding": true,
-      "premade_chat_template": false,
-      "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}\nUSER: <image>\n{{ message['content'] }}{% elif message['role'] == 'assistant' %}ASSISTANT {{ message['content'] }} {% endif %}{% endfor %} ASSISTANT"
-    }
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-vicuna-13b-hf",
+    "placeholder": "<image>",
+    "assistant": "ASSISTANT",
+    "padding": true,
+    "premade_chat_template": false,
+    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}\nUSER: <image>\n{{ message['content'] }}{% elif message['role'] == 'assistant' %}ASSISTANT {{ message['content'] }} {% endif %}{% endfor %} ASSISTANT"
+  },
+  {
+    "model_name": "llava-v1.6-vicuna-7b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-vicuna-7b-hf",
+    "placeholder": "<image>",
+    "assistant": "ASSISTANT",
+    "padding": true,
+    "premade_chat_template": false,
+    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}\nUSER: <image>\n{{ message['content'] }}{% elif message['role'] == 'assistant' %}ASSISTANT {{ message['content'] }} {% endif %}{% endfor %} ASSISTANT"
+  },
+  {
+    "model_name": "idefics-80b-instruct",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "HuggingFaceM4/idefics-80b-instruct",
+    "placeholder": "",
+    "assistant": "ASSISTANT:",
+    "padding": false,
+    "premade_chat_template": false,
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}USER: {{ message['content'] }} <end_of_utterance>\n{% else %}ASSISTANT: {{ message['content'] }} <end_of_utterance>\n{% endif %}{% endfor %}ASSISTANT:"
+  }
 ]

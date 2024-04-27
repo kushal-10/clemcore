@@ -6,7 +6,7 @@ import torch
 import backends
 from PIL import Image
 import requests
-from transformers import AutoProcessor, AutoModelForVision2Seq
+from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text
 from jinja2 import Template
 
 logger = backends.get_logger(__name__)
@@ -20,7 +20,7 @@ def load_processor(model_spec: backends.ModelSpec) -> AutoProcessor:
     '''
     logger.info(f'Loading huggingface model Processor: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id'] # Get the model name
-
+   
     processor = AutoProcessor.from_pretrained(hf_model_str, use_fast=False, device_map="auto", verbose=False)
 
     return processor
@@ -37,7 +37,10 @@ def load_model(model_spec: backends.ModelSpec) -> AutoModelForVision2Seq:
     logger.info(f'Start loading huggingface model weights: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id'] # Get the model name
 
-    model = AutoModelForVision2Seq.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto")
+    if model_spec['model_name'] != 'idefics-80b-instruct': 
+        model = AutoModelForVision2Seq.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto")
+    else:
+        model = IdeficsForVisionText2Text.from_pretrained(hf_model_str, device_map="auto", torch_dtype=torch.bfloat16)
     
     logger.info(f"Finished loading huggingface model: {model_spec.model_name}")
     
@@ -55,28 +58,7 @@ def load_image(image_path: str) -> Image:
     else:
         image = Image.open(image_path).convert('RGB')
     return image
-
-def clean_messages(current_messages: list[Dict]) -> list[Dict]:
-    '''
-    Flatten double user messages
-
-    :param current_messages: A list of messages passed to the model
-    :return current_messages: Merged double user messages into one, keeping the 'image' key
-
-    Example (Cloudgame)- 
-    {'role': 'user', 'content': 'This seems correct.'} 
-    {'role': 'user', 'content': 'Are there any chickens in the image? Answer with only "Yes" or "No".', 'image': 'games/cloudgame/resources/images/3.jpg'}
     
-    {'role': 'user', 'content': 'This seems correct. Are there any chickens in the image? Answer with only "Yes" or "No".', 'image': 'games/cloudgame/resources/images/3.jpg'}
-    '''
-
-    for msg_idx, message in enumerate(current_messages):
-        if msg_idx < len(current_messages)-1 and message['role'] == "user" and current_messages[msg_idx+1]['role'] == "user":
-            # Merge into next message, ensuring 'image' key is not deleted
-            current_messages[msg_idx+1]['content'] = f"{message['content']} " + current_messages[msg_idx+1]['content']
-            del current_messages[msg_idx] 
-
-    return current_messages
 
 def pad_images(images):
     '''
@@ -108,7 +90,7 @@ def get_images(prompt_text: str, messages: list[Dict], image_placeholder: str) -
 
     :param prompt_text: A string that goes into the input of the Processor
     :param messages: A list of messages passed to the model
-    :return images: A list of loaded images, that can be directly passed as input to the Processor.
+    :return images: A list of image locations/ PIL Images, that can be directly passed as input to the Processor.
     '''
 
     # Count number of image placeholders (<image>, <img>, ...) in the cleaned prompt
@@ -119,6 +101,8 @@ def get_images(prompt_text: str, messages: list[Dict], image_placeholder: str) -
     for _, message in enumerate(messages):
         if 'image' in message:
             imgs.append(message['image'])
+    if image_placeholder == "":
+        return imgs
 
     # Check if number of image placeholders and number of images passed are valid
     if len(imgs) != num_images:
@@ -156,6 +140,9 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.assistant_tag = model_spec["assistant"]
         self.image_placeholder = model_spec["placeholder"]
         self.padding = False
+        self.IDEFICS = False
+        if model_spec['model_name'] == 'idefics-80b-instruct':
+            self.IDEFICS = True
         if model_spec["padding"]:
             self.padding = True
 
@@ -179,19 +166,46 @@ class HuggingfaceMultimodalModel(backends.Model):
         template = Template(template_str)
         prompt_text = template.render(messages=messages)
 
+        print("### PROMPT TEXT ###")
+        print(prompt_text)
+
         # Get a list of images that will be passed to the Processor
         images = get_images(prompt_text, messages, self.image_placeholder)
         if self.padding:
             images = pad_images(images)
 
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temeprature": self.get_temperature()}
-        # Generate the output
-        inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
-        model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
-        generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
+
+        if not self.IDEFICS:         
+            # Generate the output
+            inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
+            model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
+            generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
+
+        else:    
+            idefics_input = [] #A list containing the prompt text, images specific to idefics input
+            for m in messages:
+                if m['role'] == 'user':
+                    idefics_input.append('\nUSER: ' + m['content'])
+                    if 'image' in m.keys():
+                        idefics_input.append(m['image'])
+                    idefics_input.append('<end_of_utterance>')
+                elif m['role'] == 'assistant':
+                    idefics_input.append('\nASSISTANT: ' + m['content'])        
+                    idefics_input.append('<end_of_utterance>')    
+            idefics_input.append('\nASSISTANT:')  
+
+            inputs = self.processor(idefics_input, return_tensors="pt").to(self.device)
+            # Generation args for Idefics
+            exit_condition = self.processor.tokenizer("<end_of_utterance>", add_special_tokens=False).input_ids
+            bad_words_ids = self.processor.tokenizer(["<image>", "<fake_token_around_image>"], add_special_tokens=False).input_ids
+            generated_ids = self.multimodal_model.generate(**inputs, eos_token_id=exit_condition, bad_words_ids=bad_words_ids, max_length=100)
+            generated_text = self.processor.batch_decode(generated_ids, skip_special_tokens=True)
 
         # Store generated text
         response = {'response': generated_text}
+        print("### GENERATED RESPONSE ###")
+        print(response)
 
         response_text = generated_text[0].split(self.assistant_tag)[-1] # Get the last assistant response
 

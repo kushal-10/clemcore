@@ -92,7 +92,7 @@ class Cloudgame(DialogueGameMaster):
             self.add_user_message(self.speaker, self.initial_prompt, image = self.image)
             self.add_user_message(self.judge, "Do you think this is correct?")
         if turn_idx == 1:
-            self.add_user_message(self.speaker, "Are there any chickens in the picture?")
+            self.add_user_message(self.speaker, 'Are there any chickens in the picture? Answer with only "Yes" or "No".')
             self.add_user_message(self.judge, "Do you think this is correct?")
 
 
