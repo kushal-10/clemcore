@@ -100,6 +100,8 @@ class Cloudgame(DialogueGameMaster):
     def _validate_player_response(self, player: Player, answer: str) -> bool:
         """Check if the utterance conforms to rules (cloudgame specific)."""
 
+        # Remove \n from answer
+        answer = answer.replace("\n", "")
         # there should never be a chicken in a picture
         if len(self.turns) != 0:
             true_answer = "no"

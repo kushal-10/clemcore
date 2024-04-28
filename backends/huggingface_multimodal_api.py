@@ -32,7 +32,7 @@ def load_processor(model_spec: backends.ModelSpec) -> AutoProcessor:
     return processor
 
 
-def load_model(model_spec: backends.ModelSpec) -> AutoModelForVision2Seq:
+def load_model(model_spec: backends.ModelSpec):
     '''
     Load a specific model 
 
@@ -52,20 +52,6 @@ def load_model(model_spec: backends.ModelSpec) -> AutoModelForVision2Seq:
     
     return model
 
-def load_image(image_path: str) -> Image:
-    '''
-    Load an image from a given link/directory
-
-    :param image_path: A string that defines the link/directory of the image 
-    :return image: Loaded image
-    '''
-    if image_path.startswith('http') or image_path.startswith('https'):
-        image = Image.open(requests.get(image_path, stream=True).raw).convert('RGB')
-    else:
-        image = Image.open(image_path).convert('RGB')
-    return image
-    
-  
 def pad_images(images):
     '''
     Pad the images. Only used for LLaVA NeXT models
@@ -91,24 +77,27 @@ def pad_images(images):
 
     return padded_images
 
-def get_images(messages: list[Dict], image_token: str) -> list:
+def get_images(messages: list[Dict]) -> list:
     '''
     Return loaded images from messages
 
-    :param prompt_text: A string that goes into the input of the Processor
     :param messages: A list of messages passed to the model
-    :return images: A list of image locations/ PIL Images, that can be directly passed as input to the Processor.
+    :return images: A list of PIL Image objects.
     '''    
     # Collect image links/file locations mentioned in messages
-    imgs = []
-    for _, message in enumerate(messages):
+    images = []
+    for message in messages:
         if 'image' in message:
-            imgs.append(message['image'])
-    if image_token == "": # A special case for Idefics, return only a list of images
-        return imgs
-    
+            images.append(message['image'])
+
     # Load Images
-    loaded_images = [load_image(m) for m in imgs]
+    loaded_images = []
+    for img in images:
+        if img.startswith('http') or img.startswith('https'):
+            image = Image.open(requests.get(img, stream=True).raw).convert('RGB')
+        else:
+            image = Image.open(img).convert('RGB')
+        loaded_images.append(image)
 
     return loaded_images
 
@@ -130,7 +119,6 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.multimodal_model = load_model(model_spec)
         self.template = model_spec["custom_chat_template"]
         self.cull = model_spec["eos_to_cull"]
-        self.img_token = model_spec["image_token"]
 
         self.padding = False
         self.IDEFICS = False
@@ -160,7 +148,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         prompt_text = template.render(messages=messages)
 
         # Get a list of images that will be passed to the Processor
-        images = get_images(messages, self.img_token)
+        images = get_images(messages)
         if self.padding:
             images = pad_images(images)
 
