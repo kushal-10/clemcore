@@ -6,8 +6,14 @@ import torch
 import backends
 from PIL import Image
 import requests
-from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text
+from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text, AutoModelForCausalLM
 from jinja2 import Template
+
+# Define a map to load model from transformers Auto Classes
+MODEL_TYPE_MAP = {
+        "Idefics": IdeficsForVisionText2Text,
+        "Vision2Seq": AutoModelForVision2Seq
+    }
 
 logger = backends.get_logger(__name__)
 
@@ -37,12 +43,12 @@ def load_model(model_spec: backends.ModelSpec) -> AutoModelForVision2Seq:
     logger.info(f'Start loading huggingface model weights: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id'] # Get the model name
 
-    if model_spec['model_name'] != 'idefics-80b-instruct': 
-        model = AutoModelForVision2Seq.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto")
-    else:
-        model = IdeficsForVisionText2Text.from_pretrained(hf_model_str, device_map="auto", torch_dtype=torch.bfloat16)
+    model_type = MODEL_TYPE_MAP[model_spec['model_type']] # Use the appropriate Auto class to  load the model 
+
+    model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto") # Load the model
     
     logger.info(f"Finished loading huggingface model: {model_spec.model_name}")
+    logger.info(f"Device Map: {model.hf_device_map}")
     
     return model
 
@@ -139,6 +145,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.template = model_spec["custom_chat_template"]
         self.assistant_tag = model_spec["assistant"]
         self.image_placeholder = model_spec["placeholder"]
+        
         self.padding = False
         self.IDEFICS = False
         if model_spec['model_name'] == 'idefics-80b-instruct':
@@ -165,9 +172,6 @@ class HuggingfaceMultimodalModel(backends.Model):
         template_str = self.template
         template = Template(template_str)
         prompt_text = template.render(messages=messages)
-
-        print("### PROMPT TEXT ###")
-        print(prompt_text)
 
         # Get a list of images that will be passed to the Processor
         images = get_images(prompt_text, messages, self.image_placeholder)
@@ -204,8 +208,6 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         # Store generated text
         response = {'response': generated_text}
-        print("### GENERATED RESPONSE ###")
-        print(response)
 
         response_text = generated_text[0].split(self.assistant_tag)[-1] # Get the last assistant response
 
