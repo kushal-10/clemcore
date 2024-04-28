@@ -65,10 +65,11 @@ def load_image(image_path: str) -> Image:
         image = Image.open(image_path).convert('RGB')
     return image
     
-
+  
 def pad_images(images):
     '''
-    Pad the images
+    Pad the images. Only used for LLaVA NeXT models
+    Will be deprecated when issue https://github.com/huggingface/transformers/issues/29832 is closed
     '''
     # Determine the maximum width and height among all images
     max_width = max(image.size[0] for image in images)
@@ -90,37 +91,22 @@ def pad_images(images):
 
     return padded_images
 
-def get_images(prompt_text: str, messages: list[Dict], image_placeholder: str) -> list:
+def get_images(messages: list[Dict], image_token: str) -> list:
     '''
     Return loaded images from messages
 
     :param prompt_text: A string that goes into the input of the Processor
     :param messages: A list of messages passed to the model
     :return images: A list of image locations/ PIL Images, that can be directly passed as input to the Processor.
-    '''
-
-    # Count number of image placeholders (<image>, <img>, ...) in the cleaned prompt
-    num_images = prompt_text.count(image_placeholder) 
-    
+    '''    
     # Collect image links/file locations mentioned in messages
     imgs = []
     for _, message in enumerate(messages):
         if 'image' in message:
             imgs.append(message['image'])
-    if image_placeholder == "":
+    if image_token == "": # A special case for Idefics, return only a list of images
         return imgs
-
-    # Check if number of image placeholders and number of images passed are valid
-    if len(imgs) != num_images:
-        if len(imgs) == 1:
-            # If only one image is available, copy it for num_images times. 
-            # For games that have single image for all turns, but the game passes only one image in the message
-            imgs *= num_images
-        else:
-            # If the number of images doesn't match. 
-            # For games that have different image at each turn, number of image in message = number of image passed.  
-            raise ValueError(f"Number of images ({len(imgs)}) does not match expected count ({num_images}).\nPlease check the messages and ensure there is an image link/location for each turn")
-
+    
     # Load Images
     loaded_images = [load_image(m) for m in imgs]
 
@@ -144,7 +130,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.multimodal_model = load_model(model_spec)
         self.template = model_spec["custom_chat_template"]
         self.cull = model_spec["eos_to_cull"]
-        self.image_placeholder = model_spec["placeholder"]
+        self.img_token = model_spec["image_token"]
 
         self.padding = False
         self.IDEFICS = False
@@ -174,7 +160,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         prompt_text = template.render(messages=messages)
 
         # Get a list of images that will be passed to the Processor
-        images = get_images(prompt_text, messages, self.image_placeholder)
+        images = get_images(messages, self.img_token)
         if self.padding:
             images = pad_images(images)
 
