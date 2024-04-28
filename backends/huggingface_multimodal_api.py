@@ -46,6 +46,11 @@ def load_model(model_spec: backends.ModelSpec):
     model_type = MODEL_TYPE_MAP[model_spec['model_type']] # Use the appropriate Auto class to  load the model 
 
     model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto") # Load the model
+
+    # check if model's generation_config has pad_token_id set:
+    if not model.generation_config.pad_token_id:
+        # set pad_token_id to tokenizer's eos_token_id to prevent excessive warnings:
+        model.generation_config.pad_token_id = model.generation_config.eos_token_id #Same as processor.tokenizer.pad_token_id
     
     logger.info(f"Finished loading huggingface model: {model_spec.model_name}")
     logger.info(f"Device Map: {model.hf_device_map}")
