@@ -6,7 +6,7 @@ import torch
 import backends
 from PIL import Image
 import requests
-from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text, AutoModelForCausalLM
+from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text
 from jinja2 import Template
 
 # Define a map to load model from transformers Auto Classes
@@ -143,9 +143,9 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.processor = load_processor(model_spec)
         self.multimodal_model = load_model(model_spec)
         self.template = model_spec["custom_chat_template"]
-        self.assistant_tag = model_spec["assistant"]
+        self.cull = model_spec["eos_to_cull"]
         self.image_placeholder = model_spec["placeholder"]
-        
+
         self.padding = False
         self.IDEFICS = False
         if model_spec['model_name'] == 'idefics-80b-instruct':
@@ -209,6 +209,6 @@ class HuggingfaceMultimodalModel(backends.Model):
         # Store generated text
         response = {'response': generated_text}
 
-        response_text = generated_text[0].split(self.assistant_tag)[-1] # Get the last assistant response
+        response_text = generated_text[0].split(self.cull)[-1] # Get the last assistant response
 
         return prompt, response, response_text
