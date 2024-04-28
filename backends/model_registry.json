@@ -405,30 +405,30 @@
     "backend": "huggingface_multimodal",
     "huggingface_id": "llava-hf/llava-v1.6-mistral-7b-hf",
     "model_type": "Vision2Seq",
-    "assistant": "[/INST]",
+    "eos_to_cull": "[/INST]",
     "padding": true,
     "premade_chat_template": false,
-    "custom_chat_template": "{% for message in messages %}{% if message['role'] == 'user' %}[INST]  <image>\n{{ message['content']}} [/INST] {% else %}\n{{message['content']}}\n{% endif %}{% endfor %}"
+    "custom_chat_template": "{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image']%}[INST] <image>\n{{message['content']}} [/INST]{% else %}[INST]\n{{message['content']}} [/INST]{% endif %}{% elif message['role'] == 'assistant' %}{{message['content']}}{% endif %}{% endfor %}"
   },
   {
     "model_name": "llava-v1.6-vicuna-13b-hf",
     "backend": "huggingface_multimodal",
     "huggingface_id": "llava-hf/llava-v1.6-vicuna-13b-hf",
     "model_type": "Vision2Seq",
-    "assistant": "ASSISTANT",
+    "eos_to_cull": "ASSISTANT:",
     "padding": true,
     "premade_chat_template": false,
-    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}\nUSER: <image>\n{{ message['content'] }}{% elif message['role'] == 'assistant' %}ASSISTANT {{ message['content'] }} {% endif %}{% endfor %} ASSISTANT"
+    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image'] %}USER:<image>\n{{message['content']}}{% else %}USER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}ASSISTANT:{{message['content']}}{% endif %}{% endfor %}ASSISTANT:"
   },
   {
     "model_name": "llava-v1.6-vicuna-7b-hf",
     "backend": "huggingface_multimodal",
     "huggingface_id": "llava-hf/llava-v1.6-vicuna-7b-hf",
     "model_type": "Vision2Seq",
-    "assistant": "ASSISTANT",
+    "eos_to_cull": "ASSISTANT:",
     "padding": true,
     "premade_chat_template": false,
-    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}\nUSER: <image>\n{{ message['content'] }}{% elif message['role'] == 'assistant' %}ASSISTANT {{ message['content'] }} {% endif %}{% endfor %} ASSISTANT"
+    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image'] %}USER:<image>\n{{message['content']}}{% else %}USER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}ASSISTANT:{{message['content']}}{% endif %}{% endfor %}ASSISTANT:"
   },
   {
     "model_name": "idefics-80b-instruct",
