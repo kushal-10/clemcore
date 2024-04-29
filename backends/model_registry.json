@@ -439,5 +439,16 @@
     "padding": false,
     "premade_chat_template": false,
     "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}USER: {{ message['content'] }} <end_of_utterance>\n{% else %}ASSISTANT: {{ message['content'] }} <end_of_utterance>\n{% endif %}{% endfor %}ASSISTANT:"
+  },
+  {
+    "model_name": "Emu2-Chat",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "BAAI/Emu2-Chat",
+    "model_type": "Emu2",
+    "trust_remote_code": true,
+    "eos_to_cull": "Assistant:",
+    "padding": false,
+    "premade_chat_template": false,
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}USER: {{ message['content'] }} <end_of_utterance>\n{% else %}ASSISTANT: {{ message['content'] }} <end_of_utterance>\n{% endif %}{% endfor %}ASSISTANT:"
   }
 ]

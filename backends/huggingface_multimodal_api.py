@@ -6,13 +6,14 @@ import torch
 import backends
 from PIL import Image
 import requests
-from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text
+from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text, AutoModelForCausalLM, AutoTokenizer
 from jinja2 import Template
 
 # Define a map to load model from transformers Auto Classes
 MODEL_TYPE_MAP = {
         "Idefics": IdeficsForVisionText2Text,
-        "Vision2Seq": AutoModelForVision2Seq
+        "Vision2Seq": AutoModelForVision2Seq,
+        "Emu2": AutoModelForCausalLM
     }
 
 logger = backends.get_logger(__name__)
@@ -32,6 +33,21 @@ def load_processor(model_spec: backends.ModelSpec) -> AutoProcessor:
     return processor
 
 
+def load_tokenizer(model_spec: backends.ModelSpec) -> AutoTokenizer:
+    '''
+    Load tokenizer for a specific model.
+
+    :param model_spec: A dictionary that defines the model to be used, loaded from Model Registry
+    :return tokenizer: Tokenizer for the specific model
+    '''
+    logger.info(f'Loading huggingface model tokenizer: {model_spec.model_name}')
+    hf_model_str = model_spec['huggingface_id']  # Get the model name
+
+    tokenizer = AutoTokenizer.from_pretrained(hf_model_str, use_fast=False, device_map="auto", verbose=False)
+
+    return tokenizer
+
+
 def load_model(model_spec: backends.ModelSpec):
     '''
     Load a specific model 
@@ -45,7 +61,12 @@ def load_model(model_spec: backends.ModelSpec):
 
     model_type = MODEL_TYPE_MAP[model_spec['model_type']] # Use the appropriate Auto class to  load the model 
 
-    model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto") # Load the model
+    if hasattr(model_spec, 'trust_remote_code'):
+        if model_spec['trust_remote_code']:
+            model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto",
+                                               trust_remote_code=model_spec['trust_remote_code'])
+    else:
+        model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto") # Load the model
 
     # check if model's generation_config has pad_token_id set:
     if not model.generation_config.pad_token_id:
@@ -149,6 +170,46 @@ def generate_idefics_output(messages: list[Dict],
     return generated_text
 
 
+def generate_emu2_output(messages: list[Dict], model: AutoModelForCausalLM, tokenizer: AutoTokenizer, max_tokens: int):
+    """
+    Return generated text from Emu2 model
+
+    param messages: A list[Dict] type object passed to the backend containing 'role', 'content' and 'image'
+    param model: Emu2 model
+    param tokenizer: Emu2 tokenizer
+    param device: Processing device - cuda/CPU
+    """
+    # See https://huggingface.co/BAAI/Emu2-Chat for example code this is based on
+    # create Emu2 string list input query:
+    query = ""
+    for message in messages:
+        query += "[<IMG_PLH>]"
+        query += f"[{message['content']}]."
+    query += f"[<IMG_PLH>]"
+
+    # get images:
+    images = get_images(messages)
+
+    # process query and images into model input:
+    inputs = model.build_input_ids(
+        text=[query],
+        tokenizer=tokenizer,
+        image=images
+    )
+
+    # generate outputs:
+    outputs = model.generate(
+        input_ids=inputs["input_ids"],
+        attention_mask=inputs["attention_mask"],
+        image=inputs["image"].to(torch.bfloat16),
+        max_new_tokens=max_tokens,
+        length_penalty=-1)
+
+    output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+
+    return output_text
+
+
 class HuggingfaceMultimodal(backends.Backend):
     def __init__(self):
         super().__init__()
@@ -162,7 +223,13 @@ class HuggingfaceMultimodalModel(backends.Model):
     def __init__(self, model_spec: backends.ModelSpec):
         super().__init__(model_spec)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.processor = load_processor(model_spec)
+        self.model_type = model_spec['model_type']
+        if self.model_type == "Emu2":
+            self.processor = None
+            self.tokenizer = load_tokenizer(model_spec)
+        else:
+            self.processor = load_processor(model_spec)
+            self.tokenizer = None
         self.multimodal_model = load_model(model_spec)
         self.template = model_spec["custom_chat_template"]
         self.cull = model_spec["eos_to_cull"]
@@ -202,20 +269,25 @@ class HuggingfaceMultimodalModel(backends.Model):
         print(f"Images Input: {images}\n")
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
-        if not self.IDEFICS:         
+        if self.IDEFICS:
+            generated_text = generate_idefics_output(messages=messages,
+                                                     model=self.multimodal_model,
+                                                     processor=self.processor,
+                                                     max_tokens=self.get_max_tokens(),
+                                                     device=self.device)
+        elif self.model_type == "Emu2":
+            generated_text = generate_emu2_output(messages=messages,
+                                                    model=self.multimodal_model,
+                                                     tokenizer=self.tokenizer,
+                                                     max_tokens=self.get_max_tokens())
+        else:
             # Generate the output
-            if not images: # If no images are present in the history + current uttereance, use tokenizer to get inputs
+            if not images:  # If no images are present in the history + current uttereance, use tokenizer to get inputs
                 inputs = self.processor.tokenizer(prompt_text, return_tensors="pt").to(self.device)
             else:
                 inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
             model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
             generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
-        else:    
-            generated_text = generate_idefics_output(messages=messages, 
-                                                     model=self.multimodal_model,
-                                                     processor=self.processor,
-                                                     max_tokens=self.get_max_tokens(),
-                                                     device=self.device)
             
 
         # Store generated text
