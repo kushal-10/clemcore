@@ -204,8 +204,8 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         if not self.IDEFICS:         
             # Generate the output
-            if not images:
-                inputs = self.processor(prompt_text, return_tensors="pt").to(self.device)
+            if not images: # If no images are present in the history + current uttereance, use tokenizer to get inputs
+                inputs = self.processor.tokenizer(prompt_text, return_tensors="pt").to(self.device)
             else:
                 inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
             model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
