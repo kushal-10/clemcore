@@ -184,7 +184,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         :param log_messages: If True, raw and cleaned messages passed will be logged.
         :return: the continuation
         """
-
+        print(f"Input Messages: {messages}\n")
         # Get prompt by applying jinja template
         template_str = self.template
         template = Template(template_str)
@@ -195,6 +195,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         if self.padding:
             images = pad_images(images)
 
+        print(f"Prompt Text: {prompt_text}\n")
+        print(f"Images Input: {images}\n")
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
         if not self.IDEFICS:         
