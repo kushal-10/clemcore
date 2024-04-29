@@ -215,6 +215,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         # Store generated text
         response = {'response': generated_text}
 
+        print(f"Response: {response}\n")
+
         response_text = generated_text[0].split(self.cull)[-1] # Get the last assistant response
 
         return prompt, response, response_text
