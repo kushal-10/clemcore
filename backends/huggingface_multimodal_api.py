@@ -106,6 +106,41 @@ def get_images(messages: list[Dict]) -> list:
 
     return loaded_images
 
+def generate_idefics_output(messages: list[Dict], model: IdeficsForVisionText2Text, processor: AutoProcessor, device) -> list[str]:
+    '''
+    Return generated text from Idefics model 
+
+    param messages: A list[Dict] type object passed to the backend containing 'role', 'content' and 'image'
+    param model: Idefics model
+    param processor: Idefics processor
+    param device: Processing device - cuda/CPU
+    '''
+
+    #Create a list containing the prompt text and images specific to idefics input
+    #Refer - https://huggingface.co/HuggingFaceM4/idefics-80b-instruct
+    idefics_input = [] 
+    for m in messages:
+        if m['role'] == 'user':
+            idefics_input.append('\nUSER: ' + m['content'])
+            if 'image' in m.keys():
+                idefics_input.append(m['image'])
+            idefics_input.append('<end_of_utterance>')
+        elif m['role'] == 'assistant':
+            idefics_input.append('\nASSISTANT: ' + m['content'])        
+            idefics_input.append('<end_of_utterance>')    
+    idefics_input.append('\nASSISTANT:')  
+    idefics_input = [idefics_input]
+
+    inputs = processor(idefics_input, add_end_of_utterance_token=False, return_tensors="pt").to(device)
+    
+    # Generation args for Idefics
+    exit_condition = processor.tokenizer("<end_of_utterance>", add_special_tokens=False).input_ids
+    bad_words_ids = processor.tokenizer(["<image>", "<fake_token_around_image>"], add_special_tokens=False).input_ids
+    generated_ids = model.generate(**inputs, eos_token_id=exit_condition, bad_words_ids=bad_words_ids, max_length=100)
+    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
+
+    return generated_text
+
 
 class HuggingfaceMultimodal(backends.Backend):
     def __init__(self):
@@ -157,33 +192,19 @@ class HuggingfaceMultimodalModel(backends.Model):
         if self.padding:
             images = pad_images(images)
 
-        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temeprature": self.get_temperature()}
+        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
         if not self.IDEFICS:         
             # Generate the output
             inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
             model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
             generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
-
         else:    
-            idefics_input = [] #A list containing the prompt text, images specific to idefics input
-            for m in messages:
-                if m['role'] == 'user':
-                    idefics_input.append('\nUSER: ' + m['content'])
-                    if 'image' in m.keys():
-                        idefics_input.append(m['image'])
-                    idefics_input.append('<end_of_utterance>')
-                elif m['role'] == 'assistant':
-                    idefics_input.append('\nASSISTANT: ' + m['content'])        
-                    idefics_input.append('<end_of_utterance>')    
-            idefics_input.append('\nASSISTANT:')  
-
-            inputs = self.processor(idefics_input, return_tensors="pt").to(self.device)
-            # Generation args for Idefics
-            exit_condition = self.processor.tokenizer("<end_of_utterance>", add_special_tokens=False).input_ids
-            bad_words_ids = self.processor.tokenizer(["<image>", "<fake_token_around_image>"], add_special_tokens=False).input_ids
-            generated_ids = self.multimodal_model.generate(**inputs, eos_token_id=exit_condition, bad_words_ids=bad_words_ids, max_length=100)
-            generated_text = self.processor.batch_decode(generated_ids, skip_special_tokens=True)
+            generated_text = generate_idefics_output(messages=messages, 
+                                                     model=self.multimodal_model,
+                                                     processor=self.processor,
+                                                     device=self.device)
+            
 
         # Store generated text
         response = {'response': generated_text}
