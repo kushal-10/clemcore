@@ -170,7 +170,8 @@ def generate_idefics_output(messages: list[Dict],
     return generated_text
 
 
-def generate_emu2_output(messages: list[Dict], model: AutoModelForCausalLM, tokenizer: AutoTokenizer, max_tokens: int):
+def generate_emu2_output(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt: str,
+                         images, max_tokens: int):
     """
     Return generated text from Emu2 model
 
@@ -180,19 +181,10 @@ def generate_emu2_output(messages: list[Dict], model: AutoModelForCausalLM, toke
     param device: Processing device - cuda/CPU
     """
     # See https://huggingface.co/BAAI/Emu2-Chat for example code this is based on
-    # create Emu2 string list input query:
-    query = ""
-    for message in messages:
-        query += "[<IMG_PLH>]"
-        query += f"[{message['content']}]."
-    query += f"[<IMG_PLH>]"
-
-    # get images:
-    images = get_images(messages)
 
     # process query and images into model input:
     inputs = model.build_input_ids(
-        text=[query],
+        text=[prompt],
         tokenizer=tokenizer,
         image=images
     )
@@ -276,10 +268,11 @@ class HuggingfaceMultimodalModel(backends.Model):
                                                      max_tokens=self.get_max_tokens(),
                                                      device=self.device)
         elif self.model_type == "Emu2":
-            generated_text = generate_emu2_output(messages=messages,
-                                                    model=self.multimodal_model,
-                                                     tokenizer=self.tokenizer,
-                                                     max_tokens=self.get_max_tokens())
+            generated_text = generate_emu2_output(model=self.multimodal_model,
+                                                  tokenizer=self.tokenizer,
+                                                  prompt=prompt_text,
+                                                  images=images,
+                                                  max_tokens=self.get_max_tokens())
         else:
             # Generate the output
             if not images:  # If no images are present in the history + current uttereance, use tokenizer to get inputs
