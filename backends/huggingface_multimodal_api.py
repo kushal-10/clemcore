@@ -95,6 +95,9 @@ def get_images(messages: list[Dict]) -> list:
         if 'image' in message:
             images.append(message['image'])
 
+    if not images:
+        return None
+    
     # Load Images
     loaded_images = []
     for img in images:
