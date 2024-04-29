@@ -195,7 +195,7 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         # Get a list of images that will be passed to the Processor
         images = get_images(messages)
-        if self.padding:
+        if self.padding and images:
             images = pad_images(images)
 
         print(f"Prompt Text: {prompt_text}\n")
@@ -204,7 +204,10 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         if not self.IDEFICS:         
             # Generate the output
-            inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
+            if not images:
+                inputs = self.processor(prompt_text, return_tensors="pt").to(self.device)
+            else:
+                inputs = self.processor(prompt_text, images=images, return_tensors="pt").to(self.device)
             model_output = self.multimodal_model.generate(**inputs, max_new_tokens=self.get_max_tokens())
             generated_text = self.processor.batch_decode(model_output, skip_special_tokens=True)
         else:    
