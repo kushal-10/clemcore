@@ -121,18 +121,18 @@ def generate_idefics_output(messages: list[Dict], model: IdeficsForVisionText2Te
     idefics_input = [] 
     for m in messages:
         if m['role'] == 'user':
-            idefics_input.append('\nUSER: ' + m['content'])
+            idefics_input.append('\nUser: ' + m['content'])
             if 'image' in m.keys():
                 idefics_input.append(m['image'])
             idefics_input.append('<end_of_utterance>')
         elif m['role'] == 'assistant':
-            idefics_input.append('\nASSISTANT: ' + m['content'])        
+            idefics_input.append('\nAssistant: ' + m['content'])        
             idefics_input.append('<end_of_utterance>')    
-    idefics_input.append('\nASSISTANT:')  
+    idefics_input.append('\nAssistant:')  
     idefics_input = [idefics_input]
 
     inputs = processor(idefics_input, add_end_of_utterance_token=False, return_tensors="pt").to(device)
-    
+ 
     # Generation args for Idefics
     exit_condition = processor.tokenizer("<end_of_utterance>", add_special_tokens=False).input_ids
     bad_words_ids = processor.tokenizer(["<image>", "<fake_token_around_image>"], add_special_tokens=False).input_ids
