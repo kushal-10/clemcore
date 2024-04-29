@@ -173,16 +173,17 @@ def generate_idefics_output(messages: list[Dict],
 def generate_emu2_output(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt: str,
                          images, max_tokens: int):
     """
-    Return generated text from Emu2 model
+    Return generated text from Emu2 model.
+
+    Inference is based on example code at https://huggingface.co/BAAI/Emu2-Chat and the used template is based on
+    https://github.com/baaivision/Emu/blob/26710c97571cce867ad05867b955f7a63c9b8bd3/inference.py
 
     param messages: A list[Dict] type object passed to the backend containing 'role', 'content' and 'image'
     param model: Emu2 model
     param tokenizer: Emu2 tokenizer
     param device: Processing device - cuda/CPU
     """
-    # See https://huggingface.co/BAAI/Emu2-Chat for example code this is based on
-
-    # process query and images into model input:
+    # process prompt and images into model input:
     inputs = model.build_input_ids(
         text=[prompt],
         tokenizer=tokenizer,
