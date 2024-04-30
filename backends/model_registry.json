@@ -447,7 +447,7 @@
     "model_type": "Emu2",
     "trust_remote_code": true,
     "eos_to_cull": "[Assistant]:",
-    "padding": true,
+    "padding": false,
     "premade_chat_template": false,
     "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}[USER]: [IMG]<image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image><image>[/IMG] {{ message['content'] }}{% else %}[ASSISTANT]: {{ message['content'] }} {% endif %}{% endfor %}[ASSISTANT]:"
   }
