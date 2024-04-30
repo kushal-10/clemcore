@@ -63,7 +63,11 @@ def load_model(model_spec: backends.ModelSpec):
 
     if hasattr(model_spec, 'trust_remote_code'):
         if model_spec['trust_remote_code']:
-            model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto",
+            if model_spec['model_type'] == "Emu2":
+                model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="bfloat16",
+                                                   trust_remote_code=model_spec['trust_remote_code'])
+            else:
+                model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto",
                                                trust_remote_code=model_spec['trust_remote_code'])
     else:
         model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto") # Load the model
