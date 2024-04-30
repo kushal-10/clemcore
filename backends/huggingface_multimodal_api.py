@@ -65,7 +65,8 @@ def load_model(model_spec: backends.ModelSpec):
         if model_spec['trust_remote_code']:
             if model_spec['model_type'] == "Emu2":
                 model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype=torch.bfloat16,
-                                                   trust_remote_code=model_spec['trust_remote_code'])
+                                                   trust_remote_code=model_spec['trust_remote_code'],
+                                                   low_cpu_mem_usage=True)
             else:
                 model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto",
                                                trust_remote_code=model_spec['trust_remote_code'])
