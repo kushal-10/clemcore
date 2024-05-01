@@ -84,7 +84,14 @@ def load_tokenizer(model_spec: backends.ModelSpec) -> AutoTokenizer:
     logger.info(f'Loading huggingface model tokenizer: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id']  # Get the model name
 
-    tokenizer = AutoTokenizer.from_pretrained(hf_model_str, use_fast=False, device_map="auto", verbose=False)
+    if hasattr(model_spec, 'trust_remote_code'):
+        if model_spec['trust_remote_code']:
+            tokenizer = AutoTokenizer.from_pretrained(hf_model_str, use_fast=False, device_map="auto", verbose=False,
+                                                      trust_remote_code=True)
+        else:
+            tokenizer = AutoTokenizer.from_pretrained(hf_model_str, use_fast=False, device_map="auto", verbose=False)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(hf_model_str, use_fast=False, device_map="auto", verbose=False)
 
     return tokenizer
 
