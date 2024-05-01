@@ -8,6 +8,7 @@ from PIL import Image
 import requests
 from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text, AutoModelForCausalLM, AutoTokenizer, AutoConfig
 from jinja2 import Template
+from accelerate import init_empty_weights, infer_auto_device_map, load_checkpoint_and_dispatch
 
 # Define a map to load model from transformers Auto Classes
 MODEL_TYPE_MAP = {
@@ -104,9 +105,23 @@ def load_model(model_spec: backends.ModelSpec):
     if hasattr(model_spec, 'trust_remote_code'):
         if model_spec['trust_remote_code']:
             if model_spec['model_type'] == "Emu2":
-                model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype=torch.bfloat16,
-                                                   trust_remote_code=model_spec['trust_remote_code'],
-                                                   low_cpu_mem_usage=True)
+                with init_empty_weights():
+                    model = AutoModelForCausalLM.from_pretrained(
+                        "BAAI/Emu2-Chat",
+                        torch_dtype=torch.bfloat16,
+                        low_cpu_mem_usage=True,
+                        trust_remote_code=True)
+
+                device_map = infer_auto_device_map(model, max_memory={0: '38GiB', 1: '38GiB', },
+                                                   no_split_module_classes=['Block', 'LlamaDecoderLayer'])
+                # input and output logits should be on same device
+                device_map["model.decoder.lm.lm_head"] = 0
+
+                model = load_checkpoint_and_dispatch(
+                    model,
+                    model_spec['hf_model_file_path'],
+                    device_map=device_map).eval()
+
             else:
                 model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto",
                                                trust_remote_code=model_spec['trust_remote_code'])
@@ -238,12 +253,13 @@ def generate_emu2_output(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, 
     )
 
     # generate outputs:
-    outputs = model.generate(
-        input_ids=inputs["input_ids"],
-        attention_mask=inputs["attention_mask"],
-        image=inputs["image"].to(torch.bfloat16),
-        max_new_tokens=max_tokens,
-        length_penalty=-1)
+    with torch.no_grad():
+        outputs = model.generate(
+            input_ids=inputs["input_ids"],
+            attention_mask=inputs["attention_mask"],
+            image=inputs["image"].to(torch.bfloat16),
+            max_new_tokens=max_tokens,
+            length_penalty=-1)
 
     output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
