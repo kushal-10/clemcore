@@ -6,7 +6,7 @@ import torch
 import backends
 from PIL import Image
 import requests
-from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text, AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text, AutoModelForCausalLM, AutoTokenizer, AutoConfig
 from jinja2 import Template
 
 # Define a map to load model from transformers Auto Classes
@@ -16,7 +16,47 @@ MODEL_TYPE_MAP = {
         "Emu2": AutoModelForCausalLM
     }
 
+FALLBACK_CONTEXT_SIZE = 256
+
 logger = backends.get_logger(__name__)
+
+def get_context_limit(model_spec: backends.ModelSpec) -> int:
+    '''
+    Get the context limit of the model
+
+    :param model_spec: Contains definitions about the model to be used
+    :return context: Context limit of the model
+    '''
+    hf_model_str = model_spec['huggingface_id']
+    model_config = AutoConfig.from_pretrained(hf_model_str)
+
+    if hasattr(model_config, "text_config"):
+        context = model_config.text_config.max_position_embeddings
+    elif hasattr(model_config, "max_sequence_length"):
+        context = model_config.max_sequence_length
+    else:
+        context = FALLBACK_CONTEXT_SIZE
+    logger.info(f"Context limit for model - {hf_model_str} is {context}")
+
+    return context
+
+def check_context_limit(context_size: int, prompt_tokens: list, max_new_tokens: int = 100) -> Tuple[bool, int, int, int]:
+    """
+    External context limit check
+    :param context_size: max_sequence_length/max_position_embeddings of the model
+    :param prompt_tokens: List of prompt token IDs.
+    :param max_new_tokens: How many tokens to generate ('at most', but no stop sequence is defined).
+    :return: Tuple with
+            Bool: True if context limit is not exceeded, False if too many tokens
+            Number of tokens for the given messages and maximum new tokens
+            Number of tokens of 'context space left'
+            Total context token limit
+    """
+    prompt_size = len(prompt_tokens)
+    tokens_used = prompt_size + max_new_tokens  # context includes tokens to be generated
+    tokens_left = context_size - tokens_used
+    fits = tokens_used <= context_size
+    return fits, tokens_used, tokens_left, context_size
 
 def load_processor(model_spec: backends.ModelSpec) -> AutoProcessor:
     '''
@@ -241,6 +281,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         if model_spec["padding"]:
             self.padding = True
 
+        self.context_size = get_context_limit(model_spec)
+
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """
         :param messages: for example
@@ -254,19 +296,28 @@ class HuggingfaceMultimodalModel(backends.Model):
         :param log_messages: If True, raw and cleaned messages passed will be logged.
         :return: the continuation
         """
-        # print(f"Input Messages: {messages}\n")
+
         # Get prompt by applying jinja template
         template_str = self.template
         template = Template(template_str)
         prompt_text = template.render(messages=messages)
+
+        # Check context limit
+        prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
+        context_check = check_context_limit(self.context_size, prompt_tokens, max_new_tokens=self.get_max_tokens())
+        if not context_check[0]:  # if context is exceeded, context_check[0] is False
+            logger.info(f"Context token limit for {self.model_spec.model_name} exceeded: "
+                        f"{context_check[1]}/{context_check[3]}")
+            # fail gracefully:
+            raise backends.ContextExceededError(f"Context token limit for {self.model_spec.model_name} exceeded",
+                                                tokens_used=context_check[1], tokens_left=context_check[2],
+                                                context_size=context_check[3]) 
 
         # Get a list of images that will be passed to the Processor
         images = get_images(messages)
         if self.padding and images:
             images = pad_images(images)
 
-        # (f"Prompt Text: {prompt_text}\n")
-        # print(f"Images Input: {images}\n")
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
         if self.IDEFICS:
@@ -293,8 +344,6 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         # Store generated text
         response = {'response': generated_text}
-
-        # print(f"Response: {response}\n")
 
         response_text = generated_text[0].split(self.cull)[-1] # Get the last assistant response
 
