@@ -29,7 +29,8 @@ device_map["model.decoder.lm.lm_head"] = 0
 
 model = load_checkpoint_and_dispatch(
     model,
-    'local/path/to/hf/version/Emu2-Chat/model',
+    # 'local/path/to/hf/version/Emu2-Chat/model',
+    '/data/huggingface_cache/BAAI/Emu2-Chat/',
     device_map=device_map).eval()
 
 # `[<IMG_PLH>]` is the image placeholder which will be replaced by image embeddings.
