@@ -17,12 +17,22 @@ model = AutoModelForCausalLM.from_pretrained(
 
 query = "[<IMG_PLH>][red, white, 3, bottom left].[<IMG_PLH>][yellow, white, 2, top left].[<IMG_PLH>][green, black, 4, bottom right][<IMG_PLH>]"
 
+"""
 images = [
     Image.open(requests.get('https://github.com/baaivision/Emu/Emu2/examples/red_white_3_bottom_left.jpg?raw=true',stream=True).raw).convert('RGB'),
     Image.open(requests.get('https://github.com/baaivision/Emu/Emu2/examples/yellow_white_2_top_right.jpg?raw=true',stream=True).raw).convert('RGB'),
     Image.open(requests.get('https://github.com/baaivision/Emu/Emu2/examples/green_black_4_bottom_right.jpg?raw=true',stream=True).raw).convert('RGB'),
     Image.open(requests.get('https://github.com/baaivision/Emu/Emu2/examples/blue_black_1_top_left.jpg?raw=true',stream=True).raw).convert('RGB'),
 ]
+"""
+
+images = [
+    Image.open('games/cloudgame/resources/images/1.jpg').convert('RGB'),
+    Image.open('games/cloudgame/resources/images/2.jpg').convert('RGB'),
+    Image.open('games/cloudgame/resources/images/3.jpg').convert('RGB'),
+    Image.open('games/cloudgame/resources/images/4.jpg').convert('RGB'),
+]
+
 
 inputs = model.build_input_ids(
     text=[query],
