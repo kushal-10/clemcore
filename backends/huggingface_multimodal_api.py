@@ -319,7 +319,10 @@ class HuggingfaceMultimodalModel(backends.Model):
         prompt_text = template.render(messages=messages)
 
         # Check context limit
-        prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
+        if self.model_type == "Emu2":
+            prompt_tokens = self.tokenizer.tokenize(prompt_text)
+        else:
+            prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
         context_check = check_context_limit(self.context_size, prompt_tokens, max_new_tokens=self.get_max_tokens())
         if not context_check[0]:  # if context is exceeded, context_check[0] is False
             logger.info(f"Context token limit for {self.model_spec.model_name} exceeded: "
