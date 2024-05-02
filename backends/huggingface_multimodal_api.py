@@ -112,6 +112,7 @@ def load_model(model_spec: backends.ModelSpec):
     if hasattr(model_spec, 'trust_remote_code'):
         if model_spec['trust_remote_code']:
             if model_spec['model_type'] == "Emu2":
+                # based on Emu2 example code,
                 with init_empty_weights():
                     model = AutoModelForCausalLM.from_pretrained(
                         "BAAI/Emu2-Chat",
@@ -252,6 +253,9 @@ def generate_emu2_output(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, 
     param tokenizer: Emu2 tokenizer
     param device: Processing device - cuda/CPU
     """
+
+    print(prompt)
+
     # process prompt and images into model input:
     inputs = model.build_input_ids(
         text=[prompt],
