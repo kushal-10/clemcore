@@ -8,13 +8,11 @@ from PIL import Image
 import requests
 from transformers import AutoProcessor, AutoModelForVision2Seq, IdeficsForVisionText2Text, AutoModelForCausalLM, AutoTokenizer, AutoConfig
 from jinja2 import Template
-from accelerate import init_empty_weights, infer_auto_device_map, load_checkpoint_and_dispatch
 
 # Define a map to load model from transformers Auto Classes
 MODEL_TYPE_MAP = {
         "Idefics": IdeficsForVisionText2Text,
-        "Vision2Seq": AutoModelForVision2Seq,
-        "Emu2": AutoModelForCausalLM
+        "Vision2Seq": AutoModelForVision2Seq
     }
 
 FALLBACK_CONTEXT_SIZE = 256
@@ -109,32 +107,7 @@ def load_model(model_spec: backends.ModelSpec):
 
     model_type = MODEL_TYPE_MAP[model_spec['model_type']] # Use the appropriate Auto class to  load the model 
 
-    if hasattr(model_spec, 'trust_remote_code'):
-        if model_spec['trust_remote_code']:
-            if model_spec['model_type'] == "Emu2":
-                # based on Emu2 example code,
-                with init_empty_weights():
-                    model = AutoModelForCausalLM.from_pretrained(
-                        "BAAI/Emu2-Chat",
-                        torch_dtype=torch.bfloat16,
-                        low_cpu_mem_usage=True,
-                        trust_remote_code=True)
-
-                device_map = infer_auto_device_map(model, max_memory={0: '38GiB', 1: '38GiB', },
-                                                   no_split_module_classes=['Block', 'LlamaDecoderLayer'])
-                # input and output logits should be on same device
-                device_map["model.decoder.lm.lm_head"] = 0
-
-                model = load_checkpoint_and_dispatch(
-                    model,
-                    model_spec['hf_model_file_path'],
-                    device_map=device_map).eval()
-
-            else:
-                model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto",
-                                               trust_remote_code=model_spec['trust_remote_code'])
-    else:
-        model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto") # Load the model
+    model = model_type.from_pretrained(hf_model_str, device_map="auto", torch_dtype="auto") # Load the model
 
     # check if model's generation_config has pad_token_id set:
     if not model.generation_config.pad_token_id:
@@ -240,43 +213,6 @@ def generate_idefics_output(messages: list[Dict],
     return generated_text
 
 
-def generate_emu2_output(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt: str,
-                         images, max_tokens: int):
-    """
-    Return generated text from Emu2 model.
-
-    Inference is based on example code at https://huggingface.co/BAAI/Emu2-Chat and the used template is based on
-    https://github.com/baaivision/Emu/blob/26710c97571cce867ad05867b955f7a63c9b8bd3/inference.py
-
-    param messages: A list[Dict] type object passed to the backend containing 'role', 'content' and 'image'
-    param model: Emu2 model
-    param tokenizer: Emu2 tokenizer
-    param device: Processing device - cuda/CPU
-    """
-
-    print(prompt)
-
-    # process prompt and images into model input:
-    inputs = model.build_input_ids(
-        text=[prompt],
-        tokenizer=tokenizer,
-        image=images
-    )
-
-    # generate outputs:
-    with torch.no_grad():
-        outputs = model.generate(
-            input_ids=inputs["input_ids"],
-            attention_mask=inputs["attention_mask"],
-            image=inputs["image"].to(torch.bfloat16),
-            max_new_tokens=max_tokens,
-            length_penalty=-1)
-
-    output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)
-
-    return output_text
-
-
 class HuggingfaceMultimodal(backends.Backend):
     def __init__(self):
         super().__init__()
@@ -291,12 +227,9 @@ class HuggingfaceMultimodalModel(backends.Model):
         super().__init__(model_spec)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model_type = model_spec['model_type']
-        if self.model_type == "Emu2":
-            self.processor = None
-            self.tokenizer = load_tokenizer(model_spec)
-        else:
-            self.processor = load_processor(model_spec)
-            self.tokenizer = None
+
+        self.processor = load_processor(model_spec)
+
         self.multimodal_model = load_model(model_spec)
         self.template = model_spec["custom_chat_template"]
         self.cull = model_spec["eos_to_cull"]
@@ -330,10 +263,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         prompt_text = template.render(messages=messages)
 
         # Check context limit
-        if self.model_type == "Emu2":
-            prompt_tokens = self.tokenizer.tokenize(prompt_text)
-        else:
-            prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
+        prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
         context_check = check_context_limit(self.context_size, prompt_tokens, max_new_tokens=self.get_max_tokens())
         if not context_check[0]:  # if context is exceeded, context_check[0] is False
             logger.info(f"Context token limit for {self.model_spec.model_name} exceeded: "
@@ -356,12 +286,6 @@ class HuggingfaceMultimodalModel(backends.Model):
                                                      processor=self.processor,
                                                      max_tokens=self.get_max_tokens(),
                                                      device=self.device)
-        elif self.model_type == "Emu2":
-            generated_text = generate_emu2_output(model=self.multimodal_model,
-                                                  tokenizer=self.tokenizer,
-                                                  prompt=prompt_text,
-                                                  images=images,
-                                                  max_tokens=self.get_max_tokens())
         else:
             # Generate the output
             if not images:  # If no images are present in the history + current uttereance, use tokenizer to get inputs
