@@ -540,5 +540,82 @@
     "bos_string": "<s>",
     "eos_string": "<|end_of_turn|>",
     "eos_to_cull": "<|end_of_turn|>"
+  },
+  {
+    "model_name": "llava-1.5-7b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-1.5-7b-hf",
+    "model_type": "Vision2Seq",
+    "eos_to_cull": "ASSISTANT:",
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image'] %}\nUSER: <image>\n{{message['content']}}{% else %}\nUSER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}\nASSISTANT:{{message['content']}}{% endif %}{% endfor %}\nASSISTANT:"
+  },
+  {
+    "model_name": "llava-1.5-13b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-1.5-13b-hf",
+    "model_type": "Vision2Seq",
+    "eos_to_cull": "ASSISTANT:",
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image'] %}\nUSER: <image>\n{{message['content']}}{% else %}\nUSER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}\nASSISTANT:{{message['content']}}{% endif %}{% endfor %}\nASSISTANT:"
+  },
+  {
+    "model_name": "llava-v1.6-34b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-34b-hf",
+    "model_type": "Vision2Seq",
+    "eos_to_cull": "assistant",
+    "not_fast": true,
+    "padding": true,
+    "custom_chat_template": "<|im_start|>system\nAnswer the questions.<|im_end|>{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image']%}<|im_start|>user\n<image>\n{{message['content']}}<|im_end|>{% else %}<|im_start|>\nuser\n{{message['content']}}<|im_end|>{% endif %}{% elif message['role'] == 'assistant' %}<|im_start|>assistant\n{{message['content']}}<|im_end|>{% endif %}{% endfor %}<|im_start|>assistant\n"
+  },
+  {
+    "model_name": "llava-v1.6-mistral-7b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-mistral-7b-hf",
+    "model_type": "Vision2Seq",
+    "eos_to_cull": "[/INST]",
+    "padding": true,
+    "custom_chat_template": "{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image']%}[INST] <image>\n{{message['content']}} [/INST]{% else %}[INST]\n{{message['content']}} [/INST]{% endif %}{% elif message['role'] == 'assistant' %}{{message['content']}}{% endif %}{% endfor %}"
+  },
+  {
+    "model_name": "llava-v1.6-vicuna-13b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-vicuna-13b-hf",
+    "model_type": "Vision2Seq",
+    "eos_to_cull": "ASSISTANT:",
+    "padding": true,
+    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image'] %}USER:<image>\n{{message['content']}}{% else %}USER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}ASSISTANT:{{message['content']}}{% endif %}{% endfor %}ASSISTANT:"
+  },
+  {
+    "model_name": "llava-v1.6-vicuna-7b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-vicuna-7b-hf",
+    "model_type": "Vision2Seq",
+    "eos_to_cull": "ASSISTANT:",
+    "padding": true,
+    "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image'] %}USER:<image>\n{{message['content']}}{% else %}USER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}ASSISTANT:{{message['content']}}{% endif %}{% endfor %}ASSISTANT:"
+  },
+  {
+    "model_name": "idefics-80b-instruct",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "HuggingFaceM4/idefics-80b-instruct",
+    "model_type": "Idefics",
+    "eos_to_cull": "Assistant:",
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}USER: {{ message['content'] }} <end_of_utterance>\n{% else %}ASSISTANT: {{ message['content'] }} <end_of_utterance>\n{% endif %}{% endfor %}ASSISTANT:"
+  },
+  {
+    "model_name": "idefics-9b-instruct",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "HuggingFaceM4/idefics-9b-instruct",
+    "model_type": "Idefics",
+    "eos_to_cull": "Assistant:",
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}USER: {{ message['content'] }} <end_of_utterance>\n{% else %}ASSISTANT: {{ message['content'] }} <end_of_utterance>\n{% endif %}{% endfor %}ASSISTANT:"
+  },
+  {
+    "model_name": "llava-llama-3-8b-v1_1-transformers",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "xtuner/llava-llama-3-8b-v1_1-transformers",
+    "model_type": "Vision2Seq",
+    "eos_to_cull": "assistant\n:",  
+    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image'] %}<|start_header_id|>user<|end_header_id|>\n\n<image>\n{{message['content']}}<|eot_id|>{% else %}<|start_header_id|>user<|end_header_id|>\n\n{{message['content']}}<|eot_id|>{% endif %}{% elif message['role'] == 'assistant' %}<|start_header_id|>assistant<|end_header_id|>\n\n{{message['content']}}<|eot_id|>{% endif %}{% endfor %}<|start_header_id|>assistant<|end_header_id|>\n\n"
   }
 ]
