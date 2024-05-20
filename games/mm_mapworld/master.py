@@ -208,7 +208,6 @@ class MmMapWorld(DialogueGameMaster):
             self.move = None
             # Check if the answer begins with 'MOVE:'
             hit = re.search(self.response_regex, answer)
-            print(f"Printing hit value: {hit}")
             if not hit:
                 if self.do_reprompt:
                     if self.did_reprompt:
@@ -221,7 +220,6 @@ class MmMapWorld(DialogueGameMaster):
                 self.aborted = True
                 self.log_to_self("Invalid format", "Game aborted.")
                 return False
-            print(f"Printing hit.group(): {hit.group()}\n")
             loaded = json.loads(hit.group())
             action = loaded["action"]
             action_hit = re.search(self.done_regex, action)
