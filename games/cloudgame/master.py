@@ -57,7 +57,6 @@ class Cloudgame(DialogueGameMaster):
 
         self.experiment = experiment['name']
         self.model_a = player_models[0]
-        #elf.model_b = player_backends[1]
        
 
     def _on_setup(self, **game_instance):
@@ -73,12 +72,6 @@ class Cloudgame(DialogueGameMaster):
 
         self.add_player(self.speaker)
         self.add_player(self.judge)
-
-
-    #def _on_before_game(self):
-        # add prompt to speaker message history
-        #self.add_user_message(self.speaker, self.prompt, image = self.image)
-        #self.add_user_message(self.judge, "The game starts here.")
  
     def _does_game_proceed(self):
         if not self.aborted and len(self.turns) <= 1:
@@ -115,19 +108,14 @@ class Cloudgame(DialogueGameMaster):
                 self.aborted = True
                 self.log_to_self("Invalid word count", "Game aborted.")
                 return False
-    
-            # if not answer.startswith("Answer:"):
-            #     self.success = False
-            #     self.aborted = True
-            #     self.log_to_self("Invalid format", "Game aborted.")
-            #     return False
+
             # only yes or no allowed
             if answer.lower().strip(" .") not in self.allowed_words:
                 self.success = False
                 self.aborted = True
                 self.log_to_self("Invalid words", "Game aborted.")
                 return False
-            # is anwer correct?
+            # is answer correct?
             elif answer.lower() != true_answer:
                 self.success = False
             
@@ -159,7 +147,7 @@ class Cloudgame(DialogueGameMaster):
         if image is None:
             message = {"role": role, "content": utterance}
         else:
-            message = {"role": role, "content": utterance, "image": image}
+            message = {"role": role, "content": utterance, "image": [image]}
         history = self.messages_by_names[player.descriptor]
         history.append(message)
 
