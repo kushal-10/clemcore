@@ -10,7 +10,7 @@
     "backend": "openai_compatible"
   },
   {
-    "model_name": "Llama-3-70B-Instruct",
+    "model_name": "Llama-3-70B-Instruct-Anyscale",
     "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
     "backend": "openai_compatible"
   },
@@ -20,7 +20,12 @@
     "backend": "openai_compatible"
   },
   {
-    "model_name": "Llama-3-8B-Instruct",
+    "model_name": "Llama-3-8B-Together.ai",
+    "model_id": "meta-llama/Llama-3-8b-chat-hf",
+    "backend": "openai_compatible"
+  },
+  {
+    "model_name": "Llama-3-8B-Instruct-Anyscale",
     "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
     "backend": "openai_compatible"
   },
@@ -185,20 +190,39 @@
     "support_multiple_images": true
   },
   {
-    "model_name": "gemini-1.0-pro",
-    "model_id": "gemini-1.0-pro",
+    "model_name": "claude-3-5-sonnet-20240620",
+    "model_id": "claude-3-5-sonnet-20240620",
+    "backend": "anthropic",
+    "supports_images": true,
+    "support_multiple_images": true
+  },
+  {
+    "model_name": "gemini-1.0-pro-001",
+    "model_id": "gemini-1.0-pro-001",
+    "backend": "google"
+  },
+ {
+    "model_name": "gemini-1.0-pro-002",
+    "model_id": "gemini-1.0-pro-002",
     "backend": "google"
   },
   {
-    "model_name": "gemini-1.5-flash-latest",
-    "model_id": "gemini-1.5-flash-latest",
+    "model_name": "gemini-1.0-pro-vision-001",
+    "model_id": "gemini-1.0-pro-vision-latest",
     "backend": "google",
     "supports_images": true,
     "support_multiple_images": true
   },
   {
-    "model_name": "gemini-1.5-pro-latest",
-    "model_id": "gemini-1.5-pro-latest",
+    "model_name": "gemini-1.5-flash-001",
+    "model_id": "gemini-1.5-flash-001",
+    "backend": "google",
+    "supports_images": true,
+    "support_multiple_images": true
+  },
+  {
+    "model_name": "gemini-1.5-pro-001",
+    "model_id": "gemini-1.5-pro-001",
     "backend": "google",
     "supports_images": true,
     "support_multiple_images": true
@@ -746,13 +770,5 @@
     "eos_to_cull": "<end_of_utterance>",
     "output_split_prefix": "Assistant:",
     "supports_multiple_images": true
-  },
-  {
-    "model_name": "llava-llama-3-8b-v1_1-transformers",
-    "backend": "huggingface_multimodal",
-    "huggingface_id": "xtuner/llava-llama-3-8b-v1_1-transformers",
-    "model_type": "Vision2Seq",
-    "output_split_prefix": "assistant\n",  
-    "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image'] %}<|start_header_id|>user<|end_header_id|>\n\n<image>\n{{message['content']}}<|eot_id|>{% else %}<|start_header_id|>user<|end_header_id|>\n\n{{message['content']}}<|eot_id|>{% endif %}{% elif message['role'] == 'assistant' %}<|start_header_id|>assistant<|end_header_id|>\n\n{{message['content']}}<|eot_id|>{% endif %}{% endfor %}<|start_header_id|>assistant<|end_header_id|>\n\n"
   }
 ]

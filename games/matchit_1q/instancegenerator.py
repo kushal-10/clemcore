@@ -3,13 +3,13 @@ from clemgame.clemgame import GameInstanceGenerator
 
 GAME_NAME: str = "matchit_1q"
 # n instances to be generated
-N: int = 10 # max = len(similar_images.csv) = 161, if not using other image pairs
+N: int = 10 # max: len(similar_images.csv) = 161, if not using other image pairs
 # paths to image pair tables
 PATH_DIFF: str = "games/matchit/resources/image_pairs/different_images.csv"
 PATH_SIM: str = "games/matchit/resources/image_pairs/similar_images.csv"
 
 #how many questions can each player ask?
-DEC_TURN: int = 3
+DEC_TURN: int = 1
 # should the players be informed about the number of questions they can ask?
 INFO_NUM_QUESTIONS: bool = False
 
@@ -31,7 +31,6 @@ class MatchItInstanceGenerator(GameInstanceGenerator):
         diffs = differents.sample(n = N, random_state = SEED)
 
         similars = pd.read_csv(PATH_SIM)
-        #similars = similars[similars.clipscore >= THRESHOLD_SIM ]
         sims = similars.sample(n = N, random_state= SEED)[["url1", "url2"]]
         
         # same images get sampled from the same df as different image, just doubling url1

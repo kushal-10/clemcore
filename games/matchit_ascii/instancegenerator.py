@@ -45,10 +45,7 @@ class MatchItInstanceGenerator(GameInstanceGenerator):
 
         if INFO_NUM_QUESTIONS:
             sentence_num_questions = self.load_template('resources/prompts/info_num_questions.template').replace("$DEC_TURN$", str(DEC_TURN))
-            print("this is the sentence: ", sentence_num_questions)
-            print("$NUM_QUESTIONS$" in initial_prompt)
             initial_prompt = initial_prompt.replace("$NUM_QUESTIONS$", sentence_num_questions)
-            print("this is the prompt: ", initial_prompt)
         else:
             initial_prompt = initial_prompt.replace("$NUM_QUESTIONS$", "")
 

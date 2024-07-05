@@ -26,7 +26,7 @@ from clemgame.metrics import METRIC_ABORTED, METRIC_SUCCESS, METRIC_LOSE, METRIC
 
 DIRS = ["north", "south", "east", "west"]
 GAME_NAME = 'mm_mapworld'
-MAX_TURNS = 15
+MAX_TURNS = 20
 
 CARDINAL_TO_DELTA = {
     'north': (0, 1),
@@ -48,8 +48,12 @@ class PathWalker(Player):
 
     def _custom_response(self, messages, turn_idx) -> str:
         """Return a random direction."""
-        random_dir = random.choice(DIRS)
-        return f'GO: {random_dir}'
+        actions = ["GO: west", "GO: east", "GO: north", "GO: south", "DONE"]
+        response = {
+            "description": " ",
+            "action": np.random.choice(actions)
+        }
+        return json.dumps(response)
     
 
 class PathDescriber(Player):
@@ -63,11 +67,14 @@ class PathDescriber(Player):
         self.current_room = instance_data["start"]
         self.success_response = game_instance["success_response"]
         self.invalid_response = game_instance["invalid_response"]
+        self.init_prompt = game_instance["initial_prompt"]
         self.loop_response = game_instance["loop_warning"]
         self.limit_warning = game_instance["limit_warning"]
         self.visited_nodes=[self.current_room]
         self.use_loop_warning = game_instance["use_loop_warning"]
         self.use_turn_limit_warning = game_instance["use_turn_limit_warning"]
+        
+        self.invalid_move = False
         
     def get_available_moves(self, node):
         return [edge for edge in self.edges if node == edge[0]]
@@ -91,22 +98,20 @@ class PathDescriber(Player):
             self.current_room = new_room
 
     def _custom_response(self, messages, turn_idx) -> str:
-        last_move = json.loads(messages[-1]['content'])['action']
-        without_move = last_move.replace('GO:', '')
-        words = without_move.strip().split()
-        new_dir = words[0]
-        old_room = self.current_room
-        self.cardinal_room_change(new_dir)
-        invalid_direction = old_room == self.current_room
-        available_directions = self.get_available_directions(self.current_room)
-        if invalid_direction:
-            response = self.invalid_response.replace("$DIRECTIONS$", ", ".join(available_directions))
+        if turn_idx == 0:
+            response = self.init_prompt
+            available_directions = self.get_available_directions(self.current_room)
+            response = response.replace('$INITIAL_DIRECTIONS$', ', '.join(available_directions))
         else:
-            response = self.success_response.replace("$DIRECTIONS$", ", ".join(available_directions))
-        if self.detect_loop() and self.use_loop_warning:
-            response = self.loop_response + response
-        if turn_idx == (MAX_TURNS - 2) and self.use_turn_limit_warning:
-            response = self.limit_warning + response
+            available_directions = self.get_available_directions(self.current_room)
+            if self.invalid_move:
+                response = self.invalid_response.replace("$DIRECTIONS$", ", ".join(available_directions))
+            else:
+                response = self.success_response.replace("$DIRECTIONS$", ", ".join(available_directions))
+            # if self.detect_loop() and self.use_loop_warning:
+            #     response = self.loop_response + response
+            # if turn_idx == (MAX_TURNS - 1) and self.use_turn_limit_warning:
+            #     response = self.limit_warning + response
         return response
 
         
@@ -142,18 +147,17 @@ class MmMapWorld(DialogueGameMaster):
         """" sets the information you specify in instances.json """
         self.game_instance = game_instance
         instance_data = utils.load_instance(self.game_instance)
-        instance_data['initial_prompt'] = game_instance["initial_prompt"]
         self.imgs = instance_data["imgs"]
         self.nodes = instance_data["nodes"]
         self.edges = instance_data["edges"]
         self.start = instance_data["start"]
+        self.cats = instance_data["cats"]
         self.current_room = instance_data["start"]
-        self.init_prompt = game_instance["initial_prompt"]
         self.visited_nodes=[self.current_room]
         
-        self.response_regex = re.compile(game_instance["response_regex"])
-        self.done_regex = re.compile(game_instance["done_regex"])
-        self.move_regex = re.compile(game_instance["move_regex"])
+        self.response_regex = re.compile(game_instance["response_regex"], re.IGNORECASE)
+        self.done_regex = re.compile(game_instance["done_regex"], re.IGNORECASE)
+        self.move_regex = re.compile(game_instance["move_regex"], re.IGNORECASE)
         
         self.done_const = game_instance["stop_construction"]
         self.move_const = game_instance["move_construction"]
@@ -165,18 +169,24 @@ class MmMapWorld(DialogueGameMaster):
 
         self.describer = PathDescriber(CustomResponseModel(), game_instance)
         self.walker = PathWalker(self.player_models[0])
-        self.add_player(self.walker)
         self.add_player(self.describer)
+        self.add_player(self.walker)
 
     def _on_before_game(self):
-        start_directions = self.describer.get_available_directions(self.describer.start)
-        prompt = self.init_prompt.replace('$INITIAL_DIRECTIONS$', ', '.join(start_directions))
-        # add initial prompt to dialogue
-        if self.use_images:
-            initial_image = self.describer.imgs[self.start]
-            self.add_user_message(self.walker, prompt, image = initial_image)
-        else:
-            self.add_user_message(self.walker, prompt)
+        begin_message = json.dumps({
+            "start": self.start,
+            "size": len(self.nodes),
+            "game": GAME_NAME
+        })
+        self.add_user_message(self.describer, begin_message)
+            
+    def _on_before_turn(self, turn_idx: int):
+        value = {
+            "turn": turn_idx,
+            "room": self.cats[self.current_room],
+            "image": os.path.split(self.imgs[self.current_room])[1]
+        }
+        self.log_to_self("room_image", json.dumps(value))
  
     def _does_game_proceed(self):
         if not self.aborted and not self.stop and self.current_turn < MAX_TURNS:
@@ -220,8 +230,13 @@ class MmMapWorld(DialogueGameMaster):
                 self.aborted = True
                 self.log_to_self("Invalid format", "Game aborted.")
                 return False
-            loaded = json.loads(hit.group())
-            action = loaded["action"]
+            try:
+                action = json.loads(hit.group())['action']
+                action = action.lower()
+            except json.decoder.JSONDecodeError:
+                self.aborted = True
+                self.log_to_self("JSON decode error", "Game aborted.")
+                return False
             action_hit = re.search(self.done_regex, action)
             if action_hit:
                 self.stop = True
@@ -250,10 +265,7 @@ class MmMapWorld(DialogueGameMaster):
             if not self.need_reprompt or self.did_reprompt:
                 self.add_user_message(self.describer, utterance)
         if player == self.describer:
-            if self.use_images:
-                self.add_user_message(self.walker, utterance, player.imgs[self.current_room])
-            else:
-                self.add_user_message(self.walker, utterance)
+            self.add_user_message(self.walker, utterance, image = [player.imgs[self.current_room]])
                 
     def _should_reprompt(self, player: Player):
         if player == self.walker and self.need_reprompt and not self.did_reprompt:
@@ -265,7 +277,7 @@ class MmMapWorld(DialogueGameMaster):
         reprompt = self.reprompt_format
         reprompt = reprompt.replace("$DIRECTIONS$", ', '.join(avail))
         if self.use_images:
-            self.add_user_message(self.walker, reprompt, self.imgs[self.current_room])
+            self.add_user_message(self.walker, reprompt, image = [self.imgs[self.current_room]])
         else:
             self.add_user_message(self.walker, reprompt)
         self.did_reprompt = True
@@ -279,9 +291,10 @@ class MmMapWorld(DialogueGameMaster):
             old_room = self.current_room
             if self.move is not None:
                 self.cardinal_room_change(self.move)
-
+                self.describer.cardinal_room_change(self.move)
+            self.describer.invalid_move = old_room == self.current_room
             self.visited_nodes.append(self.current_room)
-
+            self.describer.visited_nodes.append(self.current_room)
             self.log_to_self(type_ = "move", value = json.dumps({"old": old_room, "new": self.current_room}))
         self.need_reprompt = False
         self.did_reprompt = False
@@ -300,11 +313,11 @@ class MmMapWorld(DialogueGameMaster):
             message = {"role": role, "content": utterance}
         else:
             message = {"role": role, "content": utterance, "image": image}
-            self.remove_previous_images(player)
         history = self.messages_by_names[player.descriptor]
         history.append(message)
 
     def add_user_message(self, player: Player, utterance: str, image = None):
+        self.remove_previous_images(player)
         self.add_message(player, utterance, role="user", image=image)
         
         
@@ -362,45 +375,55 @@ class MM_MapWorldScorer(GameScorer):
         return found
     
     def plot_path(self, path):
-        offset = 0.03
+        offset = 0.05
         fig = plt.figure(figsize=(4, 4))
-        plt.plot([node[0] for node in self.nodes], [node[1] for node in self.nodes], 'o', color='gray', linewidth = 20, markersize = 25)
-        traveled = {}
-
+        for node in self.nodes:
+            if node in path and node != path[-1]:
+                plt.plot(node[0], node[1], 'o', color='brown', 
+                        linewidth = 20, markersize = 25, zorder = 9, mfc = 'tab:olive')
+            if node == path[-1]:
+                plt.plot(node[0], node[1], 'o', color='brown', 
+                        linewidth = 20, markersize = 25, zorder = 9, mfc = 'tab:cyan')
+            if not node in path:
+                plt.plot(node[0], node[1], 'o', color='brown', 
+                        linewidth = 20, markersize = 25, zorder = 9, mfc = 'tab:gray')
+        plt.xlim(-1, 4)
+        plt.ylim(-1, 4)
+        traveled = {node: 0 for node in self.nodes}
+        traveled[self.start_node] += 1
         for edge in self.edges:
-            x1, y1 = edge[0]  # Get coordinates of one endpoint
-            x2, y2 = edge[1]  # Get coordinates of the other endpoint  
-            plt.plot([x1, x2], [y1, y2], color='gray', linestyle='--')
-            traveled[((x1, y1), (x2, y2))] = 0
-
+            plt.plot([edge[0][0], edge[1][0]], [edge[0][1], edge[1][1]], color='gray', linestyle='--', zorder = 5)
         last = path[0]
-        for i in range(1, len(path)):
-            x1, y1 = last
-            x2, y2 = path[i]
-            dx = x2 - x1
-            dy = y2 - y1
-            t = traveled[(path[i], path[i - 1])]
-            traveled[(path[i], path[i - 1])] += 1
-            traveled[(path[i - 1], path[i])] += 1
-            plt.arrow(x1, 
-                      y1, 
-                      dx + t * offset, 
-                      dy + t * offset, 
-                      color='red', 
-                      width = 0.005, 
-                      head_width = 0.05, 
-                      length_includes_head = True, 
-                      zorder = 10)
-            last = (
-                x1 + dx + t * offset,
-                y1 + dy + t * offset
-            )
-
-        # Customize the plot
-        plt.axis('equal')
+        if len(path) > 1:
+            for i in range(1, len(path)):
+                if path[i] == path[i - 1]:
+                    continue
+                x1, y1 = last
+                x2, y2 = path[i]
+                dx = x2 - x1
+                dy = y2 - y1
+                t = traveled[path[i]]
+                traveled[path[i]] += 1
+                color = "black"
+                if i == len(path)-1:
+                    color = "red"
+                t = sum([(1/(1+j)) for j in range(t)])
+                plt.arrow(x1, 
+                        y1, 
+                        dx + t * offset, 
+                        dy + t * offset, 
+                        color=color, 
+                        width = 0.005, 
+                        head_width = 0.05, 
+                        length_includes_head = True, 
+                        zorder = 10)
+                last = (
+                    x1 + dx + t * offset,
+                    y1 + dy + t * offset
+                )
         plt.xlabel('X')
         plt.ylabel('Y')
-        plt.grid(True)
+        plt.grid(True, alpha = 0.35)
         return fig
 
 
@@ -478,7 +501,10 @@ class MM_MapWorldScorer(GameScorer):
             self.log_episode_score('effieciency', eff)
             exp = 100*len(visited)/len(self.nodes)
             self.log_episode_score('exploration', exp)
-            self.log_episode_score(BENCH_SCORE, (2*exp*eff)/(eff+exp))
+            if not eff and not exp:
+                self.log_episode_score(BENCH_SCORE, 0)
+            else:
+                self.log_episode_score(BENCH_SCORE, (2*exp*eff)/(eff+exp))
             
         
 
