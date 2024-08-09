@@ -5,8 +5,8 @@ GAME_NAME: str = "matchit_info"
 # n instances to be generated
 N: int = 10 # max: len(similar_images.csv) = 161, if not using other image pairs
 # paths to image pair tables
-PATH_DIFF: str = "games/matchit/resources/image_pairs/different_images.csv"
-PATH_SIM: str = "games/matchit/resources/image_pairs/similar_images.csv"
+PATH_DIFF: str = "games/matchit_info/resources/image_pairs/different_images.csv"
+PATH_SIM: str = "games/matchit_info/resources/image_pairs/similar_images.csv"
 
 #how many questions can each player ask?
 DEC_TURN: int = 3
