@@ -1,3 +1,7 @@
+# Inference class for Idefics3-Llama-8b
+# Requires installation of transformers from source
+# Until this PR is merged - https://github.com/huggingface/transformers/pull/32473
+
 import requests
 import torch
 from PIL import Image
@@ -6,7 +10,7 @@ from io import BytesIO
 from transformers import AutoProcessor, AutoModelForVision2Seq
 from transformers.image_utils import load_image
 
-DEVICE = "cuda:0"
+DEVICE = "cuda"
 
 # Note that passing the image urls (instead of the actual pil images) to the processor is also possible
 image1 = load_image("https://cdn.britannica.com/61/93061-050-99147DCE/Statue-of-Liberty-Island-New-York-Bay.jpg")
@@ -15,7 +19,7 @@ image3 = load_image("https://cdn.britannica.com/68/170868-050-8DDE8263/Golden-Ga
 
 processor = AutoProcessor.from_pretrained("HuggingFaceM4/Idefics3-8B-Llama3")
 model = AutoModelForVision2Seq.from_pretrained(
-    "HuggingFaceM4/Idefics3-8B-Llama3", torch_dtype=torch.bfloat16
+    "HuggingFaceM4/Idefics3-8B-Llama3"
 ).to(DEVICE)
 
 # Create inputs
@@ -42,6 +46,7 @@ messages = [
     },
 ]
 prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
+print(f"PROMPT: - {prompt}")
 inputs = processor(text=prompt, images=[image1, image2], return_tensors="pt")
 inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
 
@@ -50,4 +55,4 @@ inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
 generated_ids = model.generate(**inputs, max_new_tokens=500)
 generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
 
-print(generated_texts)
+print(f"GEN TEXT: {generated_texts}")
