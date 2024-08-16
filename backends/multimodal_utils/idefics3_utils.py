@@ -28,6 +28,8 @@ class Idefics3MLLM(BaseMLLM):
                  - 'processor_kwargs': A dictionary with 'history' (list of user-assistant message pairs). Passed to
                                        generate_outputs and get_tokens
         """
+        print("\n INSIDE THE MODEL CLASS \n")
+        print(messages)
         input_prompt = []
         image_paths = []
         for message in messages:
