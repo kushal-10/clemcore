@@ -114,7 +114,7 @@ class Idefics3MLLM(BaseMLLM):
         inputs = {k: v.to(device) for k, v in inputs.items()}
 
         # Generate
-        generated_ids = model.generate(**inputs, max_new_tokens=500).to(device)
+        generated_ids = model.generate(**inputs, max_new_tokens=500)
         generated_texts = handler.batch_decode(generated_ids, skip_special_tokens=True)
 
         # Process and clean response text
