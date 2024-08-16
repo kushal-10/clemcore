@@ -110,8 +110,8 @@ class Idefics3MLLM(BaseMLLM):
             processed_images.append(load_image(image))
 
         processed_prompt = handler.apply_chat_template(prompt, add_generation_prompt=True)
-        inputs = handler(text=processed_prompt, images=processed_images, return_tensors="pt").to(device)
-        inputs = {k: v.to(device) for k, v in inputs.items()}
+        inputs = handler(text=processed_prompt, images=processed_images, return_tensors="pt")
+        # inputs = {k: v.to(device) for k, v in inputs.items()}
 
         # Generate
         generated_ids = model.generate(**inputs, max_new_tokens=500)
