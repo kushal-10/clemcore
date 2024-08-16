@@ -1267,6 +1267,7 @@
     "supports_multiple_images": true,
     "trust_remote_code": true,
     "use_bf16": false,
-    "output_split_prefix": "Assistant:"
+    "output_split_prefix": "Assistant:",
+    "low_cpu_mem_usage": true
   }
 ]
