@@ -209,15 +209,7 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         prompt_text, images, output_kwargs = inputs['prompt'], inputs['images'], inputs['output_kwargs']
 
-        print("\n INPUT PROMPT AT BACKEND API \n")
-        print(prompt_text)
-        print("\n")
-
         prompt_tokens = self.model_class.get_tokens(prompt=prompt_text, handler=self.input_handler, **output_kwargs)
-
-        print("\n PROMPT TOKENS AT BACKEND API \n")
-        print(prompt_tokens)
-        print("\n")
 
         # Check context limit
         context_check = check_context_limit(self.context_size, prompt_tokens, max_new_tokens=self.get_max_tokens())
@@ -234,9 +226,5 @@ class HuggingfaceMultimodalModel(backends.Model):
         response, response_text = self.model_class.generate_outputs(prompt=prompt_text, images=images,
                                                                     model=self.multimodal_model,
                                                                     handler=self.input_handler, **output_kwargs)
-
-        print("\n RESPONSE TEXT AT BACKEND API \n")
-        print(response_text)
-        print("\n")
 
         return prompt, response, response_text
