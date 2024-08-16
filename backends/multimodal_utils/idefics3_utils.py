@@ -53,21 +53,22 @@ class Idefics3MLLM(BaseMLLM):
 
                 # Add user text message at the end
                 message_dict['content'].append({"type": "text", "text": message['content']})
+                input_prompt.append(message_dict)
 
             elif message['role'] == 'assistant':
                 message_dict['role'] = 'assistant'
                 message_dict['content'].append({"type": "text", "text": message['content']})
+                input_prompt.append(message_dict)
 
             elif message['role'] == 'system':
                 sys_content = message['content']
-                if not sys_content:
-                    pass
-                else:
+                if sys_content:
+                    # Add content only if system message is found
                     print("Warning! Appending System Message.")
                     message_dict['role'] = 'system'
                     message_dict['content'].append({"type": "text", "text": sys_content})
 
-            input_prompt.append(message_dict)
+                    input_prompt.append(message_dict)
 
         return {
             "prompt": input_prompt,
