@@ -50,7 +50,7 @@ class Idefics3MLLM(BaseMLLM):
                         raise ValueError("Invalid image type in message - should be str or List[str]")
 
                 # Add user text message at the end
-                message['content'].append({"type": "text", "text": message['content']})
+                message_dict['content'].append({"type": "text", "text": message['content']})
 
             elif message['role'] == 'assistant':
                 message_dict['role'] = 'assistant'
