@@ -25,8 +25,11 @@ def get_context_limit(model_spec: backends.ModelSpec) -> int:
     model_config = AutoConfig.from_pretrained(hf_model_str, trust_remote_code=trust_remote_code)
 
     # Some models have 'max_position_embeddings', others have 'max_sequence_length'
-    llm_config = getattr(model_config, 'llm_config')
-    context = getattr(llm_config, 'max_position_embeddings')
+    text_config = getattr(model_config, 'text_config', None) # Idefics3
+    if not text_config:
+        text_config = getattr(model_config, 'llm_config') # InternVL2
+
+    context = getattr(text_config, 'max_position_embeddings')
 
     logger.info(f"Context limit for model - {hf_model_str} is {context}")
     return context

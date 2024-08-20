@@ -1256,5 +1256,18 @@
     "use_bf16": true,
     "output_split_prefix": "",
     "not_distributed": true
+  },
+  {
+    "model_name": "Idefics3-8B-Llama3",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "HuggingFaceM4/Idefics3-8B-Llama3",
+    "automodel_type": "transformers.AutoModelForVision2Seq",
+    "model_class": "backends.multimodal_utils.idefics3_utils.Idefics3MLLM",
+    "use_tokenizer": false,
+    "supports_multiple_images": true,
+    "trust_remote_code": true,
+    "use_bf16": false,
+    "output_split_prefix": "Assistant:",
+    "low_cpu_mem_usage": true
   }
 ]
