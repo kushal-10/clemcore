@@ -1191,7 +1191,10 @@
     "load_in_8bit": false,
     "low_cpu_mem_usage": true,
     "custom_device_map": true,
-    "device_map": "backends.multimodal_utils.internvl_utils.split_model"
+    "device_map": "backends.multimodal_utils.internvl_utils.split_model",
+    "release_date": "15-07-24",
+    "open_weight": true,
+    "parameters": "76B"
   },
   {
     "model_name": "InternVL2-40B",
@@ -1208,7 +1211,10 @@
     "load_in_8bit": false,
     "low_cpu_mem_usage": true,
     "custom_device_map": true,
-    "device_map": "backends.multimodal_utils.internvl_utils.split_model"
+    "device_map": "backends.multimodal_utils.internvl_utils.split_model",
+    "release_date": "15-07-24",
+    "open_weight": true,
+    "parameters": "40B"
   },
   {
     "model_name": "InternVL2-26B",
@@ -1225,7 +1231,10 @@
     "load_in_8bit": false,
     "low_cpu_mem_usage": true,
     "custom_device_map": true,
-    "device_map": "backends.multimodal_utils.internvl_utils.split_model"
+    "device_map": "backends.multimodal_utils.internvl_utils.split_model",
+    "release_date": "15-07-24",
+    "open_weight": true,
+    "parameters": "26B"
   },
   {
     "model_name": "InternVL2-8B",
@@ -1242,7 +1251,10 @@
     "load_in_8bit": false,
     "low_cpu_mem_usage": true,
     "custom_device_map": true,
-    "device_map": "backends.multimodal_utils.internvl_utils.split_model"
+    "device_map": "backends.multimodal_utils.internvl_utils.split_model",
+    "release_date": "15-07-24",
+    "open_weight": true,
+    "parameters": "8B"
   },
   {
     "model_name": "internlm-xcomposer2d5-7b",
@@ -1255,7 +1267,10 @@
     "trust_remote_code": true,
     "use_bf16": true,
     "output_split_prefix": "",
-    "not_distributed": true
+    "not_distributed": true,
+    "release_date": "02-07-24",
+    "open_weight": true,
+    "parameters": "7B"
   },
   {
     "model_name": "Idefics3-8B-Llama3",
@@ -1268,6 +1283,25 @@
     "trust_remote_code": true,
     "use_bf16": false,
     "output_split_prefix": "Assistant:",
-    "low_cpu_mem_usage": true
+    "low_cpu_mem_usage": true,
+    "release_date": "05-08-24",
+    "open_weight": true,
+    "parameters": "8B"
+  },
+  {
+    "model_name": "dolphin-vision-72b",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "cognitivecomputations/dolphin-vision-72b",
+    "automodel_type": "transformers.AutoModelForCausalLM",
+    "model_class": "backends.multimodal_utils.dolphin_utils.DolphinMLLM",
+    "use_tokenizer": true,
+    "supports_multiple_images": true,
+    "trust_remote_code": true,
+    "use_bf16": true,
+    "output_split_prefix": "",
+    "low_cpu_mem_usage": true,
+    "release_date": "28-06-24",
+    "open_weight": true,
+    "parameters": "72B"
   }
 ]

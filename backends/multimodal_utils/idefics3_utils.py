@@ -2,6 +2,7 @@
 # Requires installation of transformers from source
 # Until this PR is merged - https://github.com/huggingface/transformers/pull/32473
 # Working Commit SHA - 0576e9c01e79f6c64411c66420e7810619c35b77 - Use this specifically, others don't work
+# TODO - check multi GPU support/CPU support. Works fine on a single A100
 
 from typing import Dict, List, Any, Union, Tuple
 from transformers import AutoProcessor, AutoModelForVision2Seq
@@ -63,7 +64,6 @@ class Idefics3MLLM(BaseMLLM):
                 sys_content = message['content']
                 if sys_content:
                     # Add content only if system message is found
-                    print("Warning! Appending System Message.")
                     message_dict['role'] = 'system'
                     message_dict['content'].append({"type": "text", "text": sys_content})
 
@@ -72,7 +72,7 @@ class Idefics3MLLM(BaseMLLM):
         return {
             "prompt": input_prompt,
             "images": image_paths,
-            "output_kwargs": {"device": kwargs.get('device')}
+            "output_kwargs": {"device": kwargs.get('device'), "max_tokens": kwargs.get('max_tokens')}
         }
 
     @staticmethod
@@ -81,8 +81,8 @@ class Idefics3MLLM(BaseMLLM):
         Generate tokens for the given prompt and conversation history.
 
         :param prompt: The current prompt to be tokenized.
-        :param handler: The tokenizer used for tokenizing the prompt and history.
-        :param kwargs: Additional keyword arguments, expecting 'history' which is a list of tuples (user message, assistant response).
+        :param handler: The tokenizer/processor used for tokenizing the prompt and history.
+        :param kwargs: Additional keyword arguments,
 
         :return: A list of tokens generated from the combined prompt and conversation history.
         """
@@ -111,6 +111,7 @@ class Idefics3MLLM(BaseMLLM):
         """
 
         device = output_kwargs.get("device")
+        max_tokens = output_kwargs.get("max_tokens")
 
         # Prepare model for inference
         model = model.to(device)
@@ -128,7 +129,7 @@ class Idefics3MLLM(BaseMLLM):
         inputs = {k: v.to(device) for k, v in inputs.items()}
 
         # Generate
-        generated_ids = model.generate(**inputs, max_new_tokens=500)
+        generated_ids = model.generate(**inputs, max_new_tokens=max_tokens)
         generated_texts = handler.batch_decode(generated_ids, skip_special_tokens=True)
 
         # Process and clean response text
