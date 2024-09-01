@@ -1303,5 +1303,19 @@
     "release_date": "28-06-24",
     "open_weight": true,
     "parameters": "72B"
+  },
+  {
+    "model_name": "Phi-3.5-vision-instruct",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "microsoft/Phi-3.5-vision-instruct",
+    "automodel_type": "transformers.AutoModelForCausalLM",
+    "model_class": "backends.multimodal_utils.phi_utils.PhiMLLM",
+    "supports_multiple_images": true,
+    "trust_remote_code": true,
+    "output_split_prefix": "",
+    "low_cpu_mem_usage": true,
+    "release_date": "17-08-24",
+    "open_weight": true,
+    "parameters": "4B"
   }
 ]

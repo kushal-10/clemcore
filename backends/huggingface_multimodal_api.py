@@ -206,7 +206,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             raise ValueError(f"Multiple images not supported in a single turn for model {self.model_name}")
 
         model_kwargs = {"template": self.chat_template, "max_tokens": self.get_max_tokens(), "device": self.device,
-                        "split_prefix": self.split_prefix, "cull": self.eos_to_cull}
+                        "split_prefix": self.split_prefix, "cull": self.eos_to_cull, "temperature": self.get_temperature()}
 
         inputs = self.model_class.prepare_inputs(messages=messages, **model_kwargs)
 

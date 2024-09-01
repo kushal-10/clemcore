@@ -246,7 +246,7 @@ class textmapworld_specificroom(DialogueGameMaster):
         if player == self.guesser:
             self.add_user_message(self.describer, utterance)
         if player == self.describer:
-            if self.reprompting_parameter and loop_identification(self.visited_nodes, False):
+            if self.reprompting_parameter and loop_identification(self.visited_nodes):
                     self.log_to_self("loop_detected", "Loop detected in the visited nodes list")
                     self.reprompting_parameter = False
                     utterance = self.loop_reprompting +"\n"+utterance
@@ -266,7 +266,7 @@ class textmapworld_specificroom(DialogueGameMaster):
             if not self.game_stop and not self.invalid_response and not self.limit_reached and not self.game_error:
                 self.log_to_self(type_ = "move", value = json.dumps({"old": old_node, "new": new_node}))
                 self.visited_nodes.append(new_node)
-                if self.reprompting_parameter and loop_identification(self.visited_nodes, False):
+                if self.reprompting_parameter and loop_identification(self.visited_nodes):
                     self.visited_nodes.clear()
                     self.reprompting_parameter = True
 
@@ -369,7 +369,7 @@ class GraphGameScorer(GameScorer):
                     seen.update(self.adj(current))
                     loops.append(current)
                     visited.add(current)
-                    if loop_identification(loops, False):
+                    if loop_identification(loops):
                         count_loops += 1
                         loops.clear()
                     

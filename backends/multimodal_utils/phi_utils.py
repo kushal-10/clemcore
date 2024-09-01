@@ -1,0 +1,144 @@
+from PIL import Image
+import requests
+from PIL.ImageFile import ImageFile
+from transformers import AutoModelForCausalLM
+from transformers import AutoProcessor
+from typing import Dict, List, Any, Union, Tuple
+
+from backends.multimodal_utils.base_utils import BaseMLLM
+
+class PhiMLLM(BaseMLLM):
+
+    def prepare_inputs(self, messages: List[Dict[str, Any]], **kwargs) -> Dict[str, Any]:
+        """
+        Prepare the inputs for the model, including the prompt, images, and conversation history.
+
+        :param messages: A list of dictionaries, where each dictionary contains:
+                         - 'role': The role of the message sender ('user' or 'assistant').
+                         - 'content': The text content of the message.
+                         - 'image': Optional; a single image URL (str) or a list of image URLs (List[str]).
+        :param kwargs: Additional keyword arguments that may be used in the process.
+        :return: A dictionary containing:
+                 - 'prompt': List of processed input messages for phi3 models
+                 - 'images': A list of image URLs to be processed.
+                 - 'processor_kwargs': A dictionary further passed to generate_outputs and get_tokens
+        """
+
+        images = []
+        image_counter = 0
+        input_prompt_messages = []
+
+        for message in messages:
+            if message['role'] == 'user':
+                img_placeholder = ""
+                if 'image' in message:
+                    if isinstance(message['image'], str):
+                        # Single image
+                        image_counter += 1
+                        img_placeholder = f"<|image_{image_counter}|\n"
+                        images.append(self.load_image(message['image']))
+                    elif isinstance(message['image'], list):
+                        # List of images
+                        for img in message['image']:
+                            image_counter += 1
+                            img_placeholder += f"<|image_{image_counter}|\n"
+                            images.append(self.load_image(img))
+                    else:
+                        raise ValueError("Invalid image type in message - should be str or List[str]")
+
+                usr_msg = {'role': 'user', 'content': img_placeholder+message['content']}
+                input_prompt_messages.append(usr_msg)
+
+            elif message['role'] == 'assistant':
+                asst_msg = {'role': 'assistant', 'content': message['content']}
+                input_prompt_messages.append(asst_msg)
+
+            # Pass system message - empty in all cases anyway
+
+        return {
+            "prompt": input_prompt_messages,
+            "images": images,
+            "output_kwargs": {"device": kwargs.get('device'), "max_tokens": kwargs.get('max_tokens'), "temperature": kwargs.get('temperature')}
+        }
+
+    @staticmethod
+    def load_image(image_path: str):
+        """
+        Load an image from the given local path/url
+
+        :param image_path: The path to the image to be loaded.
+        :return: The loaded image.
+        """
+
+        if image_path.startswith("http"):
+            loaded_image = Image.open(requests.get(image_path, stream=True).raw)
+        else:
+            loaded_image = Image.open(image_path)
+
+        return loaded_image
+
+    @staticmethod
+    def get_tokens(prompt: List, handler: AutoProcessor, **output_kwargs) -> List[str]:
+        """
+        Generate tokens for the given prompt and conversation history.
+
+        :param prompt: The list of messages passed as input to the model.
+        :param handler: The processor used for tokenizing the prompt.
+        :param output_kwargs: Additional keyword arguments
+
+        :return: A list of tokens generated from the combined prompt and conversation history.
+        """
+
+        tokens = handler.tokenizer.apply_chat_template(
+            prompt,
+            tokenize=True,
+            add_generation_prompt=True  # Considers the <|assistant|> tag
+        )
+
+        return tokens
+
+    def generate_outputs(self, prompt: List, images: List[str], model: AutoModelForCausalLM,
+                         handler: AutoProcessor, **output_kwargs) -> Tuple[Dict[str, Any], str]:
+        """
+        Generate model outputs given a prompt, images, and additional parameters.
+
+        :param prompt: The text prompt to be used for generating the response.
+        :param images: A list of image URLs or paths to be included in the model's input.
+        :param model: The model used for generating the output. This should be compatible with InternLM type models.
+        :param handler: The tokenizer/processor used to preprocess the prompt and handle the input.
+        :param output_kwargs: Additional keyword arguments for the model, expected to include 'history'.
+        :return:
+             - response (Dict[str, Any]): The raw output from the model, formatted as a dictionary.
+             - response_text (str): The decoded text response generated by the model.
+        """
+
+        max_tokens = output_kwargs.get('max_tokens')
+        temperature = output_kwargs.get('temperature')
+        device = output_kwargs.get("device")
+
+        input_prompt = handler.tokenizer.apply_chat_template(
+                      prompt,
+                      tokenize=False,
+                      add_generation_prompt=True
+                    )
+
+        inputs = handler(input_prompt, return_tensors="pt").to(device)
+
+        generation_args = {
+            "max_new_tokens": max_tokens,
+            "temperature": temperature,
+            "do_sample": False,
+        }
+
+        generate_ids = model.generate(**inputs,
+                                      eos_token_id=handler.tokenizer.eos_token_id,
+                                      **generation_args)
+
+        generate_ids = generate_ids[:, inputs['input_ids'].shape[1]:]
+        response_text = handler.batch_decode(generate_ids,
+                                             skip_special_tokens=True,
+                                             clean_up_tokenization_spaces=False)[0]
+
+        response = {"response": response_text}
+
+        return response, response_text
