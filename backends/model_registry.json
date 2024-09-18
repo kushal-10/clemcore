@@ -1317,5 +1317,22 @@
     "release_date": "17-08-24",
     "open_weight": true,
     "parameters": "4B"
+  },
+  {
+    "model_name": "Pixtral-12B-2409",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "mistralai/Pixtral-12B-2409",
+    "automodel_type": "vllm.LLM",
+    "model_class": "backends.multimodal_utils.pixtral_utils.PixtralMLLM",
+    "supports_multiple_images": true,
+    "trust_remote_code": false,
+    "output_split_prefix": "",
+    "low_cpu_mem_usage": true,
+    "release_date": "11-09-24",
+    "open_weight": true,
+    "parameters": "12B",
+    "use_vllm": true,
+    "tokenizer_mode": "mistral",
+    "vllm_context": 8192
   }
 ]

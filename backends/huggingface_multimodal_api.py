@@ -19,6 +19,11 @@ def get_context_limit(model_spec: backends.ModelSpec) -> int:
     :param model_spec: Contains definitions about the model to be used.
     :return: Context limit of the model.
     """
+    use_vllm = getattr(model_spec, 'use_vllm', False)  # Default is True, set to False for Llava 34B via Model Registry
+    if use_vllm:
+        vllm_context = getattr(model_spec, 'vllm_context', 8192)
+        return vllm_context
+    
     hf_model_str = model_spec['huggingface_id']
     trust_remote_code = getattr(model_spec, 'trust_remote_code', False)
 
@@ -68,6 +73,12 @@ def load_processor_or_tokenizer(model_spec: backends.ModelSpec):
     :param model_spec: Contains definitions the model to be used, loaded from Model Registry.
     :return input_handler: Processor/Tokenizer for the specific model.
     """
+    use_vllm = getattr(model_spec, 'use_vllm', False)  # Default is True, set to False for Llava 34B via Model Registry
+    if use_vllm:
+        logger.info(f'Using VLLM for model Pixtral. Use Mistral processor for tokenization.')
+        input_handler = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
+        return input_handler
+
     hf_model_str = model_spec['huggingface_id']  # Get the model name
 
     use_fast = getattr(model_spec, 'use_fast', True)  # Default is True, set to False for Llava 34B via Model Registry
@@ -95,7 +106,7 @@ def load_model(model_spec: backends.ModelSpec):
 
     :param model_spec: A dictionary that defines the model to be used, loaded from Model Registry.
     :return model: The specific model.
-    """
+    """    
     logger.info(f'Start loading huggingface model weights: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id']  # Get the model name
 
@@ -109,6 +120,19 @@ def load_model(model_spec: backends.ModelSpec):
     load_in_8bit = getattr(model_spec, 'load_in_8bit', False)
     low_cpu_mem_usage = getattr(model_spec, 'low_cpu_mem_usage', False)
     device_map = getattr(model_spec, 'device_map', 'auto')
+    tokenizer_mode = getattr(model_spec, 'tokenizer_mode', None)
+    max_img_per_msg = getattr(model_spec, 'max_img_per_msg', 5)
+    max_tokens_per_img = getattr(model_spec, 'max_tokens_per_img', 4096)
+
+    use_vllm = getattr(model_spec, 'use_vllm', False)  # Default is True, set to False for Llava 34B via Model Registry
+    if use_vllm:
+        logger.info(f'Using VLLM for model')
+        model = model_type(
+            model=hf_model_str, tokenizer_mode=tokenizer_mode,  
+            limit_mm_per_prompt={"image": max_img_per_msg},
+            max_num_batched_tokens=max_img_per_msg * max_tokens_per_img,
+        )
+        return model
 
     # Models like InternVL2, specify their own device map for the model to work.
     custom_device_map = getattr(model_spec, 'custom_device_map', False)
@@ -211,7 +235,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         inputs = self.model_class.prepare_inputs(messages=messages, **model_kwargs)
 
         prompt_text, images, output_kwargs = inputs['prompt'], inputs['images'], inputs['output_kwargs']
-
+   
         prompt_tokens = self.model_class.get_tokens(prompt=prompt_text, handler=self.input_handler, **output_kwargs)
 
         # Check context limit
