@@ -1,0 +1,5 @@
+,"-, clemscore","all, Average % Played","all, Average Quality Score","matchit, % Played","matchit, Quality Score","matchit, Quality Score (std)","mm_mapworld, % Played","mm_mapworld, Quality Score","mm_mapworld, Quality Score (std)","mm_mapworld_graphs, % Played","mm_mapworld_graphs, Quality Score","mm_mapworld_graphs, Quality Score (std)","mm_mapworld_specificroom, % Played","mm_mapworld_specificroom, Quality Score","mm_mapworld_specificroom, Quality Score (std)"
+llava-1.5-13b-hf-ft-t0.0--llava-1.5-13b-hf-ft-t0.0,4.58,7.92,57.89,31.67,57.89,50.73,0.0,,,0.0,,,0.0,,
+llava-1.5-13b-hf-t0.0--llava-1.5-13b-hf-t0.0,8.61,25.83,33.34,100.0,66.67,47.54,0.0,,,0.0,,,3.33,0.0,
+llava-1.5-7b-hf-ft-t0.0--llava-1.5-7b-hf-ft-t0.0,11.07,32.67,33.89,60.0,58.33,50.0,44.0,30.83,34.33,0.0,,,26.67,12.5,35.36
+llava-1.5-7b-hf-t0.0--llava-1.5-7b-hf-t0.0,14.67,28.33,51.79,60.0,75.0,43.92,20.0,50.36,32.58,0.0,,,33.33,30.0,48.3
