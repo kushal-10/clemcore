@@ -253,7 +253,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.processor = load_processor(model_spec)
         self.multimodal_model = load_model(model_spec)
         self.split_prefix = model_spec['output_split_prefix']
-        self.context_size = get_context_limit(model_spec)
+        # self.context_size = get_context_limit(model_spec)
 
         # Type cast model_spec to a Dictionary, for cleaner loading of variables
         model_spec_dict = vars(model_spec)
@@ -295,14 +295,14 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         # Check context limit
         prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
-        context_check = check_context_limit(self.context_size, prompt_tokens, max_new_tokens=self.get_max_tokens())
-        if not context_check[0]:  # if context is exceeded, context_check[0] is False
-            logger.info(f"Context token limit for {self.model_spec.model_name} exceeded: "
-                        f"{context_check[1]}/{context_check[3]}")
-            # fail gracefully:
-            raise backends.ContextExceededError(f"Context token limit for {self.model_spec.model_name} exceeded",
-                                                tokens_used=context_check[1], tokens_left=context_check[2],
-                                                context_size=context_check[3])
+        # context_check = check_context_limit(self.context_size, prompt_tokens, max_new_tokens=self.get_max_tokens())
+        # if not context_check[0]:  # if context is exceeded, context_check[0] is False
+        #     logger.info(f"Context token limit for {self.model_spec.model_name} exceeded: "
+        #                 f"{context_check[1]}/{context_check[3]}")
+        #     # fail gracefully:
+        #     raise backends.ContextExceededError(f"Context token limit for {self.model_spec.model_name} exceeded",
+        #                                         tokens_used=context_check[1], tokens_left=context_check[2],
+        #                                         context_size=context_check[3])
 
         # Get a list of images [as input to the Processor]
         images = get_images(messages)
