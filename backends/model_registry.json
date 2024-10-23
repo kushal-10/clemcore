@@ -1326,9 +1326,9 @@
         "parameters": "13B"
     },
     {
-        "model_name": "llava-1.5-13b-hf-ft",
+        "model_name": "llava-1.5-13b-hf-ft-2ep",
         "backend": "huggingface_multimodal",
-        "huggingface_id": "Koshti10/llava-1.5-13b-hf-ft",
+        "huggingface_id": "Koshti10/llava-1.5-13b-hf-ft-2ep",
         "model_type": "Vision2Seq",
         "output_split_prefix": "ASSISTANT:",
         "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image'] %}\nUSER: <image>\n{{message['content']}}{% else %}\nUSER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}\nASSISTANT:{{message['content']}}{% endif %}{% endfor %}\nASSISTANT:",
