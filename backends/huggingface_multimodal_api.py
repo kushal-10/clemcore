@@ -279,8 +279,9 @@ class HuggingfaceMultimodalModel(backends.Model):
             prompt_text = template.render(messages=messages)
         elif "InternVL2" in self.model_name:
             history, question = utils.generate_history_internvl2(messages=messages)
-            for t in history:
-                prompt_text += t[0] + t[1]
+            if history:
+                for t in history:
+                    prompt_text += t[0] + t[1]
             prompt_text += question
 
         # Check context limit based on if AutoProcessor is loaded or AutoTokenizer
