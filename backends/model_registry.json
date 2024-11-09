@@ -1308,6 +1308,7 @@
       "response": "backends.multimodal_utils.generate_llava_response",
       "output_split_prefix": "ASSISTANT:",
       "do_sample": true,
+      "supports_multiple_images": true,
       "release_date": "2024-01-03",
       "open_weight": true,
       "parameters": "7B"
