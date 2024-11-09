@@ -244,6 +244,7 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         self.split_prefix = model_spec.output_split_prefix if hasattr(model_spec, 'output_split_prefix') else ""
         self.template = model_spec.custom_chat_template if hasattr(model_spec, 'custom_chat_template') else None
+        self.premade_template = True if hasattr(model_spec, 'premade_chat_template') else False
         self.cull = model_spec.eos_to_cull if hasattr(model_spec, 'eos_to_cull') else None
         self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec, 'supports_multiple_images') else False
         self.do_sample = model_spec.do_sample if hasattr(model_spec, 'do_sample') else None

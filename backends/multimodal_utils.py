@@ -332,9 +332,10 @@ def generate_idefics_prompt_text(messages: List[str]) -> str:
                     for img in msg['image']:
                         prompt_text += img
                 else:
-                    prompt_text += msg['image'][0]          
+                    prompt_text += msg['image'][0]
+            prompt_text += "<end_of_utterance>"          
         elif msg['role'] == 'assistant':
-            prompt_text += f" Assistant: {msg['content']} "
+            prompt_text += f" Assistant: {msg['content']} <end_of_utterance>"
         else:
             raise ValueError(f"Invalid role: {msg['role']}. Expected 'user', 'system', or 'assistant'.")
             
@@ -373,9 +374,10 @@ def generate_idefics_response(**response_kwargs) -> str:
                         input_messages.append(loaded_image)
                 else:
                     loaded_image = load_idefics_image(msg['image'][0])
-                    input_messages.append(loaded_image)               
+                    input_messages.append(loaded_image)      
+            input_messages.append("<end_of_utterance>")         
         elif msg['role'] == 'assistant':
-            input_messages.append(f"\nAssistant: {msg['content']}")
+            input_messages.append(f"\nAssistant: {msg['content']} <end_of_utterance>")
         else:
             raise ValueError(f"Invalid role: {msg['role']}. Expected 'user', 'system', or 'assistant'.")
 
@@ -390,3 +392,54 @@ def generate_idefics_response(**response_kwargs) -> str:
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
     
     return generated_text[0]
+
+def generate_idefics3_response(**response_kwargs) -> str:
+
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+
+    input_messages = []
+    images = []
+    for msg in messages:
+        if msg['role'] == 'system':
+            continue  # Skip system message. Ref - https://huggingface.co/HuggingFaceM4/Idefics3-8B-Llama3
+        elif msg['role'] == 'user':
+            msg_dict = {
+                'role': 'user',
+                'content': []
+            }
+            if 'image' in msg:
+                if len(msg['image']) > 1:
+                    for img in msg['image']:
+                        images.append(load_idefics_image(img))
+                        msg_dict['content'].append({'type': 'image'})
+                else:
+                    images.append(load_idefics_image(msg['image'][0]))
+                    msg_dict['content'].append({'type': 'image'})
+            msg_dict.append({'type': 'text', 'text': msg['content']})
+            input_messages.append(msg_dict)
+     
+        elif msg['role'] == 'assistant':
+            msg_dict = {
+                'role': 'assistant',
+                'content': [
+                    {'type': 'text', 'text': msg['content']}
+                ]
+            }
+            input_messages.append(msg_dict)
+        else:
+            raise ValueError(f"Invalid role: {msg['role']}. Expected 'user', 'system', or 'assistant'.")
+        
+    prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
+    inputs = processor(text=prompt, images=images, return_tensors="pt")
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+
+    # Generate
+    generated_ids = model.generate(**inputs, max_new_tokens=500)
+    generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
+
+    return generated_texts[0]
+
