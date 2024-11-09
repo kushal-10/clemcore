@@ -388,11 +388,25 @@ def generate_idefics_prompt_text(messages: List[str], **prompt_kwargs) -> str:
     Returns:
         str: The concatenated prompt text generated from the message history.
     """
-    idefics_messages, _ = generate_llava_messages(messages=messages)
-    processor = prompt_kwargs['processor']
-    prompt = processor.apply_chat_template(idefics_messages, add_generation_prompt=True)
+    prompt_text = ""
+    for msg in messages:
+        if msg['role'] == 'system':
+            continue  # Skip system message. Ref - https://huggingface.co/HuggingFaceM4/idefics-9b-instruct
+        elif msg['role'] == 'user':
+            prompt_text += f" User: {msg['content']} "
+            if 'image' in msg:
+                if len(msg['image']) > 1:
+                    for img in msg['image']:
+                        prompt_text += img
+                else:
+                    prompt_text += msg['image'][0]
+            prompt_text += "<end_of_utterance>"          
+        elif msg['role'] == 'assistant':
+            prompt_text += f" Assistant: {msg['content']} <end_of_utterance>"
+        else:
+            raise ValueError(f"Invalid role: {msg['role']}. Expected 'user', 'system', or 'assistant'.")
             
-    return prompt
+    return prompt_text
 
 def generate_idefics_response(**response_kwargs) -> str:
     """Generates a response from the IDEFICS model based on the provided messages and configuration.

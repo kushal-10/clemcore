@@ -1540,7 +1540,7 @@
     },
     "processor_class": "transformers.AutoProcessor",
     "processor_config": {},
-    "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
+    "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
     "response": "backends.multimodal_utils.generate_llava_response",
     "supports_multiple_images": true,
     "trust_remote_code": true,
