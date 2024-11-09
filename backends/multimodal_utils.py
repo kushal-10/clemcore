@@ -244,6 +244,7 @@ def get_internvl2_image(messages: List[str], device: str):
     return pixel_values
 
 def generate_internvl2_inputs(messages: List[str]):
+    prompt_text = ""
     history, question = generate_history_internvl2(messages=messages)
     if history:
         for t in history:
