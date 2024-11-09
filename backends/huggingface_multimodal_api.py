@@ -118,8 +118,8 @@ def load_processor(model_spec: backends.ModelSpec):
     processor_class_str = model_spec['processor_class']  # Processor type - AutoProcessor/AutoTokenizer
     processor_config = model_spec['processor_config']  # Processor kwargs
 
-    processor_class = import_method(processor_class_str, processor_config)
-    processor = processor_class.from_pretrained(hf_model_str) # Load the processor with defined args
+    processor_class = import_method(processor_class_str)
+    processor = processor_class.from_pretrained(hf_model_str, processor_config) # Load the processor with defined args
     
     logger.info(f'Loading Processor for model : {model_spec.model_name}')
 
