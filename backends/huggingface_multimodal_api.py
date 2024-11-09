@@ -39,13 +39,14 @@ def get_context_limit(model_spec: backends.ModelSpec) -> int:
     def find_context_limit(config) -> int:
         """Recursively search for max_sequence_length or max_position_embeddings."""
         # Check if the desired keys are directly in the config
-        if 'max_position_embeddings' in config:
-            return config['max_position_embeddings']
-        if 'max_sequence_length' in config:
-            return config['max_sequence_length']
+        if hasattr(config, 'max_position_embeddings'):
+            return config.max_position_embeddings
+        if hasattr(config, 'max_sequence_length'):
+            return config.max_sequence_length
         
-        # Recursively search through the dictionary
-        for key, value in config.items():
+        # Recursively search through the attributes of the config object
+        for attr in dir(config):
+            value = getattr(config, attr)
             if isinstance(value, dict):
                 result = find_context_limit(value)
                 if result is not None:
@@ -56,6 +57,10 @@ def get_context_limit(model_spec: backends.ModelSpec) -> int:
                         result = find_context_limit(item)
                         if result is not None:
                             return result
+            elif hasattr(value, '__dict__'):  # Check if the value is an object with attributes
+                result = find_context_limit(value)
+                if result is not None:
+                    return result
         return None
 
     context = find_context_limit(model_config)
