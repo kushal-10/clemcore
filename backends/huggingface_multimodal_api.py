@@ -265,6 +265,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         Raises:
             AttributeError: If neither 'tokenizer.tokenize' nor 'processor.tokenize' exists.
             backends.ContextExceededError: If the context token limit is exceeded.
+            ValueError: If neither custom chat template or custom prompt method is provided 
         """
         # Check to see if game passes multiple images in a single turn
         # Proceed only if model supports multiple images, else return blanks for prompt, response and response_text
@@ -279,9 +280,12 @@ class HuggingfaceMultimodalModel(backends.Model):
             template_str = self.template
             template = Template(template_str)
             prompt_text = template.render(messages=messages)
-        elif self.input_method:
+        elif self.prompt_method:
             prompt_method = import_method(self.prompt_method)
             prompt_text = prompt_method(messages)
+        else:
+            raise ValueError("Neither template nor prompt method is provided.")
+
 
         # Check context limit based on if AutoProcessor is loaded or AutoTokenizer
         if hasattr(self.processor, 'tokenize'):
