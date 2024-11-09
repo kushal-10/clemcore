@@ -118,14 +118,13 @@
         "load_in_8bit": true,
         "low_cpu_mem_usage": true,
         "use_flash_attn": true,
-        "trust_remote_code": true,
         "device_map": "backends.multimodal_utils.split_model"
     },
     "processor_class": "transformers.AutoTokenizer",
     "processor_config": {
-        "trust_remote_code": true,
         "use_fast": false
     },
+    "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,
     "release_date": "2024-07-15",

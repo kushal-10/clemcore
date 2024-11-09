@@ -119,8 +119,12 @@ def load_processor(model_spec: backends.ModelSpec):
     processor_config = model_spec['processor_config']  # Processor kwargs
 
     processor_class = import_method(processor_class_str)
-    processor = processor_class.from_pretrained(hf_model_str, processor_config) # Load the processor with defined args
-    
+
+    if "trust_remote_code" in model_spec:
+        processor = processor_class.from_pretrained(hf_model_str, trust_remote_code=True, **processor_config) # Load the processor with trust_remote_code=True
+    else:
+        processor = processor_class.from_pretrained(hf_model_str, **processor_config) # Load the processor with defined args
+
     logger.info(f'Loading Processor for model : {model_spec.model_name}')
 
     return processor
@@ -150,10 +154,13 @@ def load_model(model_spec: backends.ModelSpec):
     if 'device_map' in model_config and not model_config['device_map'] == 'auto':
         logger.info(f"Loading Custom device map for model: {hf_model_str}")
         split_model = import_method(model_config['device_map'])
-        device_map = split_model(hf_model_str)
+        device_map = split_model(model_spec['model_name'])
         model_config['device_map'] = device_map
         
-    model = model_class.from_pretrained(hf_model_str, model_config)  # Load the model using from_pretrained
+    if 'trust_remote_code' in model_spec:
+        model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
+    else:
+        model = model_class.from_pretrained(hf_model_str, **model_config)  # Load the model using from_pretrained
 
     # Check if model's generation_config has pad_token_id set:
     if not model.generation_config.pad_token_id:
