@@ -305,26 +305,17 @@ class HuggingfaceMultimodalModel(backends.Model):
         if "InternVL2" in self.model_name:
             images = utils.get_internvl2_image(messages=messages, device=self.device)
             history, question = utils.generate_history_internvl2(messages=messages)
-            logger.info("*" * 50)
-            logger.info(f"\n\n Prompt : {question} \n\n")
-            logger.info("*" * 50)
             generation_config = dict(max_new_tokens = self.get_max_tokens(), do_sample=True)
-            print(f"\n\n\n\n type Processor {type(self.processor)}")
-            print(f"\n\n\n\n len images {len(images)}")
-            print(f"\n\n\n\n question {type(question), len(question)}")
-            print(f"\n\n\n\n history {history}")
-            response, _ = self.multimodal_model.chat(self.processor, images, question, generation_config, 
+            generated_response, _ = self.multimodal_model.chat(self.processor, images, question, generation_config, 
                                                      history=history, return_history=True)
-        else:
-            response = ""
-            logger.warning("NNNNNNNNNNNNNNNNNNNNNNNNNNN")
+
 
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
         # Store generated text
-        response = {"response": response}
+        response = {"response": generated_response}
 
-        response_text = response.split(self.split_prefix)[-1]  # Get the last assistant response
+        response_text = generated_response.split(self.split_prefix)[-1]  # Get the last assistant response
         if self.cull:
             rt_split = response_text.split(self.cull)  # Cull from End of String token
             response_text = rt_split[0]
