@@ -308,7 +308,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             logger.info(f"\n\n Prompt : {question} \n\n")
             logger.info("*" * 50)
             generation_config = dict(do_sample = self.do_sample, max_new_tokens = self.get_max_tokens())
-            response = self.multimodal_model.chat(self.processor, images, question, generation_config, history=history)
+            response, _ = self.multimodal_model.chat(self.processor, images, question, generation_config, history=history, generate_history=True)
         else:
             response = ""
             logger.warning("NNNNNNNNNNNNNNNNNNNNNNNNNNN")
