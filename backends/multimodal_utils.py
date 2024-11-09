@@ -242,3 +242,36 @@ def get_internvl2_image(messages: List[str], device: str):
             pixel_values = load_image(last_user_message['image'][0], max_num=12).to(torch.bfloat16).to(device)
 
     return pixel_values
+
+def generate_internvl2_inputs(messages: List[str]):
+    history, question = generate_history_internvl2(messages=messages)
+    if history:
+        for t in history:
+            prompt_text += t[0] + t[1]
+    prompt_text += question
+    return prompt_text
+
+def generate_internvl2_response(**response_kwargs):
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+
+    images = get_internvl2_image(messages=messages, device=device)
+    history, question = generate_history_internvl2(messages=messages)
+    if not history:
+        history = None
+    generation_config = dict(max_new_tokens = max_tokens, do_sample=True)
+    generated_response, _ = model.chat(processor, images, question, generation_config, 
+                                                     history=history, return_history=True)
+
+    return generated_response
+
+
+##### Idefics1 Type Models #####
+def generate_idefics_inputs():
+    pass
+
+def generate_idefics_response():
+    pass
