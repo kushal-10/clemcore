@@ -1540,26 +1540,6 @@
     "parameters": "8B"
   },
   {
-    "model_name": "idefics2-8b",
-    "backend": "huggingface_multimodal",
-    "huggingface_id": "HuggingFaceM4/idefics2-8b",
-    "model_class": "transformers.AutoModelForVision2Seq",
-    "model_config": {
-        "torch_dtype": "auto",
-        "device_map": "auto"
-    },
-    "processor_class": "transformers.AutoProcessor",
-    "processor_config": {},
-    "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
-    "response": "backends.multimodal_utils.generate_idefics3_response",
-    "supports_multiple_images": true,
-    "trust_remote_code": true,
-    "output_split_prefix": "Assistant:",
-    "release_date": "2024-08-05",
-    "open_weight": true,
-    "parameters": "8B"
-  },
-  {
     "model_name": "dolphin-vision-72b",
     "backend": "huggingface_multimodal",
     "huggingface_id": "cognitivecomputations/dolphin-vision-72b",
