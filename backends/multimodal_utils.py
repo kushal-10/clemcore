@@ -35,7 +35,7 @@ def generate_history_internvl2(messages: List[str]) -> Tuple[List[Tuple], str]:
         ValueError: if msg['role'] is different than 'user', 'system', or 'assistant'.
     """
 
-    history = None
+    history = []
     for msg in messages:
         if msg['role'] == 'system':
             continue # Skip the system message, Not passed to the model. Ref - https://huggingface.co/OpenGVLab/InternVL2-40B 
