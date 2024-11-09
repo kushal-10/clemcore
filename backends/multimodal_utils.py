@@ -296,6 +296,14 @@ def generate_internvl2_response(**response_kwargs) -> str:
 ##### IDEFICS TYPE MODELS #####
 """
 def load_idefics_image(image_file: str):
+    """Loads an image from a file or URL.
+
+    Args:
+        image_file (str): The path to the image file or URL.
+
+    Returns:
+        PIL.Image: The loaded image in RGB format.
+    """
     if image_file.startswith("http"):
         response = requests.get(image_file)
         image = Image.open(BytesIO(response.content)).convert('RGB')
@@ -305,6 +313,14 @@ def load_idefics_image(image_file: str):
     return image
 
 def generate_idefics_prompt_text(messages: List[str]) -> str:
+    """Generates a prompt text from a list of messages.
+
+    Args:
+        messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+
+    Returns:
+        str: The concatenated prompt text generated from the message history.
+    """
     prompt_text = ""
     for msg in messages:
         if msg['role'] == 'system':
@@ -325,7 +341,19 @@ def generate_idefics_prompt_text(messages: List[str]) -> str:
     return prompt_text
 
 def generate_idefics_response(**response_kwargs) -> str:
+    """Generates a response from the IDEFICS model based on the provided messages and configuration.
 
+    Args:
+        **response_kwargs: A dictionary containing the following keys:
+            - messages (List[str]): A list of message dictionaries.
+            - device (str): The device to which the image tensors will be moved (e.g., 'cuda' or 'cpu').
+            - max_tokens (int): The maximum number of tokens to generate.
+            - model: The model instance used for generating responses.
+            - processor: The processor instance used for processing images.
+
+    Returns:
+        str: The generated response from the model.
+    """
     messages = response_kwargs['messages']
     device = response_kwargs['device']
     max_tokens = response_kwargs['max_tokens']
