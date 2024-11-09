@@ -1314,40 +1314,67 @@
       "parameters": "7B"
   },
   {
-      "model_name": "llava-1.5-13b-hf",
-      "backend": "huggingface_multimodal",
-      "huggingface_id": "llava-hf/llava-1.5-13b-hf",
-      "model_type": "Vision2Seq",
-      "output_split_prefix": "ASSISTANT:",
-      "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image'] %}\nUSER: <image>\n{{message['content']}}{% else %}\nUSER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}\nASSISTANT:{{message['content']}}{% endif %}{% endfor %}\nASSISTANT:",
-      "release_date": "2024-01-03",
-      "open_weight": true,
-      "parameters": "13B"
+    "model_name": "llava-1.5-13b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-1.5-13b-hf",
+    "model_class": "transformers.LlavaForConditionalGeneration",
+    "model_config": {
+      "low_cpu_mem_usage": true,
+      "device_map": "auto",
+      "torch_dtype":"auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {},
+    "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
+    "response": "backends.multimodal_utils.generate_llava_response",
+    "output_split_prefix": "ASSISTANT:",
+    "do_sample": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-01-03",
+    "open_weight": true,
+    "parameters": "13B"
   },
   {
-      "model_name": "llava-v1.6-34b-hf",
-      "backend": "huggingface_multimodal",
-      "huggingface_id": "llava-hf/llava-v1.6-34b-hf",
-      "model_type": "Vision2Seq",
-      "output_split_prefix": "assistant",
-      "not_fast": true,
-      "padding": true,
-      "custom_chat_template": "<|im_start|>system\nAnswer the questions.<|im_end|>{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image']%}<|im_start|>user\n<image>\n{{message['content']}}<|im_end|>{% else %}<|im_start|>\nuser\n{{message['content']}}<|im_end|>{% endif %}{% elif message['role'] == 'assistant' %}<|im_start|>assistant\n{{message['content']}}<|im_end|>{% endif %}{% endfor %}<|im_start|>assistant\n",
-      "release_date": "2024-03-17",
-      "open_weight": true,
-      "parameters": "34B"
+    "model_name": "llava-v1.6-34b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-34b-hf",
+    "model_class": "transformers.LlavaNextForConditionalGeneration",
+    "model_config": {
+      "low_cpu_mem_usage": true,
+      "device_map": "auto",
+      "torch_dtype":"auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {},
+    "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
+    "response": "backends.multimodal_utils.generate_llava_response",
+    "output_split_prefix": "ASSISTANT:",
+    "do_sample": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-03-17",
+    "open_weight": true,
+    "parameters": "34B"
   },
   {
-      "model_name": "llava-v1.6-mistral-7b-hf",
-      "backend": "huggingface_multimodal",
-      "huggingface_id": "llava-hf/llava-v1.6-mistral-7b-hf",
-      "model_type": "Vision2Seq",
-      "output_split_prefix": "[/INST]",
-      "padding": true,
-      "custom_chat_template": "{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image']%}[INST] <image>\n{{message['content']}} [/INST]{% else %}[INST]\n{{message['content']}} [/INST]{% endif %}{% elif message['role'] == 'assistant' %}{{message['content']}}{% endif %}{% endfor %}",
-      "release_date": "2024-02-20",
-      "open_weight": true,
-      "parameters": "7B"
+    "model_name": "llava-v1.6-mistral-7b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-mistral-7b-hf",
+    "model_class": "transformers.LlavaNextForConditionalGeneration",
+    "model_config": {
+      "low_cpu_mem_usage": true,
+      "device_map": "auto",
+      "torch_dtype":"auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {},
+    "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
+    "response": "backends.multimodal_utils.generate_llava_response",
+    "output_split_prefix": "ASSISTANT:",
+    "do_sample": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-03-17",
+    "open_weight": true,
+    "parameters": "7B"
   },
   {
     "model_name": "llava-v1.6-vicuna-7b-hf",
@@ -1371,18 +1398,26 @@
     "parameters": "7B"
   },
   {
-      "model_name": "llava-v1.6-vicuna-13b-hf",
-      "backend": "huggingface_multimodal",
-      "huggingface_id": "llava-hf/llava-v1.6-vicuna-13b-hf",
-      "model_type": "Vision2Seq",
-      "output_split_prefix": "ASSISTANT:",
-      "padding": true,
-      "custom_chat_template": "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image'] %}USER:<image>\n{{message['content']}}{% else %}USER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}ASSISTANT:{{message['content']}}{% endif %}{% endfor %}ASSISTANT:",
-      "release_date": "2024-03-17",
-      "open_weight": true,
-      "parameters": "13B"
+    "model_name": "llava-v1.6-vicuna-13b-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/llava-v1.6-vicuna-13b-hf",
+    "model_class": "transformers.LlavaNextForConditionalGeneration",
+    "model_config": {
+      "low_cpu_mem_usage": true,
+      "device_map": "auto",
+      "torch_dtype":"auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {},
+    "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
+    "response": "backends.multimodal_utils.generate_llava_response",
+    "output_split_prefix": "ASSISTANT:",
+    "do_sample": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-03-17",
+    "open_weight": true,
+    "parameters": "13B"
   },
-
   {
     "model_name": "idefics-80b-instruct",
     "backend": "huggingface_multimodal",

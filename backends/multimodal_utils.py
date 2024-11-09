@@ -294,11 +294,19 @@ def generate_internvl2_response(**response_kwargs) -> str:
 
 """
 ##### LLAVA TYPE MODELS #####
-Compatible models - LLaVA 1.5, Idefics3
+Compatible models - LLaVA 1.5, LLaVA 1.6, Idefics3
 """
 
 def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
-    """
+    """Generates LLAVA messages and image paths from a list of messages.
+
+    Args:
+        messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+
+    Returns:
+        Tuple[List, List]: A tuple containing:
+            - A list of formatted LLAVA messages.
+            - A list of image paths extracted from the messages.
     """
     llava_messages = []
     image_paths = []
@@ -338,8 +346,14 @@ def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
     return llava_messages, image_paths
 
 def generate_llava_prompt_text(messages: List[str], **prompt_kwargs) -> str:
-    """
-    
+    """Generates a prompt text for LLAVA from a list of messages.
+
+    Args:
+        messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+        **prompt_kwargs: Additional keyword arguments for processing.
+
+    Returns:
+        str: The generated prompt text for LLAVA.
     """
     llava_messages, _ = generate_llava_messages(messages=messages)
     processor = prompt_kwargs['processor']
@@ -348,8 +362,18 @@ def generate_llava_prompt_text(messages: List[str], **prompt_kwargs) -> str:
     return prompt
 
 def generate_llava_response(**response_kwargs) -> str:
-    """
-    
+    """Generates a response from the LLAVA model based on the provided messages and configuration.
+
+    Args:
+        **response_kwargs: A dictionary containing the following keys:
+            - messages (List[str]): A list of message dictionaries.
+            - device (str): The device to which the image tensors will be moved (e.g., 'cuda' or 'cpu').
+            - max_tokens (int): The maximum number of tokens to generate.
+            - model: The model instance used for generating responses.
+            - processor: The processor instance used for processing images.
+
+    Returns:
+        str: The generated response from the LLAVA model.
     """
     messages = response_kwargs['messages']
     device = response_kwargs['device']
@@ -378,12 +402,12 @@ def generate_llava_response(**response_kwargs) -> str:
 ##### IDEFICS TYPE MODELS #####
 """
 
-
 def generate_idefics_prompt_text(messages: List[str], **prompt_kwargs) -> str:
-    """Generates a prompt text from a list of messages.
+    """Generates a prompt text from a list of messages for the IDEFICS model.
 
     Args:
         messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+        **prompt_kwargs: Additional keyword arguments for processing.
 
     Returns:
         str: The concatenated prompt text generated from the message history.
@@ -420,7 +444,7 @@ def generate_idefics_response(**response_kwargs) -> str:
             - processor: The processor instance used for processing images.
 
     Returns:
-        str: The generated response from the model.
+        str: The generated response from the IDEFICS model.
     """
     messages = response_kwargs['messages']
     device = response_kwargs['device']
