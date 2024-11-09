@@ -388,8 +388,5 @@ def generate_idefics_response(**response_kwargs) -> str:
 
     generated_ids = model.generate(**inputs, eos_token_id=exit_condition, bad_words_ids=bad_words_ids, max_length=max_tokens)
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
-
-    print("GEN TEXT")
-    print(generated_text)
     
     return generated_text[0]
