@@ -300,10 +300,13 @@ class HuggingfaceMultimodalModel(backends.Model):
                                                 tokens_used=context_check[1], tokens_left=context_check[2],
                                                 context_size=context_check[3])
 
-        # Load images
+        
         if "InternVL2" in self.model_name:
             images = utils.get_internvl2_image(messages=messages, device=self.device)
             history, question = utils.generate_history_internvl2(messages=messages)
+            logger.info("*" * 50)
+            logger.info(f"\n\n Prompt : {question, images} \n\n")
+            logger.info("*" * 50)
             generation_config = dict(do_sample = self.do_sample, max_new_tokens = self.get_max_tokens())
             response = self.multimodal_model.chat(self.processor, images, question, generation_config, history=history)
         else:
@@ -322,7 +325,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         response_text = response_text.strip()
 
         logger.info("*" * 50)
-        logger.info(f"\n\n PROMPT : {prompt} \n\n RESPONSE : {response} \n\n")
+        logger.info(f"\n\n RESPONSE : {response} \n\n")
         logger.info("*" * 50)
 
         return prompt, response, response_text
