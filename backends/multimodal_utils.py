@@ -419,7 +419,7 @@ def generate_idefics3_response(**response_kwargs) -> str:
                 else:
                     images.append(load_idefics_image(msg['image'][0]))
                     msg_dict['content'].append({'type': 'image'})
-            msg_dict.append({'type': 'text', 'text': msg['content']})
+            msg_dict['content'].append({'type': 'text', 'text': msg['content']})
             input_messages.append(msg_dict)
      
         elif msg['role'] == 'assistant':
