@@ -11,8 +11,6 @@ from jinja2 import Template
 import warnings
 import importlib
 
-import backends.multimodal_utils as utils
-
 FALLBACK_CONTEXT_SIZE = 256
 
 logger = backends.get_logger(__name__)
