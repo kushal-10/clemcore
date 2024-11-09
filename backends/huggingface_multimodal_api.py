@@ -284,10 +284,10 @@ class HuggingfaceMultimodalModel(backends.Model):
             prompt_text += question
 
         # Check context limit based on if AutoProcessor is loaded or AutoTokenizer
-        if hasattr(self.processor.tokenizer, 'tokenize'):
-            prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
-        elif hasattr(self.processor, 'tokenize'):
+        if hasattr(self.processor, 'tokenize'):
             prompt_tokens = self.processor.tokenize(prompt_text)
+        elif hasattr(self.processor.tokenizer, 'tokenize'):
+            prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
         else:
             raise AttributeError("Neither 'tokenizer.tokenize' nor 'processor.tokenize' exists.")
         
