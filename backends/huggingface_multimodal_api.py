@@ -31,19 +31,31 @@ def get_context_limit(model_spec: backends.ModelSpec) -> int:
         Warning: If no context limit is found, a warning is raised and the fallback value is used.
     """
     hf_model_str = model_spec['huggingface_id']
-    model_config = AutoConfig.from_pretrained(hf_model_str)
+    if 'trust_remote_code' in model_spec:
+        model_config = AutoConfig.from_pretrained(hf_model_str, trust_remote_code=True)
+    else:
+        model_config = AutoConfig.from_pretrained(hf_model_str)
 
     def find_context_limit(config) -> int:
         """Recursively search for max_sequence_length or max_position_embeddings."""
-        if hasattr(config, "max_position_embeddings"):
-            return config.max_position_embeddings
-        if hasattr(config, "max_sequence_length"):
-            return config.max_sequence_length
-        for attr in dir(config):
-            if isinstance(getattr(config, attr), (dict, list)):
-                result = find_context_limit(getattr(config, attr))
+        # Check if the desired keys are directly in the config
+        if 'max_position_embeddings' in config:
+            return config['max_position_embeddings']
+        if 'max_sequence_length' in config:
+            return config['max_sequence_length']
+        
+        # Recursively search through the dictionary
+        for key, value in config.items():
+            if isinstance(value, dict):
+                result = find_context_limit(value)
                 if result is not None:
                     return result
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        result = find_context_limit(item)
+                        if result is not None:
+                            return result
         return None
 
     context = find_context_limit(model_config)
