@@ -244,7 +244,7 @@ def get_internvl2_image(messages: List[str], device: str):
 
     return pixel_values
 
-def generate_internvl2_prompt_text(messages: List[str]) -> str:
+def generate_internvl2_prompt_text(messages: List[str], **prompt_kwargs) -> str:
     """Generates input text for the InternVL2 model from a list of messages.
 
     Args:
@@ -312,7 +312,7 @@ def load_idefics_image(image_file: str):
 
     return image
 
-def generate_idefics_prompt_text(messages: List[str]) -> str:
+def generate_idefics_prompt_text(messages: List[str], **prompt_kwargs) -> str:
     """Generates a prompt text from a list of messages.
 
     Args:
@@ -401,7 +401,37 @@ def generate_idefics3_response(**response_kwargs) -> str:
     model = response_kwargs['model']
     processor = response_kwargs['processor']
 
-    input_prompt = []
+    input_prompt, image_paths = generate_llava_messages(messages=messages)
+    
+    # Process images
+    processed_images = []
+    for image in image_paths:
+        processed_images.append(load_image(image))
+
+    processed_prompt = processor.apply_chat_template(input_prompt, add_generation_prompt=True)
+    if not processed_images:
+        inputs = processor.tokenizer(text=processed_prompt, return_tensors="pt")
+    else:
+        inputs = processor(text=processed_prompt, images=processed_images, return_tensors="pt")
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+
+    # Generate
+    generated_ids = model.generate(**inputs, max_new_tokens=500)
+    generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
+
+    # Process and clean response text
+    response_text = generated_texts[-1]
+
+    return response_text
+
+
+"""
+##### LLAVA TYPE MODELS #####
+"""
+def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
+    """
+    """
+    llava_messages = []
     image_paths = []
     for message in messages:
         message_dict = {}
@@ -424,36 +454,52 @@ def generate_idefics3_response(**response_kwargs) -> str:
 
             # Add user text message at the end
             message_dict['content'].append({"type": "text", "text": message['content']})
-            input_prompt.append(message_dict)
+            llava_messages.append(message_dict)
 
         elif message['role'] == 'assistant':
             message_dict['role'] = 'assistant'
             message_dict['content'].append({"type": "text", "text": message['content']})
-            input_prompt.append(message_dict)
+            llava_messages.append(message_dict)
 
         elif message['role'] == 'system':
-            continue
+            continue # Skip System message
         else:
             raise ValueError(f"Invalid role: {message_dict['role']}. Expected 'user', 'system', or 'assistant'.")
         
+    return llava_messages, image_paths
+
+def generate_llava_prompt_text(messages: List[str], **prompt_kwargs) -> str:
+    """
     
-     # Process images
+    """
+    llava_messages, _ = generate_llava_messages(messages=messages)
+    processor = prompt_kwargs['processor']
+    prompt = processor.apply_chat_template(llava_messages, add_generation_prompt=True)
+
+    return prompt
+
+def generate_llava_response(**response_kwargs) -> str:
+    """
+    
+    """
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+    do_sample = response_kwargs['do_sample']
+
+    llava_messages, image_paths = generate_llava_messages(messages=messages)
+    prompt = processor.apply_chat_template(llava_messages, add_generation_prompt=True)
+
+    # Process images
     processed_images = []
     for image in image_paths:
         processed_images.append(load_image(image))
 
-    processed_prompt = processor.apply_chat_template(input_prompt, add_generation_prompt=True)
-    if not processed_images:
-        inputs = processor.tokenizer(text=processed_prompt, return_tensors="pt")
-    else:
-        inputs = processor(text=processed_prompt, images=processed_images, return_tensors="pt")
-    inputs = {k: v.to(device) for k, v in inputs.items()}
+    inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(0, torch.float16)
 
-    # Generate
-    generated_ids = model.generate(**inputs, max_new_tokens=500)
-    generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
+    output = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample)
+    response = processor.decode(output[0], skip_special_tokens=True)
 
-    # Process and clean response text
-    response_text = generated_texts[-1]
-
-    return response_text
+    return response

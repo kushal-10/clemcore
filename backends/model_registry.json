@@ -1296,9 +1296,16 @@
       "model_name": "llava-1.5-7b-hf",
       "backend": "huggingface_multimodal",
       "huggingface_id": "llava-hf/llava-1.5-7b-hf",
-      "model_type": "Vision2Seq",
+      "model_class": "transformers.LlavaForConditionalGeneration",
+      "model_config": {
+        "low_cpu_mem_usage": true,
+        "device_map": "auto",
+        "torch_dtype":"auto"
+      },
+      "processor_class": "transformers.AutoProcessor",
+      "processor_config": {},
       "output_split_prefix": "ASSISTANT:",
-      "custom_chat_template": "{%- for message in messages -%}{% if message['role'] == 'user' %}{% if message['image'] %}\nUSER: <image>\n{{message['content']}}{% else %}\nUSER:\n{{message['content']}}{% endif %}{% elif message['role'] == 'assistant' %}\nASSISTANT:{{message['content']}}{% endif %}{% endfor %}\nASSISTANT:",
+      "do_sample": true,
       "release_date": "2024-01-03",
       "open_weight": true,
       "parameters": "7B"

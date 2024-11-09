@@ -273,6 +273,11 @@ class HuggingfaceMultimodalModel(backends.Model):
             logger.warning(f"Multiple images not supported in a single turn for model {self.model_name}")
             return "", {"response": ""}, ""
 
+        prompt_kwargs = {
+            'model': self.multimodal_model,
+            'processor': self.processor,
+            'device': self.device,
+        }
         prompt_text = ""
         # Get input prompt by applying jinja template, if template is provided
         if self.template:
@@ -280,7 +285,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             template = Template(template_str)
             prompt_text = template.render(messages=messages)
         elif self.prompt_method:
-            prompt_method = import_method(self.prompt_method)
+            prompt_method = import_method(self.prompt_method, **prompt_kwargs)
             prompt_text = prompt_method(messages)
         else:
             raise ValueError("Neither template nor prompt method is provided.")
