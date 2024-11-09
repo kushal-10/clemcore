@@ -9,7 +9,7 @@ import torch
 import torchvision.transforms as T
 from PIL import Image
 from torchvision.transforms.functional import InterpolationMode
-from transformers import AutoModel, AutoTokenizer
+from transformers.image_utils import load_image
 import requests
 from io import BytesIO
 
@@ -186,7 +186,7 @@ def dynamic_preprocess(image, min_num=1, max_num=12, image_size=448, use_thumbna
         processed_images.append(thumbnail_img)
     return processed_images
 
-def load_image(image_file, input_size=448, max_num=12):
+def load_internvl2_image(image_file, input_size=448, max_num=12):
     """Loads an image file and applies transformations.
 
     Args:
@@ -235,12 +235,12 @@ def get_internvl2_image(messages: List[str], device: str):
         raise ValueError("No user message found in the provided messages.")
     else:
         if len(last_user_message['image']) > 1:            
-            pixel_values = load_image(last_user_message['image'][0], max_num=12).to(torch.bfloat16).to(device)
+            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=12).to(torch.bfloat16).to(device)
             for i in range(1, len(last_user_message['image'])):
-                pixel_values1 = load_image(last_user_message['image'][i], max_num=12).to(torch.bfloat16).to(device)
+                pixel_values1 = load_internvl2_image(last_user_message['image'][i], max_num=12).to(torch.bfloat16).to(device)
                 pixel_values = torch.cat((pixel_values, pixel_values1), dim=0)
         else:
-            pixel_values = load_image(last_user_message['image'][0], max_num=12).to(torch.bfloat16).to(device)
+            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=12).to(torch.bfloat16).to(device)
 
     return pixel_values
 
@@ -401,45 +401,59 @@ def generate_idefics3_response(**response_kwargs) -> str:
     model = response_kwargs['model']
     processor = response_kwargs['processor']
 
-    input_messages = []
-    images = []
-    for msg in messages:
-        if msg['role'] == 'system':
-            continue  # Skip system message. Ref - https://huggingface.co/HuggingFaceM4/Idefics3-8B-Llama3
-        elif msg['role'] == 'user':
-            msg_dict = {
-                'role': 'user',
-                'content': []
-            }
-            if 'image' in msg:
-                if len(msg['image']) > 1:
-                    for img in msg['image']:
-                        images.append(load_idefics_image(img))
-                        msg_dict['content'].append({'type': 'image'})
+    input_prompt = []
+    image_paths = []
+    for message in messages:
+        message_dict = {}
+        message_dict['content'] = []
+
+        if message['role'] == 'user':
+            message_dict['role'] = 'user'
+            if 'image' in message:
+                if isinstance(message['image'], str):
+                    # Single image
+                    message_dict['content'].append({"type": "image"})
+                    image_paths.append(message['image'])
+                elif isinstance(message['image'], list):
+                    # List of images
+                    for img in message['image']:
+                        message_dict['content'].append({"type": "image"})
+                        image_paths.append(img)
                 else:
-                    images.append(load_idefics_image(msg['image'][0]))
-                    msg_dict['content'].append({'type': 'image'})
-            msg_dict['content'].append({'type': 'text', 'text': msg['content']})
-            input_messages.append(msg_dict)
-     
-        elif msg['role'] == 'assistant':
-            msg_dict = {
-                'role': 'assistant',
-                'content': [
-                    {'type': 'text', 'text': msg['content']}
-                ]
-            }
-            input_messages.append(msg_dict)
+                    raise ValueError("Invalid image type in message - should be str or List[str]")
+
+            # Add user text message at the end
+            message_dict['content'].append({"type": "text", "text": message['content']})
+            input_prompt.append(message_dict)
+
+        elif message['role'] == 'assistant':
+            message_dict['role'] = 'assistant'
+            message_dict['content'].append({"type": "text", "text": message['content']})
+            input_prompt.append(message_dict)
+
+        elif message['role'] == 'system':
+            continue
         else:
-            raise ValueError(f"Invalid role: {msg['role']}. Expected 'user', 'system', or 'assistant'.")
+            raise ValueError(f"Invalid role: {message_dict['role']}. Expected 'user', 'system', or 'assistant'.")
         
-    prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
-    inputs = processor(text=prompt, images=images, return_tensors="pt")
+    
+     # Process images
+    processed_images = []
+    for image in image_paths:
+        processed_images.append(load_image(image))
+
+    processed_prompt = processor.apply_chat_template(input_prompt, add_generation_prompt=True)
+    if not processed_images:
+        inputs = processor.tokenizer(text=processed_prompt, return_tensors="pt")
+    else:
+        inputs = processor(text=processed_prompt, images=processed_images, return_tensors="pt")
     inputs = {k: v.to(device) for k, v in inputs.items()}
 
     # Generate
     generated_ids = model.generate(**inputs, max_new_tokens=500)
     generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
 
-    return generated_texts[0]
+    # Process and clean response text
+    response_text = generated_texts[-1]
 
+    return response_text
