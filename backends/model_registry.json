@@ -1434,6 +1434,8 @@
     "processor_config": {
         "use_fast": false
     },
+    "prompt": "backends.multimodal_utils.generate_internvl2_inputs",
+    "response": "backends.multimodal_utils.generate_internvl2_response",
     "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,
@@ -1457,6 +1459,8 @@
     "processor_config": {
         "use_fast": false
     },
+    "prompt": "backends.multimodal_utils.generate_internvl2_inputs",
+    "response": "backends.multimodal_utils.generate_internvl2_response",
     "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,
@@ -1480,6 +1484,8 @@
     "processor_config": {
         "use_fast": false
     },
+    "prompt": "backends.multimodal_utils.generate_internvl2_inputs",
+    "response": "backends.multimodal_utils.generate_internvl2_response",
     "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,
