@@ -244,7 +244,7 @@ def get_internvl2_image(messages: List[str], device: str):
 
     return pixel_values
 
-def generate_internvl2_inputs(messages: List[str]) -> str:
+def generate_internvl2_prompt_text(messages: List[str]) -> str:
     """Generates input text for the InternVL2 model from a list of messages.
 
     Args:
@@ -304,7 +304,7 @@ def load_idefics_image(image_file: str):
 
     return image
 
-def generate_idefics_inputs(messages: List[str]) -> str:
+def generate_idefics_prompt_text(messages: List[str]) -> str:
     prompt_text = ""
     for msg in messages:
         if msg['role'] == 'system':
