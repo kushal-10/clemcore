@@ -46,6 +46,10 @@ def get_context_limit(model_spec: backends.ModelSpec) -> int:
         
         # Recursively search through the attributes of the config object
         for attr in dir(config):
+            # Skip callable attributes and private attributes
+            if attr.startswith('_') or callable(getattr(config, attr)):
+                continue
+            
             value = getattr(config, attr)
             if isinstance(value, dict):
                 result = find_context_limit(value)
