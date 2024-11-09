@@ -305,7 +305,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             images = utils.get_internvl2_image(messages=messages, device=self.device)
             history, question = utils.generate_history_internvl2(messages=messages)
             logger.info("*" * 50)
-            logger.info(f"\n\n Prompt : {question, images} \n\n")
+            logger.info(f"\n\n Prompt : {question} \n\n")
             logger.info("*" * 50)
             generation_config = dict(do_sample = self.do_sample, max_new_tokens = self.get_max_tokens())
             response = self.multimodal_model.chat(self.processor, images, question, generation_config, history=history)
