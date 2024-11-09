@@ -312,7 +312,11 @@ def generate_idefics_inputs(messages: List[str]) -> str:
         elif msg['role'] == 'user':
             prompt_text += f" User: {msg['content']} "
             if 'image' in msg:
-                prompt_text += msg['image']                
+                if len(msg['image']) > 1:
+                    for img in msg['image']:
+                        prompt_text += img
+                else:
+                    prompt_text += msg['image'][0]          
         elif msg['role'] == 'assistant':
             prompt_text += f" Assistant: {msg['content']} "
         else:
