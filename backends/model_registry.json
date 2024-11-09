@@ -112,18 +112,22 @@
     "model_name": "InternVL2-8B",
     "backend": "huggingface_multimodal",
     "huggingface_id": "OpenGVLab/InternVL2-8B",
-    "automodel_type": "transformers.AutoModel",
-    "model_class": "backends.multimodal_utils.internvl_utils.InternvlMLLM",
-    "use_tokenizer": true,
+    "model_class": "transformers.AutoModel",
+    "model_config": {
+        "torch_dtype": "auto",
+        "load_in_8bit": true,
+        "low_cpu_mem_usage": true,
+        "use_flash_attn": true,
+        "trust_remote_code": true,
+        "device_map": "backends.multimodal_utils.split_model"
+    },
+    "processor_class": "transformers.AutoTokenizer",
+    "processor_config": {
+        "trust_remote_code": true,
+        "use_fast": false
+    },
+    "do_sample": true,
     "supports_multiple_images": true,
-    "trust_remote_code": true,
-    "use_bf16": true,
-    "use_fast": false,
-    "output_split_prefix": "Assistant:",
-    "load_in_8bit": false,
-    "low_cpu_mem_usage": true,
-    "custom_device_map": true,
-    "device_map": "backends.multimodal_utils.internvl_utils.split_model",
     "release_date": "2024-07-15",
     "open_weight": true,
     "parameters": "8B"
