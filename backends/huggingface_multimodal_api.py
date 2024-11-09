@@ -308,6 +308,8 @@ class HuggingfaceMultimodalModel(backends.Model):
             generation_config = dict(max_new_tokens = self.get_max_tokens(), do_sample=True)
             generated_response, _ = self.multimodal_model.chat(self.processor, images, question, generation_config, 
                                                      history=history, return_history=True)
+        else:
+            generated_response = ""
 
 
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
@@ -316,6 +318,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         response = {"response": generated_response}
 
         # Check if split_prefix is not empty before splitting
+        response_text = generated_response
         if self.split_prefix:
             response_text = generated_response.split(self.split_prefix)[-1]  # Get the last assistant response
         if self.cull:
