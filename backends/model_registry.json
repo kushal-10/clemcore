@@ -1386,6 +1386,8 @@
       },
       "processor_class": "transformers.AutoProcessor",
       "processor_config": {},
+      "prompt": "backends.multimodal_utils.generate_idefics_inputs",
+      "response": "backends.multimodal_utils.generate_idefics_response",
       "eos_to_cull": "<end_of_utterance>",
       "output_split_prefix": "Assistant:",
       "supports_multiple_images": true,

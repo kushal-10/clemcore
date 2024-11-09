@@ -13,8 +13,9 @@ from transformers import AutoModel, AutoTokenizer
 import requests
 from io import BytesIO
 
-
+"""
 ##### INTERNVL2 TYPE MODELS #####
+"""
 
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
@@ -243,7 +244,15 @@ def get_internvl2_image(messages: List[str], device: str):
 
     return pixel_values
 
-def generate_internvl2_inputs(messages: List[str]):
+def generate_internvl2_inputs(messages: List[str]) -> str:
+    """Generates input text for the InternVL2 model from a list of messages.
+
+    Args:
+        messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+
+    Returns:
+        str: The concatenated prompt text generated from the message history and the last user question.
+    """
     prompt_text = ""
     history, question = generate_history_internvl2(messages=messages)
     if history:
@@ -252,7 +261,20 @@ def generate_internvl2_inputs(messages: List[str]):
     prompt_text += question
     return prompt_text
 
-def generate_internvl2_response(**response_kwargs):
+def generate_internvl2_response(**response_kwargs) -> str:
+    """Generates a response from the InternVL2 model based on the provided messages and configuration.
+
+    Args:
+        **response_kwargs: A dictionary containing the following keys:
+            - messages (List[str]): A list of message dictionaries.
+            - device (str): The device to which the image tensors will be moved (e.g., 'cuda' or 'cpu').
+            - max_tokens (int): The maximum number of tokens to generate.
+            - model: The model instance used for generating responses.
+            - processor: The processor instance used for processing images.
+
+    Returns:
+        str: The generated response from the model.
+    """
     messages = response_kwargs['messages']
     device = response_kwargs['device']
     max_tokens = response_kwargs['max_tokens']
@@ -263,16 +285,76 @@ def generate_internvl2_response(**response_kwargs):
     history, question = generate_history_internvl2(messages=messages)
     if not history:
         history = None
-    generation_config = dict(max_new_tokens = max_tokens, do_sample=True)
+    generation_config = dict(max_new_tokens=max_tokens, do_sample=True)
     generated_response, _ = model.chat(processor, images, question, generation_config, 
                                                      history=history, return_history=True)
 
     return generated_response
 
 
-##### Idefics1 Type Models #####
-def generate_idefics_inputs():
-    pass
+"""
+##### IDEFICS TYPE MODELS #####
+"""
+def load_idefics_image(image_file: str):
+    if image_file.startswith("http"):
+        response = requests.get(image_file)
+        image = Image.open(BytesIO(response.content)).convert('RGB')
+    else:
+        image = Image.open(image_file).convert('RGB')
 
-def generate_idefics_response():
-    pass
+    return image
+
+def generate_idefics_inputs(messages: List[str]) -> str:
+    prompt_text = ""
+    for msg in messages:
+        if msg['role'] == 'system':
+            continue  # Skip system message. Ref - https://huggingface.co/HuggingFaceM4/idefics-9b-instruct
+        elif msg['role'] == 'user':
+            prompt_text += f" User: {msg['content']} "
+            if 'image' in msg:
+                prompt_text += msg['image']                
+        elif msg['role'] == 'assistant':
+            prompt_text += f" Assistant: {msg['content']} "
+        else:
+            raise ValueError(f"Invalid role: {msg['role']}. Expected 'user', 'system', or 'assistant'.")
+            
+    return prompt_text
+
+def generate_idefics_response(**response_kwargs) -> str:
+
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+
+    input_messages = []
+    for msg in messages:
+        if msg['role'] == 'system':
+            continue  # Skip system message. Ref - https://huggingface.co/HuggingFaceM4/idefics-9b-instruct
+        elif msg['role'] == 'user':
+            input_messages.append(f"\nUser: {msg['content']}")
+            if 'image' in msg:
+                if len(msg['image']) > 1:
+                    for img in msg['image']:
+                        loaded_image = load_idefics_image(img)
+                        input_messages.append(loaded_image)
+                else:
+                    loaded_image = load_idefics_image(msg['image'][0])
+                    input_messages.append(loaded_image)               
+        elif msg['role'] == 'assistant':
+            input_messages.append(f"\nAssistant: {msg['content']}")
+        else:
+            raise ValueError(f"Invalid role: {msg['role']}. Expected 'user', 'system', or 'assistant'.")
+
+    # --batched mode
+    inputs = processor(input_messages, add_end_of_utterance_token=False, return_tensors="pt").to(device)
+
+    # Generation args
+    exit_condition = processor.tokenizer("<end_of_utterance>", add_special_tokens=False).input_ids
+    bad_words_ids = processor.tokenizer(["<image>", "<fake_token_around_image>"], add_special_tokens=False).input_ids
+
+    generated_ids = model.generate(**inputs, eos_token_id=exit_condition, bad_words_ids=bad_words_ids, max_length=max_tokens)
+    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
+    
+    return generated_text[0]
