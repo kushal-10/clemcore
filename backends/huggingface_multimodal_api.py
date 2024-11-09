@@ -315,7 +315,9 @@ class HuggingfaceMultimodalModel(backends.Model):
         # Store generated text
         response = {"response": generated_response}
 
-        response_text = generated_response.split(self.split_prefix)[-1]  # Get the last assistant response
+        # Check if split_prefix is not empty before splitting
+        if self.split_prefix:
+            response_text = generated_response.split(self.split_prefix)[-1]  # Get the last assistant response
         if self.cull:
             rt_split = response_text.split(self.cull)  # Cull from End of String token
             response_text = rt_split[0]
