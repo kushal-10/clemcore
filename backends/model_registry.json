@@ -1305,7 +1305,7 @@
       "processor_class": "transformers.AutoProcessor",
       "processor_config": {},
       "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-      "response": "backends.multimodal_utils.generate_llava_response",
+      "response": "backends.multimodal_utils.generate_idefics_response",
       "output_split_prefix": "ASSISTANT:",
       "do_sample": true,
       "release_date": "2024-01-03",

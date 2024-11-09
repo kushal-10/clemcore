@@ -338,4 +338,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         logger.info(f"\n\n RESPONSE : {response} \n\n")
         logger.info("*" * 50)
 
+        logger.info("*" * 50)
+        logger.info(f"\n\n RESPONSETEXT : {response_text} \n\n")
+        logger.info("*" * 50)
+
         return prompt, response, response_text
