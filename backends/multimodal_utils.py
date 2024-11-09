@@ -244,7 +244,7 @@ def get_internvl2_image(messages: List[str], device: str):
 
     return pixel_values
 
-def generate_internvl2_prompt_text(messages: List[str]) -> str:
+def generate_internvl2_prompt_text(messages: List[str], **prompt_kwargs) -> str:
     """Generates input text for the InternVL2 model from a list of messages.
 
     Args:
@@ -293,30 +293,121 @@ def generate_internvl2_response(**response_kwargs) -> str:
 
 
 """
-##### IDEFICS TYPE MODELS #####
+##### LLAVA TYPE MODELS #####
+Compatible models - LLaVA 1.5, LLaVA 1.6, Idefics3
 """
-def load_idefics_image(image_file: str):
-    """Loads an image from a file or URL.
 
-    Args:
-        image_file (str): The path to the image file or URL.
-
-    Returns:
-        PIL.Image: The loaded image in RGB format.
-    """
-    if image_file.startswith("http"):
-        response = requests.get(image_file)
-        image = Image.open(BytesIO(response.content)).convert('RGB')
-    else:
-        image = Image.open(image_file).convert('RGB')
-
-    return image
-
-def generate_idefics_prompt_text(messages: List[str]) -> str:
-    """Generates a prompt text from a list of messages.
+def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
+    """Generates LLAVA messages and image paths from a list of messages.
 
     Args:
         messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+
+    Returns:
+        Tuple[List, List]: A tuple containing:
+            - A list of formatted LLAVA messages.
+            - A list of image paths extracted from the messages.
+    """
+    llava_messages = []
+    image_paths = []
+    for message in messages:
+        message_dict = {}
+        message_dict['content'] = []
+
+        if message['role'] == 'user':
+            message_dict['role'] = 'user'
+            if 'image' in message:
+                if isinstance(message['image'], str):
+                    # Single image
+                    message_dict['content'].append({"type": "image"})
+                    image_paths.append(message['image'])
+                elif isinstance(message['image'], list):
+                    # List of images
+                    for img in message['image']:
+                        message_dict['content'].append({"type": "image"})
+                        image_paths.append(img)
+                else:
+                    raise ValueError("Invalid image type in message - should be str or List[str]")
+
+            # Add user text message at the end
+            message_dict['content'].append({"type": "text", "text": message['content']})
+            llava_messages.append(message_dict)
+
+        elif message['role'] == 'assistant':
+            message_dict['role'] = 'assistant'
+            message_dict['content'].append({"type": "text", "text": message['content']})
+            llava_messages.append(message_dict)
+
+        elif message['role'] == 'system':
+            continue # Skip System message
+        else:
+            raise ValueError(f"Invalid role: {message_dict['role']}. Expected 'user', 'system', or 'assistant'.")
+        
+    return llava_messages, image_paths
+
+def generate_llava_prompt_text(messages: List[str], **prompt_kwargs) -> str:
+    """Generates a prompt text for LLAVA from a list of messages.
+
+    Args:
+        messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+        **prompt_kwargs: Additional keyword arguments for processing.
+
+    Returns:
+        str: The generated prompt text for LLAVA.
+    """
+    llava_messages, _ = generate_llava_messages(messages=messages)
+    processor = prompt_kwargs['processor']
+    prompt = processor.apply_chat_template(llava_messages, add_generation_prompt=True)
+
+    return prompt
+
+def generate_llava_response(**response_kwargs) -> str:
+    """Generates a response from the LLAVA model based on the provided messages and configuration.
+
+    Args:
+        **response_kwargs: A dictionary containing the following keys:
+            - messages (List[str]): A list of message dictionaries.
+            - device (str): The device to which the image tensors will be moved (e.g., 'cuda' or 'cpu').
+            - max_tokens (int): The maximum number of tokens to generate.
+            - model: The model instance used for generating responses.
+            - processor: The processor instance used for processing images.
+
+    Returns:
+        str: The generated response from the LLAVA model.
+    """
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+    do_sample = response_kwargs['do_sample']
+
+    llava_messages, image_paths = generate_llava_messages(messages=messages)
+    prompt = processor.apply_chat_template(llava_messages, add_generation_prompt=True)
+
+    # Process images
+    processed_images = []
+    for image in image_paths:
+        processed_images.append(load_image(image))
+
+    inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device)
+
+    output = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample)
+    response = processor.decode(output[0], skip_special_tokens=True)
+
+    return response
+
+
+"""
+##### IDEFICS TYPE MODELS #####
+"""
+
+def generate_idefics_prompt_text(messages: List[str], **prompt_kwargs) -> str:
+    """Generates a prompt text from a list of messages for the IDEFICS model.
+
+    Args:
+        messages (List[str]): A list of message dictionaries containing user, system, and assistant messages.
+        **prompt_kwargs: Additional keyword arguments for processing.
 
     Returns:
         str: The concatenated prompt text generated from the message history.
@@ -353,7 +444,7 @@ def generate_idefics_response(**response_kwargs) -> str:
             - processor: The processor instance used for processing images.
 
     Returns:
-        str: The generated response from the model.
+        str: The generated response from the IDEFICS model.
     """
     messages = response_kwargs['messages']
     device = response_kwargs['device']
@@ -370,10 +461,10 @@ def generate_idefics_response(**response_kwargs) -> str:
             if 'image' in msg:
                 if len(msg['image']) > 1:
                     for img in msg['image']:
-                        loaded_image = load_idefics_image(img)
+                        loaded_image = load_image(img)
                         input_messages.append(loaded_image)
                 else:
-                    loaded_image = load_idefics_image(msg['image'][0])
+                    loaded_image = load_image(msg['image'][0])
                     input_messages.append(loaded_image)      
             input_messages.append("<end_of_utterance>")         
         elif msg['role'] == 'assistant':
@@ -392,68 +483,3 @@ def generate_idefics_response(**response_kwargs) -> str:
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
     
     return generated_text[0]
-
-def generate_idefics3_response(**response_kwargs) -> str:
-
-    messages = response_kwargs['messages']
-    device = response_kwargs['device']
-    max_tokens = response_kwargs['max_tokens']
-    model = response_kwargs['model']
-    processor = response_kwargs['processor']
-
-    input_prompt = []
-    image_paths = []
-    for message in messages:
-        message_dict = {}
-        message_dict['content'] = []
-
-        if message['role'] == 'user':
-            message_dict['role'] = 'user'
-            if 'image' in message:
-                if isinstance(message['image'], str):
-                    # Single image
-                    message_dict['content'].append({"type": "image"})
-                    image_paths.append(message['image'])
-                elif isinstance(message['image'], list):
-                    # List of images
-                    for img in message['image']:
-                        message_dict['content'].append({"type": "image"})
-                        image_paths.append(img)
-                else:
-                    raise ValueError("Invalid image type in message - should be str or List[str]")
-
-            # Add user text message at the end
-            message_dict['content'].append({"type": "text", "text": message['content']})
-            input_prompt.append(message_dict)
-
-        elif message['role'] == 'assistant':
-            message_dict['role'] = 'assistant'
-            message_dict['content'].append({"type": "text", "text": message['content']})
-            input_prompt.append(message_dict)
-
-        elif message['role'] == 'system':
-            continue
-        else:
-            raise ValueError(f"Invalid role: {message_dict['role']}. Expected 'user', 'system', or 'assistant'.")
-        
-    
-     # Process images
-    processed_images = []
-    for image in image_paths:
-        processed_images.append(load_image(image))
-
-    processed_prompt = processor.apply_chat_template(input_prompt, add_generation_prompt=True)
-    if not processed_images:
-        inputs = processor.tokenizer(text=processed_prompt, return_tensors="pt")
-    else:
-        inputs = processor(text=processed_prompt, images=processed_images, return_tensors="pt")
-    inputs = {k: v.to(device) for k, v in inputs.items()}
-
-    # Generate
-    generated_ids = model.generate(**inputs, max_new_tokens=500)
-    generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
-
-    # Process and clean response text
-    response_text = generated_texts[-1]
-
-    return response_text
