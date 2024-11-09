@@ -1364,22 +1364,38 @@
       "parameters": "7B"
   },
   {
-      "model_name": "idefics-80b-instruct",
-      "backend": "huggingface_multimodal",
-      "huggingface_id": "HuggingFaceM4/idefics-80b-instruct",
-      "model_type": "Idefics",
-      "eos_to_cull": "<end_of_utterance>",
-      "output_split_prefix": "Assistant:",
-      "supports_multiple_images": true,
-      "release_date": "2023-07-24",
-      "open_weight": true,
-      "parameters": "80B"
+    "model_name": "idefics-80b-instruct",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "HuggingFaceM4/idefics-80b-instruct",
+    "model_class": "transformers.IdeficsForVisionText2Text",
+    "model_config": {
+      "torch_dtype":"auto",
+      "device_map": "auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {},
+    "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
+    "response": "backends.multimodal_utils.generate_idefics_response",
+    "eos_to_cull": "<end_of_utterance>",
+    "output_split_prefix": "Assistant:",
+    "supports_multiple_images": true,
+    "release_date": "2023-07-24",
+    "open_weight": true,
+    "parameters": "80B"
   },
   {
       "model_name": "idefics-9b-instruct",
       "backend": "huggingface_multimodal",
       "huggingface_id": "HuggingFaceM4/idefics-9b-instruct",
-      "model_type": "Idefics",
+      "model_class": "transformers.IdeficsForVisionText2Text",
+      "model_config": {
+        "torch_dtype":"auto",
+        "device_map": "auto"
+      },
+      "processor_class": "transformers.AutoProcessor",
+      "processor_config": {},
+      "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
+      "response": "backends.multimodal_utils.generate_idefics_response",
       "eos_to_cull": "<end_of_utterance>",
       "output_split_prefix": "Assistant:",
       "supports_multiple_images": true,
@@ -1403,6 +1419,8 @@
     "processor_config": {
         "use_fast": false
     },
+    "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
+    "response": "backends.multimodal_utils.generate_internvl2_response",
     "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,
@@ -1426,6 +1444,8 @@
     "processor_config": {
         "use_fast": false
     },
+    "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
+    "response": "backends.multimodal_utils.generate_internvl2_response",
     "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,
@@ -1449,6 +1469,8 @@
     "processor_config": {
         "use_fast": false
     },
+    "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
+    "response": "backends.multimodal_utils.generate_internvl2_response",
     "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,
@@ -1472,6 +1494,8 @@
     "processor_config": {
         "use_fast": false
     },
+    "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
+    "response": "backends.multimodal_utils.generate_internvl2_response",
     "trust_remote_code": true,
     "do_sample": true,
     "supports_multiple_images": true,

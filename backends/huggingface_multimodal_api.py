@@ -247,6 +247,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.cull = model_spec.eos_to_cull if hasattr(model_spec, 'eos_to_cull') else None
         self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec, 'supports_multiple_images') else False
         self.do_sample = model_spec.do_sample if hasattr(model_spec, 'do_sample') else None
+        self.prompt_method = model_spec.prompt if hasattr(model_spec, 'prompt') else None
+        self.response_method = model_spec.response if hasattr(model_spec, 'response') else None 
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
@@ -263,6 +265,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         Raises:
             AttributeError: If neither 'tokenizer.tokenize' nor 'processor.tokenize' exists.
             backends.ContextExceededError: If the context token limit is exceeded.
+            ValueError: If neither custom chat template or custom prompt method is provided 
         """
         # Check to see if game passes multiple images in a single turn
         # Proceed only if model supports multiple images, else return blanks for prompt, response and response_text
@@ -277,12 +280,12 @@ class HuggingfaceMultimodalModel(backends.Model):
             template_str = self.template
             template = Template(template_str)
             prompt_text = template.render(messages=messages)
-        elif "InternVL2" in self.model_name:
-            history, question = utils.generate_history_internvl2(messages=messages)
-            if history:
-                for t in history:
-                    prompt_text += t[0] + t[1]
-            prompt_text += question
+        elif self.prompt_method:
+            prompt_method = import_method(self.prompt_method)
+            prompt_text = prompt_method(messages)
+        else:
+            raise ValueError("Neither template nor prompt method is provided.")
+
 
         # Check context limit based on if AutoProcessor is loaded or AutoTokenizer
         if hasattr(self.processor, 'tokenize'):
@@ -302,17 +305,16 @@ class HuggingfaceMultimodalModel(backends.Model):
                                                 context_size=context_check[3])
 
         
-        if "InternVL2" in self.model_name:
-            images = utils.get_internvl2_image(messages=messages, device=self.device)
-            history, question = utils.generate_history_internvl2(messages=messages)
-            if not history:
-                history = None
-            generation_config = dict(max_new_tokens = self.get_max_tokens(), do_sample=True)
-            generated_response, _ = self.multimodal_model.chat(self.processor, images, question, generation_config, 
-                                                     history=history, return_history=True)
-        else:
-            generated_response = ""
-
+        response_method = import_method(self.response_method)
+        response_kwargs = {
+            'model': self.multimodal_model,
+            'processor': self.processor,
+            'device': self.device,
+            'do_sample': self.do_sample,
+            'messages': messages,
+            'max_tokens': self.get_max_tokens()
+        }
+        generated_response = response_method(**response_kwargs)
 
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
