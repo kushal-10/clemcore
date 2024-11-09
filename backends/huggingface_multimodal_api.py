@@ -285,8 +285,8 @@ class HuggingfaceMultimodalModel(backends.Model):
             template = Template(template_str)
             prompt_text = template.render(messages=messages)
         elif self.prompt_method:
-            prompt_method = import_method(self.prompt_method, **prompt_kwargs)
-            prompt_text = prompt_method(messages)
+            prompt_method = import_method(self.prompt_method)
+            prompt_text = prompt_method(messages,  **prompt_kwargs)
         else:
             raise ValueError("Neither template nor prompt method is provided.")
 
