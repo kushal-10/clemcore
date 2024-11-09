@@ -307,7 +307,11 @@ class HuggingfaceMultimodalModel(backends.Model):
             logger.info("*" * 50)
             logger.info(f"\n\n Prompt : {question} \n\n")
             logger.info("*" * 50)
-            generation_config = dict(do_sample = self.do_sample, max_new_tokens = self.get_max_tokens())
+            generation_config = dict(max_new_tokens = self.get_max_tokens(), do_sample=True)
+            print(f"\n\n\n\n type Processor {type(self.processor)}")
+            print(f"\n\n\n\n len images {len(images)}")
+            print(f"\n\n\n\n question {type(question), len(question)}")
+            print(f"\n\n\n\n history {history}")
             response, _ = self.multimodal_model.chat(self.processor, images, question, generation_config, 
                                                      history=history, return_history=True)
         else:
