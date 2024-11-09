@@ -305,6 +305,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         if "InternVL2" in self.model_name:
             images = utils.get_internvl2_image(messages=messages, device=self.device)
             history, question = utils.generate_history_internvl2(messages=messages)
+            if not history:
+                history = None
             generation_config = dict(max_new_tokens = self.get_max_tokens(), do_sample=True)
             generated_response, _ = self.multimodal_model.chat(self.processor, images, question, generation_config, 
                                                      history=history, return_history=True)
