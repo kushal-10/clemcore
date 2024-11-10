@@ -343,6 +343,19 @@ def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
         else:
             raise ValueError(f"Invalid role: {message_dict['role']}. Expected 'user', 'system', or 'assistant'.")
         
+    last_user_message = llava_messages[-1]
+    if last_user_message['role'] == 'user':
+        content = last_user_message['content']
+        contains_image = False
+        for val in content:
+            if val["type"] == "image":
+                contains_image = True
+
+        if not contains_image: # Pass a blank image 
+            blank_image = Image.new('RGB', (128, 128), color='white')
+            image_paths.append(blank_image)
+            llava_messages[-1]['content'].append({"type": "image"})
+
     return llava_messages, image_paths
 
 def generate_llava_prompt_text(messages: List[str], **prompt_kwargs) -> str:
@@ -388,7 +401,10 @@ def generate_llava_response(**response_kwargs) -> str:
     # Process images
     processed_images = []
     for image in image_paths:
-        processed_images.append(load_image(image))
+        if type(image) == str:
+            processed_images.append(load_image(image))
+        else:
+            processed_images.append(image)
 
     inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device)
 

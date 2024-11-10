@@ -316,7 +316,8 @@ class HuggingfaceMultimodalModel(backends.Model):
             'device': self.device,
             'do_sample': self.do_sample,
             'messages': messages,
-            'max_tokens': self.get_max_tokens()
+            'max_tokens': self.get_max_tokens(),
+            'model_name': self.model_name
         }
         generated_response = response_method(**response_kwargs)
 
