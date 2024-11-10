@@ -519,8 +519,9 @@ def generate_molmo_response(**response_kwargs) -> str:
     for i in range(len(messages)):
         index = len(messages) - 1 - i
         if messages[index]['role'] == 'user':
-            if messages[index]['image']:
+            if 'image' in messages[index]:
                 images = messages[index]['image']
+            break
         else:
             continue
 
