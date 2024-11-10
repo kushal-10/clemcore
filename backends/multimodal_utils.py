@@ -407,10 +407,12 @@ def generate_llava_response(**response_kwargs) -> str:
         else:
             processed_images.append(image)
 
-    if 'ov-chat-hf' in model_name: # LLaVA-OV models - Set torch datatype manually to solve halftensor error
-        inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device, torch.float16)
-    else:
-        inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device)
+    # if 'ov-chat-hf' in model_name: # LLaVA-OV models - Set torch datatype manually to solve halftensor error
+    #     inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device, torch.float16)
+    # else:
+    #     inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device)
+
+    inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device)
 
 
     output = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample)
