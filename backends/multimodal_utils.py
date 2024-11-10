@@ -506,7 +506,7 @@ def generate_idefics_response(**response_kwargs) -> str:
 ##### MOLMO TYPE MODELS #####
 """
 
-def generate_molmo_response(messages: List[str], **response_kwargs) -> str:
+def generate_molmo_response(**response_kwargs) -> str:
 
     template_str = response_kwargs['template']
     messages = response_kwargs['messages']
