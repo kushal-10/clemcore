@@ -1,0 +1,48 @@
+{
+    "experiments": [
+        {
+            "name": "same_grid",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "grid_a": "X X X X X\nX \u25a2 X \u25a2 X\nX \u25a2 X \u25a2 X\nX \u25a2 X \u25a2 X\nX X X X X",
+                    "grid_b": "X X X X X\nX \u25a2 X \u25a2 X\nX \u25a2 X \u25a2 X\nX \u25a2 X \u25a2 X\nX X X X X",
+                    "decision_turn": 3
+                }
+            ]
+        },
+        {
+            "name": "similar_grid_1",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "grid_a": "X X X X X\nX \u25a2 \u25a2 \u25a2 \u25a2\nX X X \u25a2 \u25a2\nX \u25a2 \u25a2 \u25a2 \u25a2\nX \u25a2 \u25a2 \u25a2 \u25a2",
+                    "grid_b": "X \u25a2 \u25a2 \u25a2 \u25a2\nX \u25a2 \u25a2 \u25a2 \u25a2\nX X X \u25a2 \u25a2\nX \u25a2 \u25a2 \u25a2 \u25a2\nX X X X X",
+                    "decision_turn": 3
+                }
+            ]
+        },
+        {
+            "name": "similar_grid_2",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "grid_a": "X X X X X\nX \u25a2 X \u25a2 X\nX \u25a2 X \u25a2 X\nX \u25a2 X \u25a2 X\nX X X X X",
+                    "grid_b": "X X X X X\nX X X \u25a2 X\nX \u25a2 X X X\nX \u25a2 X \u25a2 X\nX X X X X",
+                    "decision_turn": 3
+                }
+            ]
+        },
+        {
+            "name": "different_grid",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "grid_a": "\u25a2 \u25a2 X \u25a2 \u25a2\n\u25a2 \u25a2 X X \u25a2\nX X X X X\n\u25a2 \u25a2 X X \u25a2\n\u25a2 \u25a2 X \u25a2 \u25a2",
+                    "grid_b": "X \u25a2 \u25a2 \u25a2 \u25a2\nX \u25a2 \u25a2 \u25a2 \u25a2\nX \u25a2 \u25a2 \u25a2 \u25a2\nX \u25a2 \u25a2 \u25a2 \u25a2\nX X X X X",
+                    "decision_turn": 3
+                }
+            ]
+        }
+    ]
+}

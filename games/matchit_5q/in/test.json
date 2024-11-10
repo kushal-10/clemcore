@@ -1,0 +1,70 @@
+{
+    "experiments": [
+        {
+            "name": "same_image",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "image_a": "https://cs.stanford.edu/people/rak248/VG_100K/2353739.jpg",
+                    "image_b": "https://cs.stanford.edu/people/rak248/VG_100K/2353739.jpg",
+                    "decision_turn": 5
+                }
+            ]
+        },
+        {
+            "name": "similar_image",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "image_a": "https://cs.stanford.edu/people/rak248/VG_100K/2353588.jpg",
+                    "image_b": "https://cs.stanford.edu/people/rak248/VG_100K_2/2407969.jpg",
+                    "decision_turn": 5
+                }
+            ]
+        },
+        {
+            "name": "different_image",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "image_a": "https://cs.stanford.edu/people/rak248/VG_100K/2320192.jpg",
+                    "image_b": "https://cs.stanford.edu/people/rak248/VG_100K/2347964.jpg",
+                    "decision_turn": 5
+                }
+            ]
+        },
+        {
+            "name": "same_image_pentomino",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "image_a": "games/multimodal_referencegame/resources/pentomino_images/1.jpg",
+                    "image_b": "games/multimodal_referencegame/resources/pentomino_images/1.jpg",
+                    "decision_turn": 5
+                }
+            ]
+        },
+        {
+            "name": "similar_image_pentomino",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "image_a": "games/multimodal_referencegame/resources/pentomino_images/1.jpg",
+                    "image_b": "games/multimodal_referencegame/resources/pentomino_images/2.jpg",
+                    "decision_turn": 5
+                }
+            ]
+        },
+        {
+            "name": "different_image_pentomino",
+            "game_instances": [
+                {
+                    "game_id": 0,
+                    "image_a": "games/multimodal_referencegame/resources/pentomino_images/1.jpg",
+                    "image_b": "games/multimodal_referencegame/resources/pentomino_images/8.jpg",
+                    "decision_turn": 5
+                }
+            ]
+        }
+    ]
+}
