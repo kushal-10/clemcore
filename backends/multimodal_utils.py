@@ -529,11 +529,14 @@ def generate_molmo_response(**response_kwargs) -> str:
     if images:
         for img in images:
             loaded_images.append(load_image(img))
-    
-    inputs = processor.process(
-        images=loaded_images,
-        text=prompt_text
-    )
+        inputs = processor.process(
+            images=loaded_images,
+            text=prompt_text
+        )    
+    else:
+        inputs = processor.process(
+            text=prompt_text
+        )
 
     inputs = {k: v.to(device).unsqueeze(0) for k, v in inputs.items()}
 
