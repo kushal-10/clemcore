@@ -537,9 +537,11 @@ def generate_molmo_response(**response_kwargs) -> str:
         inputs = processor.process(
             text=prompt_text
         )
-
+    
     inputs = {k: v.to(device).unsqueeze(0) for k, v in inputs.items()}
 
+    model.to(dtype=torch.bfloat16)
+    inputs["images"] = inputs["images"].to(torch.bfloat16)
     # generate output; stop generation when <|endoftext|> is generated
     output = model.generate_from_batch(
         inputs,
