@@ -3,10 +3,7 @@ import json
 # game_name = "textmapworld_description"
 
 game_names = [
-    "matchit_ascii",
-    "matchit_ascii_1q",
-    "matchit_ascii_5q",
-    "matchit_ascii_info"
+    "referencegame"
 ]
 
 def gen_test_instances(game_name:str):
@@ -42,8 +39,8 @@ def gen_test_instances(game_name:str):
         insts = e["game_instances"]
         dict_obj["name"] = e["name"]
         for i in insts:
-            # if i["game_id"] == 0: # mm_ref
-            if i["game_id"] %10 == 0: # textmap
+            if i["game_id"] == 0: # mm_ref
+            # if i["game_id"] %10 == 0: # textmap
                 dict_obj["game_instances"].append(i)
 
         test_data["experiments"].append(dict_obj)
