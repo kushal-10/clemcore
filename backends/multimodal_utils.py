@@ -10,8 +10,10 @@ import torchvision.transforms as T
 from PIL import Image
 from torchvision.transforms.functional import InterpolationMode
 from transformers.image_utils import load_image
+from transformers import GenerationConfig
 import requests
 from io import BytesIO
+from jinja2 import Template
 
 """
 ##### INTERNVL2 TYPE MODELS #####
@@ -499,3 +501,53 @@ def generate_idefics_response(**response_kwargs) -> str:
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
     
     return generated_text[0]
+
+"""
+##### MOLMO TYPE MODELS #####
+"""
+
+def generate_molmo_response(messages: List[str], **response_kwargs) -> str:
+
+    template_str = response_kwargs['template']
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+
+    template = Template(template_str)
+    prompt_text = template.render(messages=messages)
+
+    images = []
+    for i in range(len(messages)):
+        index = len(messages) - 1 - i
+        if messages[index]['role'] == 'user':
+            if messages[index]['image']:
+                images = messages[index]['image']
+        else:
+            continue
+
+    loaded_images = []
+    if images:
+        for img in images:
+            loaded_images.append(load_image(img))
+    
+    inputs = processor.process(
+        images=loaded_images,
+        text=prompt_text
+    )
+
+    inputs = {k: v.to(device).unsqueeze(0) for k, v in inputs.items()}
+
+    # generate output; stop generation when <|endoftext|> is generated
+    output = model.generate_from_batch(
+        inputs,
+        GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
+        tokenizer=processor.tokenizer
+    )
+
+    # only get generated tokens; decode them to text
+    generated_tokens = output[0,inputs['input_ids'].size(1):]
+    generated_text = processor.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+
+    return generated_text

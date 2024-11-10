@@ -1683,6 +1683,28 @@
     "parameters": "8B"
   },
   {
+    "model_name": "Molmo-7B-O-0924",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "allenai/Molmo-7B-O-0924",
+    "model_class": "transformers.AutoModelForCausalLM",
+    "model_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "processor_class": "transformers.AutoTokenizer",
+    "processor_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "response": "backends.multimodal_utils.generate_molmo_response",
+    "custom_chat_template": "{% for message in messages %}\n{% if message['role'] == 'user' %}\n{{ '<|user|>\n' + message['content'] }}\n{% elif message['role'] == 'assistant' %}\n{{ '<|assistant|>\n'  + message['content']}}\n{% endif %}\n{% if loop.last and add_generation_prompt %}\n{{ '<|assistant|>' }}\n{% endif %}\n{% endfor %}",
+    "trust_remote_code": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-09-24",
+    "open_weight": true,
+    "parameters": "7B"
+  },
+  {
     "model_name": "internlm-xcomposer2d5-7b",
     "backend": "huggingface_multimodal",
     "huggingface_id": "internlm/internlm-xcomposer2d5-7b",
