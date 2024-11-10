@@ -1293,6 +1293,27 @@
       "parameters": "104B"
   },
   {
+    "model_name": "bakLlava-v1-hf",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "llava-hf/bakLlava-v1-hf",
+    "model_class": "transformers.LlavaForConditionalGeneration",
+    "model_config": {
+      "low_cpu_mem_usage": true,
+      "device_map": "auto",
+      "torch_dtype":"auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {},
+    "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
+    "response": "backends.multimodal_utils.generate_llava_response",
+    "output_split_prefix": "ASSISTANT:",
+    "do_sample": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-01-03",
+    "open_weight": true,
+    "parameters": "7B"
+  },
+  {
       "model_name": "llava-1.5-7b-hf",
       "backend": "huggingface_multimodal",
       "huggingface_id": "llava-hf/llava-1.5-7b-hf",
