@@ -283,7 +283,9 @@ class HuggingfaceMultimodalModel(backends.Model):
         if self.template:
             template_str = self.template
             template = Template(template_str)
-            prompt_text = template.render(messages=messages)
+            prompt_text = template.render(messages=messages, add_generation_prompt=True)
+        elif self.premade_template:
+            prompt_text = self.processor.tokenizer.apply_chat_template(messages=messages, add_generation_prompt=True)
         elif self.prompt_method:
             prompt_method = import_method(self.prompt_method)
             prompt_text = prompt_method(messages,  **prompt_kwargs)
