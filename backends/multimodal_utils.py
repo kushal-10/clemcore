@@ -353,7 +353,7 @@ def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
 
         if not contains_image: # Pass a blank image 
             blank_image = Image.new('RGB', (128, 128), color='white')
-            image_paths.append[blank_image]
+            image_paths.append(blank_image)
             llava_messages[-1]['content'].append({"type": "image"})
 
     return llava_messages, image_paths
