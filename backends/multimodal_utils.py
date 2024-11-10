@@ -508,15 +508,12 @@ def generate_idefics_response(**response_kwargs) -> str:
 
 def generate_molmo_response(**response_kwargs) -> str:
 
-    template_str = response_kwargs['template']
+    prompt_text = response_kwargs['prompt_text']
     messages = response_kwargs['messages']
     device = response_kwargs['device']
     max_tokens = response_kwargs['max_tokens']
     model = response_kwargs['model']
     processor = response_kwargs['processor']
-
-    template = Template(template_str)
-    prompt_text = template.render(messages=messages)
 
     images = []
     for i in range(len(messages)):
