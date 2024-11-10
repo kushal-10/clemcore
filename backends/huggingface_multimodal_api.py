@@ -211,6 +211,18 @@ def check_multiple_image(messages: List[Dict]):
 
     return has_multiple_images
 
+def remove_system_messages(messages: List[Dict]) -> List[Dict]:
+    """
+    Remove messages with 'role' equal to 'system'. For MM_REFERENCEGAME
+
+    Args:
+        messages (List[Dict]): A list of message dictionaries.
+
+    Returns:
+        List[Dict]: A filtered list of messages without 'system' role messages.
+    """
+    return [msg for msg in messages if msg.get('role') != 'system']
+
 
 class HuggingfaceMultimodal(backends.Backend):
     def __init__(self):
@@ -285,7 +297,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             template = Template(template_str)
             prompt_text = template.render(messages=messages, add_generation_prompt=True)
         elif self.premade_template:
-            print(messages)
+            messages = remove_system_messages(messages)
             prompt_text = self.processor.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         elif self.prompt_method:
             prompt_method = import_method(self.prompt_method)
