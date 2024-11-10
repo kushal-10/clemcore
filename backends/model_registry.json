@@ -1691,7 +1691,7 @@
         "torch_dtype": "auto",
         "device_map": "auto"
     },
-    "processor_class": "transformers.AutoTokenizer",
+    "processor_class": "transformers.AutoProcessor",
     "processor_config": {
         "torch_dtype": "auto",
         "device_map": "auto"
