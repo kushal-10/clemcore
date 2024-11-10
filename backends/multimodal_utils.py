@@ -406,7 +406,7 @@ def generate_llava_response(**response_kwargs) -> str:
         else:
             processed_images.append(image)
 
-    inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device)
+    inputs = processor(images=processed_images, text=prompt, return_tensors='pt').to(device, torch.float16)
 
     output = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample)
     response = processor.decode(output[0], skip_special_tokens=True)
