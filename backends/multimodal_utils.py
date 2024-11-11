@@ -540,12 +540,19 @@ def generate_molmo_response(**response_kwargs) -> str:
     
     inputs = {k: v.to(device).unsqueeze(0) for k, v in inputs.items()}
 
-    # generate output; stop generation when <|endoftext|> is generated
-    output = model.generate_from_batch(
-        inputs,
-        GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
-        tokenizer=processor.tokenizer
-    )
+    # # generate output; stop generation when <|endoftext|> is generated
+    # output = model.generate_from_batch(
+    #     inputs,
+    #     GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
+    #     tokenizer=processor.tokenizer
+    # )
+
+    with torch.autocast(device_type="cuda", enabled=True, dtype=torch.bfloat16):
+        output = model.generate_from_batch(
+            inputs,
+            GenerationConfig(max_new_tokens=200, stop_strings="<|endoftext|>"),
+            tokenizer=processor.tokenizer
+        )
 
     # only get generated tokens; decode them to text
     generated_tokens = output[0,inputs['input_ids'].size(1):]
