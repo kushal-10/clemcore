@@ -1710,7 +1710,7 @@
     "huggingface_id": "allenai/Molmo-7B-D-0924",
     "model_class": "transformers.AutoModelForCausalLM",
     "model_config": {
-        "torch_dtype": "auto",
+        "torch_dtype": "torch.float16",
         "device_map": "auto"
     },
     "processor_class": "transformers.AutoProcessor",
