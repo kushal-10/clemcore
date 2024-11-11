@@ -296,7 +296,7 @@ def generate_internvl2_response(**response_kwargs) -> str:
 
 """
 ##### LLAVA TYPE MODELS #####
-Compatible models - LLaVA 1.5, LLaVA 1.6, Idefics3
+Compatible models - LLaVA 1.5, LLaVA 1.6, LLaVA-OV, Idefics3 (Idefics2*)
 """
 
 def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
@@ -418,6 +418,7 @@ def generate_llava_response(**response_kwargs) -> str:
 
 """
 ##### IDEFICS TYPE MODELS #####
+Compatible models - Idefics1
 """
 
 def generate_idefics_prompt_text(messages: List[str], **prompt_kwargs) -> str:
@@ -504,6 +505,7 @@ def generate_idefics_response(**response_kwargs) -> str:
 
 """
 ##### MOLMO TYPE MODELS #####
+Compatible models - Molmo-7B-O-0924, Molmo-7B-D-0924, Molmo-72B-0924
 """
 
 def generate_molmo_response(**response_kwargs) -> str:
@@ -540,17 +542,10 @@ def generate_molmo_response(**response_kwargs) -> str:
     
     inputs = {k: v.to(device).unsqueeze(0) for k, v in inputs.items()}
 
-    # # generate output; stop generation when <|endoftext|> is generated
-    # output = model.generate_from_batch(
-    #     inputs,
-    #     GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
-    #     tokenizer=processor.tokenizer
-    # )
-
-    with torch.autocast(device_type="cuda", enabled=True, dtype=torch.bfloat16):
+    with torch.autocast(device_type="cuda", enabled=True):
         output = model.generate_from_batch(
             inputs,
-            GenerationConfig(max_new_tokens=200, stop_strings="<|endoftext|>"),
+            GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
             tokenizer=processor.tokenizer
         )
 

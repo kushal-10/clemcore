@@ -260,7 +260,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.model_name = model_spec['model_name']
 
         self.split_prefix = model_spec.output_split_prefix if hasattr(model_spec, 'output_split_prefix') else ""
-        self.template = model_spec.custom_chat_template if hasattr(model_spec, 'custom_chat_template') else None
+        self.custom_template = model_spec.custom_chat_template if hasattr(model_spec, 'custom_chat_template') else None
         self.premade_template = True if hasattr(model_spec, 'premade_chat_template') else False
         self.cull = model_spec.eos_to_cull if hasattr(model_spec, 'eos_to_cull') else None
         self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec, 'supports_multiple_images') else False
@@ -299,18 +299,18 @@ class HuggingfaceMultimodalModel(backends.Model):
         }
         prompt_text = ""
         # Get input prompt by applying jinja template, if template is provided
-        if self.template:
-            template_str = self.template
+        if self.custom_template:
+            template_str = self.custom_template
             template = Template(template_str)
             prompt_text = template.render(messages=messages, add_generation_prompt=True)
         elif self.premade_template:
-            messages = remove_system_messages(messages)
+            messages = remove_system_messages(messages) # Specific to Qwen-2 Chat template - requires only alternating user/assistant messages
             prompt_text = self.processor.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         elif self.prompt_method:
             prompt_method = import_method(self.prompt_method)
             prompt_text = prompt_method(messages,  **prompt_kwargs)
         else:
-            raise ValueError("Neither template nor prompt method is provided.")
+            raise ValueError(f"Neither a template nor prompt method is provided for model : {self.model_name}")
 
 
         # Check context limit based on if AutoProcessor is loaded or AutoTokenizer
@@ -340,7 +340,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             'messages': messages,
             'max_tokens': self.get_max_tokens(),
             'model_name': self.model_name,
-            'template': self.template,
+            'template': self.custom_template,
             'prompt_text': prompt_text
         }
         generated_response = response_method(**response_kwargs)
@@ -359,12 +359,8 @@ class HuggingfaceMultimodalModel(backends.Model):
             response_text = rt_split[0]
         response_text = response_text.strip()
 
-        logger.info("*" * 50)
+        logger.info("-" * 100)
         logger.info(f"\n\n RESPONSE : {response} \n\n")
-        logger.info("*" * 50)
-
-        logger.info("*" * 50)
-        logger.info(f"\n\n RESPONSETEXT : {response_text} \n\n")
-        logger.info("*" * 50)
+        logger.info("-" * 100)
 
         return prompt, response, response_text
