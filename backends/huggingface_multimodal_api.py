@@ -178,10 +178,8 @@ def load_model(model_spec: backends.ModelSpec):
             model_config['device_map'] = device_map
     
     if 'torch_dtype' in model_config:
-        if not model_config['torch_dtype'] == 'auto':
-            logger.info(f"Setting torch_dtype: {model_config['torch_dtype']}")
-            torch_dtype = import_method(model_config['torch_dtype']) # Convert from str to method
-            model_config['torch_dtype'] = torch_dtype
+        if model_config['torch_dtype'] == 'torch.float16':
+            model_config['torch_dtype'] = torch.float16
         
     if 'trust_remote_code' in model_spec:
         model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
@@ -269,9 +267,9 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.response_method = model_spec.response if hasattr(model_spec, 'response') else None 
         model_config = model_spec['model_config']
         self.torch_dtype = model_config.get('torch_dtype', None) 
-        if self.torch_dtype and self.torch_dtype != 'auto':  # Check if torch_dtype is set and not 'auto'
+        if self.torch_dtype and self.torch_dtype == 'torch.float16':  # Check if torch_dtype is set
             logger.info(f"Setting torch_dtype: {self.torch_dtype}")
-            self.torch_dtype = import_method(self.torch_dtype)  # Convert from str to method
+            self.torch_dtype = torch.float16
         
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
