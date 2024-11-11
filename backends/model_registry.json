@@ -1683,6 +1683,94 @@
     "parameters": "8B"
   },
   {
+    "model_name": "MolmoE-1B-0924",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "allenai/MolmoE-1B-0924",
+    "model_class": "transformers.AutoModelForCausalLM",
+    "model_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "response": "backends.multimodal_utils.generate_molmo_response",
+    "premade_chat_template": true,
+    "trust_remote_code": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-09-24",
+    "open_weight": true,
+    "parameters": "7B"
+  },
+  {
+    "model_name": "Molmo-7B-O-0924",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "allenai/Molmo-7B-O-0924",
+    "model_class": "transformers.AutoModelForCausalLM",
+    "model_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "response": "backends.multimodal_utils.generate_molmo_response",
+    "premade_chat_template": true,
+    "trust_remote_code": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-09-24",
+    "open_weight": true,
+    "parameters": "7B"
+  },
+  {
+    "model_name": "Molmo-7B-D-0924",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "allenai/Molmo-7B-D-0924",
+    "model_class": "transformers.AutoModelForCausalLM",
+    "model_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "response": "backends.multimodal_utils.generate_molmo_response",
+    "premade_chat_template": true,
+    "trust_remote_code": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-09-24",
+    "open_weight": true,
+    "parameters": "7B"
+  },
+  {
+    "model_name": "Molmo-72B-0924",
+    "backend": "huggingface_multimodal",
+    "huggingface_id": "allenai/Molmo-72B-0924",
+    "model_class": "transformers.AutoModelForCausalLM",
+    "model_config": {
+        "torch_dtype": "torch.float16",
+        "device_map": "auto"
+    },
+    "processor_class": "transformers.AutoProcessor",
+    "processor_config": {
+        "torch_dtype": "auto",
+        "device_map": "auto"
+    },
+    "response": "backends.multimodal_utils.generate_molmo_response",
+    "premade_chat_template": true,
+    "trust_remote_code": true,
+    "supports_multiple_images": true,
+    "release_date": "2024-09-24",
+    "open_weight": true,
+    "parameters": "72B"
+  },
+  {
     "model_name": "internlm-xcomposer2d5-7b",
     "backend": "huggingface_multimodal",
     "huggingface_id": "internlm/internlm-xcomposer2d5-7b",

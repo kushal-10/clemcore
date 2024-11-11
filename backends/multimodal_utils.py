@@ -10,8 +10,10 @@ import torchvision.transforms as T
 from PIL import Image
 from torchvision.transforms.functional import InterpolationMode
 from transformers.image_utils import load_image
+from transformers import GenerationConfig
 import requests
 from io import BytesIO
+from jinja2 import Template
 
 """
 ##### INTERNVL2 TYPE MODELS #####
@@ -294,7 +296,7 @@ def generate_internvl2_response(**response_kwargs) -> str:
 
 """
 ##### LLAVA TYPE MODELS #####
-Compatible models - LLaVA 1.5, LLaVA 1.6, Idefics3
+Compatible models - LLaVA 1.5, LLaVA 1.6, LLaVA-OV, Idefics3 (Idefics2*)
 """
 
 def generate_llava_messages(messages: List[str]) -> Tuple[List, List]:
@@ -416,6 +418,7 @@ def generate_llava_response(**response_kwargs) -> str:
 
 """
 ##### IDEFICS TYPE MODELS #####
+Compatible models - Idefics1
 """
 
 def generate_idefics_prompt_text(messages: List[str], **prompt_kwargs) -> str:
@@ -499,3 +502,56 @@ def generate_idefics_response(**response_kwargs) -> str:
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
     
     return generated_text[0]
+
+"""
+##### MOLMO TYPE MODELS #####
+Compatible models - Molmo-7B-O-0924, Molmo-7B-D-0924, Molmo-72B-0924
+"""
+
+def generate_molmo_response(**response_kwargs) -> str:
+
+    prompt_text = response_kwargs['prompt_text']
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+    torch_dtype = response_kwargs['torch_dtype']
+
+    images = []
+    for i in range(len(messages)):
+        index = len(messages) - 1 - i
+        if messages[index]['role'] == 'user':
+            if 'image' in messages[index]:
+                images = messages[index]['image']
+            break
+        else:
+            continue
+
+    loaded_images = []
+    if images:
+        for img in images:
+            loaded_images.append(load_image(img))
+        inputs = processor.process(
+            images=loaded_images,
+            text=prompt_text
+        )    
+    else:
+        inputs = processor.process(
+            text=prompt_text
+        )
+    
+    inputs = {k: v.to(device).unsqueeze(0) for k, v in inputs.items()}
+
+    with torch.autocast(device_type=device, enabled=True, dtype=torch_dtype):
+        output = model.generate_from_batch(
+            inputs,
+            GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
+            tokenizer=processor.tokenizer
+        )
+
+    # only get generated tokens; decode them to text
+    generated_tokens = output[0,inputs['input_ids'].size(1):]
+    generated_text = processor.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+
+    return generated_text

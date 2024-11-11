@@ -170,11 +170,16 @@ def load_model(model_spec: backends.ModelSpec):
     model_class = import_method(model_class_str)
 
     # Check if a custom device_map split is provided and adjust device_map accordingly
-    if 'device_map' in model_config and not model_config['device_map'] == 'auto':
-        logger.info(f"Loading Custom device map for model: {hf_model_str}")
-        split_model = import_method(model_config['device_map'])
-        device_map = split_model(model_spec['model_name'])
-        model_config['device_map'] = device_map
+    if 'device_map' in model_config:
+        if not model_config['device_map'] == 'auto':
+            logger.info(f"Loading Custom device map for model: {hf_model_str}")
+            split_model = import_method(model_config['device_map'])
+            device_map = split_model(model_spec['model_name'])
+            model_config['device_map'] = device_map
+    
+    if 'torch_dtype' in model_config:
+        if model_config['torch_dtype'] == 'torch.float16':
+            model_config['torch_dtype'] = torch.float16
         
     if 'trust_remote_code' in model_spec:
         model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
@@ -211,6 +216,18 @@ def check_multiple_image(messages: List[Dict]):
 
     return has_multiple_images
 
+def remove_system_messages(messages: List[Dict]) -> List[Dict]:
+    """
+    Remove messages with 'role' equal to 'system'. For MM_REFERENCEGAME
+
+    Args:
+        messages (List[Dict]): A list of message dictionaries.
+
+    Returns:
+        List[Dict]: A filtered list of messages without 'system' role messages.
+    """
+    return [msg for msg in messages if msg.get('role') != 'system']
+
 
 class HuggingfaceMultimodal(backends.Backend):
     def __init__(self):
@@ -241,13 +258,19 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.model_name = model_spec['model_name']
 
         self.split_prefix = model_spec.output_split_prefix if hasattr(model_spec, 'output_split_prefix') else ""
-        self.template = model_spec.custom_chat_template if hasattr(model_spec, 'custom_chat_template') else None
+        self.custom_template = model_spec.custom_chat_template if hasattr(model_spec, 'custom_chat_template') else None
         self.premade_template = True if hasattr(model_spec, 'premade_chat_template') else False
         self.cull = model_spec.eos_to_cull if hasattr(model_spec, 'eos_to_cull') else None
         self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec, 'supports_multiple_images') else False
         self.do_sample = model_spec.do_sample if hasattr(model_spec, 'do_sample') else None
         self.prompt_method = model_spec.prompt if hasattr(model_spec, 'prompt') else None
         self.response_method = model_spec.response if hasattr(model_spec, 'response') else None 
+        model_config = model_spec['model_config']
+        self.torch_dtype = model_config.get('torch_dtype', None) 
+        if self.torch_dtype and self.torch_dtype == 'torch.float16':  # Check if torch_dtype is set
+            logger.info(f"Setting torch_dtype: {self.torch_dtype}")
+            self.torch_dtype = torch.float16
+        
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
@@ -280,15 +303,18 @@ class HuggingfaceMultimodalModel(backends.Model):
         }
         prompt_text = ""
         # Get input prompt by applying jinja template, if template is provided
-        if self.template:
-            template_str = self.template
+        if self.custom_template:
+            template_str = self.custom_template
             template = Template(template_str)
-            prompt_text = template.render(messages=messages)
+            prompt_text = template.render(messages=messages, add_generation_prompt=True)
+        elif self.premade_template:
+            messages = remove_system_messages(messages) # Specific to Qwen-2 Chat template - requires only alternating user/assistant messages
+            prompt_text = self.processor.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         elif self.prompt_method:
             prompt_method = import_method(self.prompt_method)
             prompt_text = prompt_method(messages,  **prompt_kwargs)
         else:
-            raise ValueError("Neither template nor prompt method is provided.")
+            raise ValueError(f"Neither a template nor prompt method is provided for model : {self.model_name}")
 
 
         # Check context limit based on if AutoProcessor is loaded or AutoTokenizer
@@ -317,7 +343,10 @@ class HuggingfaceMultimodalModel(backends.Model):
             'do_sample': self.do_sample,
             'messages': messages,
             'max_tokens': self.get_max_tokens(),
-            'model_name': self.model_name
+            'model_name': self.model_name,
+            'template': self.custom_template,
+            'prompt_text': prompt_text,
+            'torch_dtype': self.torch_dtype
         }
         generated_response = response_method(**response_kwargs)
 
@@ -335,12 +364,8 @@ class HuggingfaceMultimodalModel(backends.Model):
             response_text = rt_split[0]
         response_text = response_text.strip()
 
-        logger.info("*" * 50)
+        logger.info("-" * 100)
         logger.info(f"\n\n RESPONSE : {response} \n\n")
-        logger.info("*" * 50)
-
-        logger.info("*" * 50)
-        logger.info(f"\n\n RESPONSETEXT : {response_text} \n\n")
-        logger.info("*" * 50)
+        logger.info("-" * 100)
 
         return prompt, response, response_text
