@@ -267,6 +267,12 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.do_sample = model_spec.do_sample if hasattr(model_spec, 'do_sample') else None
         self.prompt_method = model_spec.prompt if hasattr(model_spec, 'prompt') else None
         self.response_method = model_spec.response if hasattr(model_spec, 'response') else None 
+        model_config = model_spec['model_config']
+        self.torch_dtype = model_config.get('torch_dtype', None) 
+        if self.torch_dtype and self.torch_dtype != 'auto':  # Check if torch_dtype is set and not 'auto'
+            logger.info(f"Setting torch_dtype: {self.torch_dtype}")
+            self.torch_dtype = import_method(self.torch_dtype)  # Convert from str to method
+        
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
@@ -341,7 +347,8 @@ class HuggingfaceMultimodalModel(backends.Model):
             'max_tokens': self.get_max_tokens(),
             'model_name': self.model_name,
             'template': self.custom_template,
-            'prompt_text': prompt_text
+            'prompt_text': prompt_text,
+            'torch_dtype': self.torch_dtype
         }
         generated_response = response_method(**response_kwargs)
 

@@ -516,6 +516,7 @@ def generate_molmo_response(**response_kwargs) -> str:
     max_tokens = response_kwargs['max_tokens']
     model = response_kwargs['model']
     processor = response_kwargs['processor']
+    torch_dtype = response_kwargs['torch_dtype']
 
     images = []
     for i in range(len(messages)):
@@ -542,7 +543,7 @@ def generate_molmo_response(**response_kwargs) -> str:
     
     inputs = {k: v.to(device).unsqueeze(0) for k, v in inputs.items()}
 
-    with torch.autocast(device_type="cuda", enabled=True):
+    with torch.autocast(device_type=device, enabled=True, torch_dtype=torch_dtype):
         output = model.generate_from_batch(
             inputs,
             GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
