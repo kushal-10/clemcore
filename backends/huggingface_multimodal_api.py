@@ -170,11 +170,18 @@ def load_model(model_spec: backends.ModelSpec):
     model_class = import_method(model_class_str)
 
     # Check if a custom device_map split is provided and adjust device_map accordingly
-    if 'device_map' in model_config and not model_config['device_map'] == 'auto':
-        logger.info(f"Loading Custom device map for model: {hf_model_str}")
-        split_model = import_method(model_config['device_map'])
-        device_map = split_model(model_spec['model_name'])
-        model_config['device_map'] = device_map
+    if 'device_map' in model_config:
+        if not model_config['device_map'] == 'auto':
+            logger.info(f"Loading Custom device map for model: {hf_model_str}")
+            split_model = import_method(model_config['device_map'])
+            device_map = split_model(model_spec['model_name'])
+            model_config['device_map'] = device_map
+    
+    if 'torch_dtype' in model_config:
+        if not model_config['torch_dtype'] == 'auto':
+            logger.info(f"Setting torch_dtype: {model_config['torch_dtype']}")
+            torch_dtype = import_method(model_config['torch_dtype']) # Convert from str to method
+            model_config['torch_dtype'] = torch_dtype
         
     if 'trust_remote_code' in model_spec:
         model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
