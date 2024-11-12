@@ -90,6 +90,8 @@ def split_model(model_name):
     device_map['language_model.output'] = 0
     device_map['language_model.model.norm'] = 0
     device_map['language_model.lm_head'] = 0
+    if "NVLM" in model_name:
+        device_map['language_model.model.rotary_emb'] = 0
     device_map[f'language_model.model.layers.{num_layers - 1}'] = 0
 
     return device_map
