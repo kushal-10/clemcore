@@ -272,7 +272,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             'torch.bfloat16': torch.bfloat16,
         }
         if self.torch_dtype and self.torch_dtype != "auto":
-            self.torch_dtype = dtype_mapping.get(self.torch_dtype, None)
+            self.torch_dtype = dtype_mapping[self.torch_dtype]
             logger.info(f"Setting torch_dtype: {self.torch_dtype}")
         
 
