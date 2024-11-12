@@ -286,13 +286,18 @@ def generate_internvl2_response(**response_kwargs) -> str:
     model = response_kwargs['model']
     processor = response_kwargs['processor']
     torch_dtype = response_kwargs['torch_dtype']
+    model_name = response_kwargs['model_name']
 
     images = get_internvl2_image(messages=messages, device=device).to(torch_dtype)
     history, question = generate_history_internvl2(messages=messages)
     if not history:
         history = None
     generation_config = dict(max_new_tokens=max_tokens, do_sample=True)
-    generated_response, _ = model.chat(processor, images, question, generation_config, 
+    if "NVLM" in model_name:
+        model = model.eval()
+        generated_response = model.chat(processor, images, question, generation_config)
+    else:
+        generated_response, _ = model.chat(processor, images, question, generation_config, 
                                                      history=history, return_history=True)
 
     return generated_response
