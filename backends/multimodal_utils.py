@@ -23,7 +23,7 @@ Compatible models - InternVL2, Nvidia NVLM
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 
- 
+    
 def generate_history_internvl2(messages: List[str]) -> Tuple[List[Tuple], str]:
     """
     Separates the history and query from the list of messages in the current game instance.
@@ -238,12 +238,12 @@ def get_internvl2_image(messages: List[str], device: str):
         raise ValueError("No user message found in the provided messages.")
     else:
         if len(last_user_message['image']) > 1:            
-            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=12).to(torch.bfloat16).to(device)
+            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=6).to(torch.bfloat16).to(device)
             for i in range(1, len(last_user_message['image'])):
-                pixel_values1 = load_internvl2_image(last_user_message['image'][i], max_num=12).to(torch.bfloat16).to(device)
+                pixel_values1 = load_internvl2_image(last_user_message['image'][i], max_num=6).to(torch.bfloat16).to(device)
                 pixel_values = torch.cat((pixel_values, pixel_values1), dim=0)
         else:
-            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=12).to(torch.bfloat16).to(device)
+            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=6).to(torch.bfloat16).to(device)
 
     return pixel_values
 
