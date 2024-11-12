@@ -1583,9 +1583,9 @@
       "parameters": "9B"
   },
   {
-    "model_name": "InternVL2-Llama3-76B",
+    "model_name": "NVLM-D-72B",
     "backend": "huggingface_multimodal",
-    "huggingface_id": "OpenGVLab/InternVL2-Llama3-76B",
+    "huggingface_id": "nvidia/NVLM-D-72B",
     "model_class": "transformers.AutoModel",
     "model_config": {
         "torch_dtype": "auto",
