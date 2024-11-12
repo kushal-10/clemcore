@@ -1589,17 +1589,16 @@
     "model_class": "transformers.AutoModel",
     "model_config": {
         "torch_dtype": "torch.bfloat16",
-        "load_in_8bit": true,
         "low_cpu_mem_usage": true,
         "use_flash_attn": false,
-        "device_map": "backends.multimodal_utils.split_model"
+        "device_map": "backends.multimodal_utils.split_model_nvlm"
     },
     "processor_class": "transformers.AutoTokenizer",
     "processor_config": {
         "use_fast": false
     },
     "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
-    "response": "backends.multimodal_utils.generate_internvl2_response",
+    "response": "backends.multimodal_utils.generate_nvlm_response",
     "trust_remote_code": true,
     "do_sample": false,
     "supports_multiple_images": true,
