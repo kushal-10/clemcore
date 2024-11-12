@@ -1588,7 +1588,7 @@
     "huggingface_id": "nvidia/NVLM-D-72B",
     "model_class": "transformers.AutoModel",
     "model_config": {
-        "torch_dtype": "auto",
+        "torch_dtype": "torch.bfloat16",
         "load_in_8bit": true,
         "low_cpu_mem_usage": true,
         "use_flash_attn": false,

@@ -267,9 +267,13 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.response_method = model_spec.response if hasattr(model_spec, 'response') else None 
         model_config = model_spec['model_config']
         self.torch_dtype = model_config.get('torch_dtype', None) 
-        if self.torch_dtype and self.torch_dtype == 'torch.float16':  # Check if torch_dtype is set
+        dtype_mapping = {
+            'torch.float16': torch.float16,
+            'torch.bfloat16': torch.bfloat16,
+        }
+        if self.torch_dtype and self.torch_dtype != "auto":
+            self.torch_dtype = dtype_mapping.get(self.torch_dtype, None)
             logger.info(f"Setting torch_dtype: {self.torch_dtype}")
-            self.torch_dtype = torch.float16
         
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
