@@ -675,7 +675,7 @@ def load_image_nvlm(image_file, input_size=448, max_num=12):
     pixel_values = torch.stack(pixel_values)
     return pixel_values
 
-def get_nvlm_image(messages: List[str], device: str):
+def get_nvlm_image(messages: List[str]):
     """
     Extracts the last user message containing image data and loads the corresponding images.
 
@@ -701,12 +701,12 @@ def get_nvlm_image(messages: List[str], device: str):
         raise ValueError("No user message found in the provided messages.")
     else:
         if len(last_user_message['image']) > 1:            
-            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=6).to(torch.bfloat16).to(device)
+            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=6).to(torch.bfloat16)
             for i in range(1, len(last_user_message['image'])):
-                pixel_values1 = load_internvl2_image(last_user_message['image'][i], max_num=6).to(torch.bfloat16).to(device)
+                pixel_values1 = load_internvl2_image(last_user_message['image'][i], max_num=6).to(torch.bfloat16)
                 pixel_values = torch.cat((pixel_values, pixel_values1), dim=0)
         else:
-            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=6).to(torch.bfloat16).to(device)
+            pixel_values = load_internvl2_image(last_user_message['image'][0], max_num=6).to(torch.bfloat16)
 
     return pixel_values
 
