@@ -176,7 +176,7 @@ def load_model(model_spec: backends.ModelSpec, torch_dtype: torch.dtype = None):
             split_model = import_method(model_config['device_map'])
             device_map = split_model(model_spec['model_name'])
             model_config['device_map'] = device_map
-            
+
     if torch_dtype:
         model_config['torch_dtype'] = torch_dtype
         
@@ -251,6 +251,7 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         # Load instance variable used for evey model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        model_config = model_spec['model_config']
         self.torch_dtype = model_config.get('torch_dtype', None) 
         dtype_mapping = {
             'torch.float16': torch.float16,
@@ -272,9 +273,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec, 'supports_multiple_images') else False
         self.do_sample = model_spec.do_sample if hasattr(model_spec, 'do_sample') else None
         self.prompt_method = model_spec.prompt if hasattr(model_spec, 'prompt') else None
-        self.response_method = model_spec.response if hasattr(model_spec, 'response') else None 
-        model_config = model_spec['model_config']
-        
+        self.response_method = model_spec.response if hasattr(model_spec, 'response') else None         
         
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
