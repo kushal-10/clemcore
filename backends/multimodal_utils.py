@@ -285,8 +285,9 @@ def generate_internvl2_response(**response_kwargs) -> str:
     max_tokens = response_kwargs['max_tokens']
     model = response_kwargs['model']
     processor = response_kwargs['processor']
+    torch_dtype = response_kwargs['torch_dtype']
 
-    images = get_internvl2_image(messages=messages, device=device)
+    images = get_internvl2_image(messages=messages, device=device).to(torch_dtype)
     history, question = generate_history_internvl2(messages=messages)
     if not history:
         history = None
