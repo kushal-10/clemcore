@@ -120,7 +120,7 @@ def import_method(method_path: str):
 
 
 
-def load_processor(model_spec: backends.ModelSpec):
+def load_processor(model_spec: backends.ModelSpec, torch_dtype: torch.dtype = None):
     """
     Load processor from AutoProcessor/AutoTokenizer for a specific model (Example - LlavaProcessor).
 
@@ -149,7 +149,7 @@ def load_processor(model_spec: backends.ModelSpec):
     return processor
 
 
-def load_model(model_spec: backends.ModelSpec):
+def load_model(model_spec: backends.ModelSpec, torch_dtype: torch.dtype = None):
     """
     Load a specific model.
 
@@ -176,10 +176,9 @@ def load_model(model_spec: backends.ModelSpec):
             split_model = import_method(model_config['device_map'])
             device_map = split_model(model_spec['model_name'])
             model_config['device_map'] = device_map
-    
-    if 'torch_dtype' in model_config:
-        if model_config['torch_dtype'] == 'torch.float16':
-            model_config['torch_dtype'] = torch.float16
+            
+    if torch_dtype:
+        model_config['torch_dtype'] = torch_dtype
         
     if 'trust_remote_code' in model_spec:
         model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
@@ -252,8 +251,17 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         # Load instance variable used for evey model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.processor = load_processor(model_spec)
-        self.multimodal_model = load_model(model_spec)
+        self.torch_dtype = model_config.get('torch_dtype', None) 
+        dtype_mapping = {
+            'torch.float16': torch.float16,
+            'torch.bfloat16': torch.bfloat16
+        }
+        if self.torch_dtype and self.torch_dtype != "auto":
+            self.torch_dtype = dtype_mapping[self.torch_dtype]
+            logger.info(f"Setting torch_dtype: {self.torch_dtype}")
+
+        self.processor = load_processor(model_spec, self.torch_dtype)
+        self.multimodal_model = load_model(model_spec, self.torch_dtype)
         self.context_size = get_context_limit(model_spec)
         self.model_name = model_spec['model_name']
 
@@ -266,14 +274,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.prompt_method = model_spec.prompt if hasattr(model_spec, 'prompt') else None
         self.response_method = model_spec.response if hasattr(model_spec, 'response') else None 
         model_config = model_spec['model_config']
-        self.torch_dtype = model_config.get('torch_dtype', None) 
-        dtype_mapping = {
-            'torch.float16': torch.float16,
-            'torch.bfloat16': torch.bfloat16,
-        }
-        if self.torch_dtype and self.torch_dtype != "auto":
-            self.torch_dtype = dtype_mapping[self.torch_dtype]
-            logger.info(f"Setting torch_dtype: {self.torch_dtype}")
+        
         
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
