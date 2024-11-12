@@ -571,7 +571,7 @@ def generate_molmo_response(**response_kwargs) -> str:
 Compatible models - NVLM-D-72B
 """
 
-def split_model_nvlm():
+def split_model_nvlm(temp_str):
     device_map = {}
     world_size = torch.cuda.device_count()
     num_layers = 80
