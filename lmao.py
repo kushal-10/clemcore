@@ -32,7 +32,8 @@ for model in registry:
     if "support_multiple_images" in model:
         model.pop("support_multiple_images")
         model["multimodality"] = {
-            "images": True,
+            "single_image": True,
+            "multiple_images": True,
             "audio": False,
             "video": False
         }
@@ -40,7 +41,8 @@ for model in registry:
     if "supports_multiple_images" in model:
         model.pop("supports_multiple_images")
         model["multimodality"] = {
-            "images": True,
+            "single_image": True,
+            "multiple_images": True,
             "audio": False,
             "video": False
         }

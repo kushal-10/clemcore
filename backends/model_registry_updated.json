@@ -203,7 +203,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -225,7 +226,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -247,7 +249,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -269,7 +272,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -684,7 +688,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -706,7 +711,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -728,7 +734,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -750,7 +757,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -806,7 +814,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -828,7 +837,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -850,7 +860,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -872,7 +883,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -894,7 +906,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -916,7 +929,8 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "multimodality": {
-            "images": true,
+            "single_image": true,
+            "multiple_images": true,
             "audio": false,
             "video": false
         }
@@ -2489,7 +2503,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2525,7 +2540,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2561,7 +2577,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2597,7 +2614,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2633,7 +2651,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2669,7 +2688,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2705,7 +2725,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2741,7 +2762,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2777,7 +2799,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2813,7 +2836,8 @@
             "output_split_prefix": "ASSISTANT:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2848,7 +2872,8 @@
             "output_split_prefix": "assistant:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2883,7 +2908,8 @@
             "output_split_prefix": "assistant:",
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2918,7 +2944,8 @@
             "eos_to_cull": "<end_of_utterance>",
             "output_split_prefix": "Assistant:",
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2953,7 +2980,8 @@
             "eos_to_cull": "<end_of_utterance>",
             "output_split_prefix": "Assistant:",
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -2993,7 +3021,8 @@
             "trust_remote_code": true,
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3033,7 +3062,8 @@
             "trust_remote_code": true,
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3073,7 +3103,8 @@
             "trust_remote_code": true,
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3113,7 +3144,8 @@
             "trust_remote_code": true,
             "do_sample": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3150,7 +3182,8 @@
             "premade_chat_template": true,
             "trust_remote_code": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3187,7 +3220,8 @@
             "premade_chat_template": true,
             "trust_remote_code": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3224,7 +3258,8 @@
             "premade_chat_template": true,
             "trust_remote_code": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3261,7 +3296,8 @@
             "premade_chat_template": true,
             "trust_remote_code": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3292,7 +3328,8 @@
             "output_split_prefix": "",
             "not_distributed": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3327,7 +3364,8 @@
             "trust_remote_code": true,
             "output_split_prefix": "Assistant:",
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3358,7 +3396,8 @@
             "output_split_prefix": "",
             "low_cpu_mem_usage": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3387,7 +3426,8 @@
             "output_split_prefix": "",
             "low_cpu_mem_usage": true,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
@@ -3419,7 +3459,8 @@
             "tokenizer_mode": "mistral",
             "vllm_context": 8192,
             "multimodality": {
-                "images": true,
+                "single_image": true,
+                "multiple_images": true,
                 "audio": false,
                 "video": false
             }
