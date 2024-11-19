@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 import evaluation.evalutils as utils
-import clemgame.metrics as clemmetrics
+import clemcore.clemgame.metrics as clemmetrics
 
 TABLE_NAME = 'results'
 
@@ -30,10 +30,16 @@ class PlayedScoreError(Exception):
 
 def save_clem_table(df: pd.DataFrame, path: str) -> None:
     """Create benchmark results as a table."""
-    df_aux = df[df['metric'].isin(utils.MAIN_METRICS)]
+
+    # extract only relevant metrics
+    df = df[df['metric'].isin(utils.MAIN_METRICS)]
+
+    # make sure all values are actually numeric (temporarily surpressing SettingwithCopyWarning)
+    with pd.option_context('mode.chained_assignment', None):
+        df['value'] = pd.to_numeric(df['value'])
 
     # compute mean benchscore and mean played (which is binary, so a proportion)
-    df_a = (df_aux.groupby(['game', 'model', 'metric'])
+    df_a = (df.groupby(['game', 'model', 'metric'])
                   .mean(numeric_only=True)
                   .reset_index())
     df_a.loc[df_a.metric == clemmetrics.METRIC_PLAYED, 'value'] *= 100
@@ -43,8 +49,8 @@ def save_clem_table(df: pd.DataFrame, path: str) -> None:
         inplace=True)
 
     # compute the std of benchscore
-    df_aux_b = df_aux[df_aux.metric == clemmetrics.BENCH_SCORE]
-    df_b = (df_aux_b.groupby(['game', 'model', 'metric'])
+    df = df[df.metric == clemmetrics.BENCH_SCORE]
+    df_b = (df.groupby(['game', 'model', 'metric'])
                     .std(numeric_only=True)
                     .reset_index()
                     .round(2))

@@ -34,7 +34,7 @@ from tqdm import tqdm
 import evaluation.evalutils as utils
 import evaluation.plotting as plotting
 import evaluation.makingtables as tables
-import clemgame.metrics as clemmetrics
+import clemcore.clemgame.metrics as clemmetrics
 
 sns.set(font='Futura', style="white")
 

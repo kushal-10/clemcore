@@ -11,7 +11,7 @@ from matplotlib.colors import ListedColormap, to_rgba
 from matplotlib.patches import Polygon
 
 import evaluation.evalutils as utils
-import clemgame.metrics as clemmetrics
+import clemcore.clemgame.metrics as clemmetrics
 
 ABORTED = clemmetrics.METRIC_ABORTED
 
