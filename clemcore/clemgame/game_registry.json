@@ -87,6 +87,16 @@
     "players": "two",
     "image": "multi",
     "languages": ["en"],
-    "benchmark": ["1.6_mm"]
-  }
+    "benchmark": ["1.6", "1.6.5", "2.0"]
+  },
+  {
+  "game_name": "matchit",
+  "game_path": "../clemgames/matchit",
+  "description": "A simple game in which two players have to decide whether they see the same image or not.",
+  "main_game": "matchit",
+  "players": "two",
+  "image": "single",
+  "languages": ["en"],
+  "benchmark": ["1.6", "1.6.5", "2.0"]
+}
 ]
