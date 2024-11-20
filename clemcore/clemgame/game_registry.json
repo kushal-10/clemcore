@@ -118,5 +118,15 @@
     "image": "single",
     "languages": ["en"],
     "benchmark": ["1.6", "1.6.5", "2.0"]
+  },
+  {
+    "game_name": "mm_mapworld_specificroom",
+    "game_path": "../clemgames/mm_mapworld_specificroom",
+    "description": "In this game an agent is placed on a graph and needs to navigate through it by reasoning about past steps taken",
+    "main_game": "mm_mapworld",
+    "players": "two",
+    "image": "single",
+    "languages": ["en"],
+    "benchmark": ["1.6", "1.6.5", "2.0"]
   }
 ]
