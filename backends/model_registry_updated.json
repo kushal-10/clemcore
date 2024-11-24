@@ -119,9 +119,9 @@
         "open_weight": true,
         "parameters": "141B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "64k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -135,9 +135,9 @@
         "open_weight": true,
         "parameters": "46.7B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "64k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -153,7 +153,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1280,7 +1280,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1390,9 +1390,9 @@
         "open_weight": true,
         "parameters": "46.7B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "64k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1448,7 +1448,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1466,7 +1466,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1482,9 +1482,9 @@
         "open_weight": true,
         "parameters": "46.7B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "64k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1670,10 +1670,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://www.llama.com/llama3/license/"
         }
     },
     {
@@ -2255,7 +2255,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -2276,10 +2276,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://www.llama.com/llama3/license/"
         }
     },
     {
@@ -2300,10 +2300,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://www.llama.com/llama3/license/"
         }
     },
     {
