@@ -12,7 +12,7 @@ for model in registry:
     # Add new fields
     model_name = model["model_name"]
     model_name = model_name.lower()
-    if "qwen" or "intern" in model_name:
+    if "qwen" in model_name or "intern" in model_name:
         model["languages"] = ["zh", "en"]
     else:
         model["languages"] = ["en"]

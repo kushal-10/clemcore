@@ -7,7 +7,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -24,7 +23,6 @@
         "open_weight": true,
         "parameters": "34B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -41,7 +39,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -58,7 +55,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -75,7 +71,6 @@
         "open_weight": true,
         "parameters": "8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -92,7 +87,6 @@
         "open_weight": true,
         "parameters": "8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -109,7 +103,6 @@
         "open_weight": true,
         "parameters": "405B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -126,7 +119,6 @@
         "open_weight": true,
         "parameters": "141B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -143,7 +135,6 @@
         "open_weight": true,
         "parameters": "46.7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -160,7 +151,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -177,7 +167,6 @@
         "open_weight": true,
         "parameters": "34B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -194,7 +183,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -217,7 +205,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -240,7 +227,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -263,7 +249,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -286,7 +271,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -303,7 +287,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -320,7 +303,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -338,7 +320,6 @@
         "parameters": "",
         "o1_model": true,
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -356,7 +337,6 @@
         "parameters": "",
         "o1_model": true,
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -373,7 +353,6 @@
         "open_weight": false,
         "parameters": "175B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -390,7 +369,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -407,7 +385,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -424,7 +401,6 @@
         "open_weight": false,
         "parameters": "175B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -441,7 +417,6 @@
         "open_weight": false,
         "parameters": "175B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -458,7 +433,6 @@
         "open_weight": true,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -475,7 +449,6 @@
         "open_weight": true,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -492,7 +465,6 @@
         "open_weight": true,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -509,7 +481,6 @@
         "open_weight": true,
         "parameters": "123B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -526,7 +497,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -543,7 +513,6 @@
         "open_weight": true,
         "parameters": "35B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -560,7 +529,6 @@
         "open_weight": true,
         "parameters": "104B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -577,7 +545,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -594,7 +561,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -611,7 +577,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -628,7 +593,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -645,7 +609,6 @@
         "open_weight": false,
         "parameters": "137B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -662,7 +625,6 @@
         "open_weight": false,
         "parameters": "137B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -679,7 +641,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -702,7 +663,6 @@
         "open_weight": false,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -725,7 +685,6 @@
         "open_weight": false,
         "parameters": "20B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -748,7 +707,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -771,7 +729,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -788,7 +745,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -805,7 +761,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -828,7 +783,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -851,7 +805,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -874,7 +827,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -897,7 +849,6 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -920,7 +871,6 @@
         "open_weight": false,
         "parameters": "8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -943,7 +893,6 @@
         "open_weight": false,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -960,7 +909,6 @@
         "open_weight": false,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -977,7 +925,6 @@
         "open_weight": false,
         "parameters": "30B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -994,7 +941,6 @@
         "open_weight": false,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1013,7 +959,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1033,7 +978,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1053,7 +997,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1073,7 +1016,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1093,7 +1035,6 @@
         "open_weight": true,
         "parameters": "40B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1113,7 +1054,6 @@
         "open_weight": true,
         "parameters": "12B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1133,7 +1073,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1153,7 +1092,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1173,7 +1111,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1193,7 +1130,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1213,7 +1149,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1233,7 +1168,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1253,7 +1187,6 @@
         "open_weight": true,
         "parameters": "33B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1273,7 +1206,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1292,7 +1224,6 @@
         "open_weight": true,
         "parameters": "34B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1311,7 +1242,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1330,7 +1260,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1349,7 +1278,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1370,7 +1298,6 @@
         "open_weight": true,
         "parameters": "34B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1389,7 +1316,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1408,7 +1334,6 @@
         "open_weight": true,
         "parameters": "67B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1428,7 +1353,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1448,7 +1372,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1467,7 +1390,6 @@
         "open_weight": true,
         "parameters": "46.7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1488,7 +1410,6 @@
         "open_weight": true,
         "parameters": "34B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1507,7 +1428,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1526,7 +1446,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1545,7 +1464,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1564,7 +1482,6 @@
         "open_weight": true,
         "parameters": "46.7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1584,7 +1501,6 @@
         "open_weight": true,
         "parameters": "72B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1604,7 +1520,6 @@
         "open_weight": true,
         "parameters": "34B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1661,7 +1576,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1680,7 +1594,6 @@
         "open_weight": true,
         "parameters": "3.8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1699,7 +1612,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1756,7 +1668,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1776,7 +1687,6 @@
         "open_weight": true,
         "parameters": "8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1796,7 +1706,6 @@
         "open_weight": true,
         "parameters": "35B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1816,7 +1725,6 @@
         "open_weight": true,
         "parameters": "9B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1836,7 +1744,6 @@
         "open_weight": true,
         "parameters": "27B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1856,7 +1763,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1876,7 +1782,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1896,7 +1801,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1916,7 +1820,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1936,7 +1839,6 @@
         "open_weight": true,
         "parameters": "2B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1956,7 +1858,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1976,7 +1877,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -1996,7 +1896,6 @@
         "open_weight": true,
         "parameters": "2B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2016,7 +1915,6 @@
         "open_weight": true,
         "parameters": "2B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2036,7 +1934,6 @@
         "open_weight": true,
         "parameters": "8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2056,7 +1953,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2076,7 +1972,6 @@
         "open_weight": true,
         "parameters": "123B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2171,7 +2066,6 @@
         "open_weight": false,
         "parameters": "1B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2190,7 +2084,6 @@
         "open_weight": false,
         "parameters": "3B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2209,7 +2102,6 @@
         "open_weight": true,
         "parameters": "1.7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2253,7 +2145,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2275,7 +2166,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2297,7 +2187,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2320,7 +2209,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2343,7 +2231,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2366,7 +2253,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2388,7 +2274,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2413,7 +2298,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2438,7 +2322,6 @@
         "open_weight": true,
         "parameters": "104B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2464,7 +2347,6 @@
         "open_weight": true,
         "parameters": "104B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2481,7 +2363,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2518,7 +2399,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2555,7 +2435,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2592,7 +2471,6 @@
         "open_weight": true,
         "parameters": "8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2629,7 +2507,6 @@
         "open_weight": true,
         "parameters": "110B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2666,7 +2543,6 @@
         "open_weight": true,
         "parameters": "72B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2703,7 +2579,6 @@
         "open_weight": true,
         "parameters": "34B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2740,7 +2615,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2777,7 +2651,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2814,7 +2687,6 @@
         "open_weight": true,
         "parameters": "13B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2923,7 +2795,6 @@
         "open_weight": true,
         "parameters": "80B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -2959,7 +2830,6 @@
         "open_weight": true,
         "parameters": "9B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3159,7 +3029,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3197,7 +3066,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3235,7 +3103,6 @@
         "open_weight": true,
         "parameters": "7B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3273,7 +3140,6 @@
         "open_weight": true,
         "parameters": "72B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3343,7 +3209,6 @@
         "open_weight": true,
         "parameters": "8B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3379,7 +3244,6 @@
         "open_weight": true,
         "parameters": "72B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3411,7 +3275,6 @@
         "open_weight": true,
         "parameters": "4B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3441,7 +3304,6 @@
         "open_weight": true,
         "parameters": "12B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3477,7 +3339,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3498,7 +3359,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3519,7 +3379,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
@@ -3539,7 +3398,6 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "zh",
             "en"
         ],
         "context_size": "",
