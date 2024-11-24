@@ -169,10 +169,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "100k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://ai.meta.com/resources/models-and-libraries/llama-downloads/"
         }
     },
     {
@@ -183,12 +183,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         },
         "multimodality": {
             "single_image": true,
@@ -205,12 +205,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko", "ar", "hi", "bn", "te", "ta", "ml", "kn", "gu", "mr", "pa", "ur", "vi", "th", "id", "ms", "tl", "sw", "yo", "zu", "tr", "he", "fa", "uk", "pl", "cs", "hu", "ro", "nl", "sv", "no", "da", "fi", "el", "bg", "sr", "hr", "sk", "is"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         },
         "multimodality": {
             "single_image": true,
@@ -227,12 +227,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko", "ar", "hi", "bn", "te", "ta", "ml", "kn", "gu", "mr", "pa", "ur", "vi", "th", "id", "ms", "tl", "sw", "yo", "zu", "tr", "he", "fa", "uk", "pl", "cs", "hu", "ro", "nl", "sv", "no", "da", "fi", "el", "bg", "sr", "hr", "sk", "is"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         },
         "multimodality": {
             "single_image": true,
@@ -249,12 +249,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko", "ar", "hi", "bn", "te", "ta", "ml", "kn", "gu", "mr", "pa", "ur", "vi", "th", "id", "ms", "tl", "sw", "yo", "zu", "tr", "he", "fa", "uk", "pl", "cs", "hu", "ro", "nl", "sv", "no", "da", "fi", "el", "bg", "sr", "hr", "sk", "is"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         },
         "multimodality": {
             "single_image": true,
@@ -271,12 +271,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -287,12 +287,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -303,12 +303,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -320,12 +320,12 @@
         "parameters": "",
         "o1_model": true,
         "languages": [
-            "en"
+            "en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko", "ar", "hi", "bn", "te", "ta", "ml", "kn", "gu", "mr", "pa", "ur", "vi", "th", "id", "ms", "tl", "sw", "yo", "zu", "tr", "he", "fa", "uk", "pl", "cs", "hu", "ro", "nl", "sv", "no", "da", "fi", "el", "bg", "sr", "hr", "sk", "is"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -337,12 +337,12 @@
         "parameters": "",
         "o1_model": true,
         "languages": [
-            "en"
+            "en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko", "ar", "hi", "bn", "te", "ta", "ml", "kn", "gu", "mr", "pa", "ur", "vi", "th", "id", "ms", "tl", "sw", "yo", "zu", "tr", "he", "fa", "uk", "pl", "cs", "hu", "ro", "nl", "sv", "no", "da", "fi", "el", "bg", "sr", "hr", "sk", "is"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -353,12 +353,12 @@
         "open_weight": false,
         "parameters": "175B",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "16k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -369,12 +369,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -385,12 +385,12 @@
         "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -401,12 +401,12 @@
         "open_weight": false,
         "parameters": "175B",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "16k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -417,12 +417,12 @@
         "open_weight": false,
         "parameters": "175B",
         "languages": [
-            "en"
+            "en", "it", "af", "es", "de", "fr", "id", "ru", "pl", "uk", "el", "lv", "zh", "ar", "tr", "ja", "sw", "cy", "ko", "is", "bn", "ur", "ne", "th", "pa", "mr", "te"
         ],
-        "context_size": "",
+        "context_size": "16k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "OpenAI",
+            "url": "https://openai.com/policies/row-terms-of-use/"
         }
     },
     {
@@ -1226,10 +1226,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "100k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://ai.meta.com/resources/models-and-libraries/llama-downloads/"
         }
     },
     {
@@ -1430,10 +1430,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "100k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://ai.meta.com/resources/models-and-libraries/llama-downloads/"
         }
     },
     {
