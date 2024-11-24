@@ -9,12 +9,12 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         }
-    },
+    },  
     {
         "model_name": "codellama-34b",
         "model_id": "codellama-34b-instruct",
@@ -25,10 +25,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "100k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://ai.meta.com/resources/models-and-libraries/llama-downloads/"
         }
     },
     {
@@ -41,10 +41,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://www.llama.com/llama3/license/"
         }
     },
     {
@@ -57,10 +57,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://www.llama.com/llama3/license/"
         }
     },
     {
@@ -73,10 +73,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://www.llama.com/llama3/license/"
         }
     },
     {
@@ -89,10 +89,10 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://www.llama.com/llama3/license/"
         }
     },
     {
@@ -103,12 +103,12 @@
         "open_weight": true,
         "parameters": "405B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "th"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE"
         }
     },
     {
@@ -1934,12 +1934,12 @@
         "open_weight": true,
         "parameters": "8B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "th"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE"
         }
     },
     {
@@ -1953,12 +1953,12 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "th"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE"
         }
     },
     {
@@ -3339,12 +3339,12 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "th"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE"
         }
     },
     {
@@ -3352,19 +3352,18 @@
         "backend": "vllm",
         "huggingface_id": "neuralmagic/Meta-Llama-3.1-70B-Instruct-FP8",
         "number_gpus": 1,
-        "context_limit": 4096,
         "premade_chat_template": true,
         "eos_to_cull": "<\\|eot_id\\|>",
         "release_date": "2023-07-23",
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "th"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE"
         }
     },
     {
@@ -3372,19 +3371,18 @@
         "backend": "vllm",
         "huggingface_id": "neuralmagic/Meta-Llama-3.1-70B-Instruct-FP8",
         "number_gpus": 1,
-        "context_limit": 8192,
         "premade_chat_template": true,
         "eos_to_cull": "<\\|eot_id\\|>",
         "release_date": "2023-07-23",
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "th"
         ],
-        "context_size": "",
+        "context_size": "8k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE"
         }
     },
     {
@@ -3398,12 +3396,12 @@
         "open_weight": true,
         "parameters": "70B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "th"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Meta",
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE"
         }
     }
 ]
