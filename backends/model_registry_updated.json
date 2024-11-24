@@ -137,7 +137,7 @@
         "languages": [
             "en", "de", "fr", "it", "es"
         ],
-        "context_size": "64k",
+        "context_size": "32k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -430,15 +430,15 @@
         "model_id": "mistral-medium-2312",
         "backend": "mistral",
         "release_date": "2023-12-01",
-        "open_weight": true,
+        "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Mistral",
+            "url": "https://mistral.ai/licenses/MRL-0.1.md"
         }
     },
     {
@@ -446,15 +446,15 @@
         "model_id": "mistral-tiny-2312",
         "backend": "mistral",
         "release_date": "2023-12-01",
-        "open_weight": true,
+        "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "32k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Mistral",
+            "url": "https://mistral.ai/licenses/MRL-0.1.md"
         }
     },
     {
@@ -462,15 +462,15 @@
         "model_id": "mistral-small-2312",
         "backend": "mistral",
         "release_date": "2023-12-01",
-        "open_weight": true,
+        "open_weight": false,
         "parameters": "",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "32k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Mistral",
+            "url": "https://mistral.ai/licenses/MRL-0.1.md"
         }
     },
     {
@@ -478,15 +478,15 @@
         "model_id": "mistral-large-2402",
         "backend": "mistral",
         "release_date": "2024-02-01",
-        "open_weight": true,
-        "parameters": "123B",
+        "open_weight": false,
+        "parameters": "",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Mistral",
+            "url": "https://mistral.ai/licenses/MRL-0.1.md"
         }
     },
     {
@@ -961,7 +961,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1392,7 +1392,7 @@
         "languages": [
             "en", "de", "fr", "it", "es"
         ],
-        "context_size": "64k",
+        "context_size": "32k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1484,7 +1484,7 @@
         "languages": [
             "en", "de", "fr", "it", "es"
         ],
-        "context_size": "64k",
+        "context_size": "32k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1972,12 +1972,12 @@
         "open_weight": true,
         "parameters": "123B",
         "languages": [
-            "en"
+            "en", "de", "fr", "it", "es", "pt", "hi", "ru", "zh", "ja", "ko"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+            "name": "Mistral",
+            "url": "https://mistral.ai/licenses/MRL-0.1.md"
         }
     },
     {
@@ -2147,7 +2147,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -2168,7 +2168,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -2189,7 +2189,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -3306,7 +3306,7 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "128k",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -3319,7 +3319,6 @@
             "low_cpu_mem_usage": true,
             "use_vllm": true,
             "tokenizer_mode": "mistral",
-            "vllm_context": 8192,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
