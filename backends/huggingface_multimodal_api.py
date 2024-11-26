@@ -3,7 +3,7 @@ Backend using HuggingFace transformers for open-weight multimodal models.
 """
 from typing import List, Dict, Tuple, Any
 import torch
-import clemcore.backends as backends
+import backends
 from PIL import Image
 import requests
 from transformers import AutoTokenizer, AutoConfig
