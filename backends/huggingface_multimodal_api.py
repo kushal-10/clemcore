@@ -3,17 +3,17 @@ Backend using HuggingFace transformers for open-weight multimodal models.
 """
 from typing import List, Dict, Tuple, Any
 import torch
-import backends
+import clemcore.backends as backends
 from PIL import Image
 import requests
 from transformers import AutoTokenizer, AutoConfig
 from jinja2 import Template
 import warnings
 import importlib
-
+import logging
 FALLBACK_CONTEXT_SIZE = 256
 
-logger = backends.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def get_context_limit(model_spec: backends.ModelSpec) -> int:
     """
@@ -308,7 +308,8 @@ class HuggingfaceMultimodalModel(backends.Model):
                                                 tokens_used=context_check[1], tokens_left=context_check[2],
                                                 context_size=context_check[3])
 
-        
+        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
+
         response_method = import_method(self.response_method)
         response_kwargs = {
             'model': self.multimodal_model,
@@ -321,8 +322,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         }
         generated_response = response_method(**response_kwargs)
 
-        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
-
+        logger.info("*" * 50 + "  Generated Response  " + "*" * 50)
+        logger.info(f"\n : {generated_response} \n")
         # Store generated text
         response = {"response": generated_response}
 
@@ -335,12 +336,5 @@ class HuggingfaceMultimodalModel(backends.Model):
             response_text = rt_split[0]
         response_text = response_text.strip()
 
-        logger.info("*" * 50)
-        logger.info(f"\n\n RESPONSE : {response} \n\n")
-        logger.info("*" * 50)
-
-        logger.info("*" * 50)
-        logger.info(f"\n\n RESPONSETEXT : {response_text} \n\n")
-        logger.info("*" * 50)
 
         return prompt, response, response_text
