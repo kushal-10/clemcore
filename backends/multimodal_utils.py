@@ -45,7 +45,7 @@ def generate_history_internvl2(messages: List[str]) -> Tuple[List[Tuple], str]:
             continue # Skip the system message, Not passed to the model. Ref - https://huggingface.co/OpenGVLab/InternVL2-40B 
         elif msg['role'] == 'user':
             if 'image' in msg:
-                user_message = f"</image>\n{msg['content']}" # Add <image> token if image is passed in this instance.
+                user_message = f"<image>\n{msg['content']}" # Add <image> token if image is passed in this instance.
             else:
                 user_message = msg['content']
         elif msg['role'] == 'assistant':
@@ -231,14 +231,19 @@ def get_internvl2_image(messages: List[str], device: str):
 
     if last_user_message is None:
         raise ValueError("No user message found in the provided messages.")
-    
+
+    logger.info("*" * 50 + "  Last User Message  " + "*" * 50)
+    logger.info(f"\n : {last_user_message} \n")
+
     if 'image' in last_user_message:
+        logger.info("*" * 50 + " Images Number  " + str(len(last_user_message['image'])) + "*" * 50)
         # Load all images and concatenate them into a single tensor
         pixel_values = torch.cat(
             [load_internvl2_image(img, max_num=12).to(torch.bfloat16).to(device) for img in last_user_message['image']]
         , dim=0)
     else:
         pixel_values = None
+        logger.info("*" * 50 + "  Pixel Values not found  " + "*" * 50)
 
     return pixel_values
 
@@ -286,14 +291,23 @@ def generate_internvl2_response(**response_kwargs) -> str:
     images = get_internvl2_image(messages=messages, device=device)
     history, question = generate_history_internvl2(messages=messages)
     
+    logger.info("*" * 50 + " Question  " + "*" * 50)
+    logger.info(f"\n : {question} \n")
+
+    logger.info("*" * 50 + " History  " + "*" * 50)
+    logger.info(f"\n : {history} \n")
+
     if not history:
         history = None
     generation_config = dict(max_new_tokens=max_tokens, do_sample=do_sample)
     try:
         generated_response, _ = model.chat(processor, images, question, generation_config, 
                                                      history=history, return_history=True)
+
     except Exception as e:
         raise RuntimeError("Failed to generate response from the model.") from e
+
+    
 
     return generated_response
 
