@@ -367,6 +367,28 @@
       "estimated_parameters": ""
   },
   {
+      "model_name": "claude-3-5-haiku-20241022",
+      "model_id": "claude-3-5-haiku-20241022",
+      "backend": "anthropic",
+      "supports_images": false,
+      "support_multiple_images": false,
+      "release_date": "2024-10-22",
+      "open_weight": false,
+      "parameters": "",
+      "estimated_parameters": ""
+  },
+  {
+      "model_name": "claude-3-5-sonnet-20241022",
+      "model_id": "claude-3-5-sonnet-20241022",
+      "backend": "anthropic",
+      "supports_images": true,
+      "support_multiple_images": true,
+      "release_date": "2024-10-22",
+      "open_weight": false,
+      "parameters": "",
+      "estimated_parameters": ""
+  },
+  {
       "model_name": "gemini-1.0-pro-001",
       "model_id": "gemini-1.0-pro-001",
       "backend": "google",
@@ -446,6 +468,16 @@
       "release_date": "2024-10-03",
       "open_weight": false,
       "parameters": "8B"
+  },
+    {
+      "model_name": "gemini-2.0-flash-exp",
+      "model_id": "gemini-2.0-flash-exp",
+      "backend": "google",
+      "supports_images": true,
+      "support_multiple_images": true,
+      "release_date": "2024-12-11",
+      "open_weight": false,
+      "parameters": ""
   },
   {
       "model_name": "luminous-supreme-control",
@@ -1137,6 +1169,56 @@
       "parameters": "1.7B"
   },
   {
+      "model_name": "Qwen2.5-Coder-32B-Instruct",
+      "backend": "huggingface_local",
+      "huggingface_id": "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "premade_chat_template": true,
+      "eos_to_cull": "<\\|im_end\\|>",
+      "release_date": "2024-11-06",
+      "open_weight": true,
+      "parameters": "32B"
+  },
+  {
+      "model_name": "Qwen2.5-Coder-14B-Instruct",
+      "backend": "huggingface_local",
+      "huggingface_id": "Qwen/Qwen2.5-Coder-14B-Instruct",
+      "premade_chat_template": true,
+      "eos_to_cull": "<\\|im_end\\|>",
+      "release_date": "2024-11-06",
+      "open_weight": true,
+      "parameters": "14B"
+  },
+  {
+      "model_name": "Qwen2.5-Coder-7B-Instruct",
+      "backend": "huggingface_local",
+      "huggingface_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "premade_chat_template": true,
+      "eos_to_cull": "<\\|im_end\\|>",
+      "release_date": "2024-11-06",
+      "open_weight": true,
+      "parameters": "7B"
+  },
+  {
+      "model_name": "salamandra-7b-instruct",
+      "backend": "huggingface_local",
+      "huggingface_id": "BSC-LT/salamandra-7b-instruct",
+      "premade_chat_template": true,
+      "eos_to_cull": "</s>",
+      "release_date": "2024-09-30",
+      "open_weight": true,
+      "parameters": "7B"
+  },
+  {
+      "model_name": "Llama-3.1-Nemotron-70B-Instruct-HF",
+      "backend": "huggingface_local",
+      "huggingface_id": "nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
+      "premade_chat_template": true,
+      "eos_to_cull": "<\\|eot_id\\|>",
+      "release_date": "2024-10-12",
+      "open_weight": true,
+      "parameters": "70B"
+  },
+  {
       "model_name": "TowerInstruct-13B-v0.1",
       "backend": "huggingface_local",
       "huggingface_id": "Unbabel/TowerInstruct-13B-v0.1",
@@ -1155,6 +1237,16 @@
       "release_date": "2024-01-24",
       "open_weight": true,
       "parameters": "1.3B"
+  },
+  {
+      "model_name": "Llama-3.1-Tulu-3-8B",
+      "backend": "huggingface_local",
+      "huggingface_id": "allenai/Llama-3.1-Tulu-3-8B",
+      "premade_chat_template": true,
+      "eos_to_cull": "<\\|end_of_text\\|>",
+      "release_date": "2024-11-20",
+      "open_weight": true,
+      "parameters": "8B"
   },
   {
       "model_name": "Qwen1.5-0.5B-Chat-GGUF-q8",
