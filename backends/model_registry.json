@@ -156,6 +156,15 @@
       "parameters": "1.76T"
   },
   {
+      "model_name": "o1-2024-12-17",
+      "model_id": "o1-2024-12-17",
+      "backend": "openai",
+      "release_date": "2024-12-17",
+      "open_weight": false,
+      "parameters": "",
+      "o1_model": true
+  },
+  {
       "model_name": "o1-preview-2024-09-12",
       "model_id": "o1-preview-2024-09-12",
       "backend": "openai",
