@@ -241,15 +241,15 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.model_name = model_spec['model_name']
 
         mod_config = model_spec['model_config']
-        self.split_prefix = mod_config.output_split_prefix if hasattr(mod_config, 'output_split_prefix') else ""
-        self.template = mod_config.custom_chat_template if hasattr(mod_config, 'custom_chat_template') else None
-        self.premade_template = True if hasattr(mod_config, 'premade_chat_template') else False
-        self.cull = mod_config.eos_to_cull if hasattr(mod_config, 'eos_to_cull') else None
-        self.supports_multiple_images = True if hasattr(mod_config['multimodality'], 'multiple_images') else False
-        self.do_sample = mod_config.do_sample if hasattr(mod_config, 'do_sample') else None
-        self.prompt_method = mod_config.prompt if hasattr(mod_config, 'prompt') else None
-        self.response_method = mod_config.response if hasattr(mod_config, 'response') else None
-        print(f"Values: split_prefix={self.split_prefix}, template={self.template}, premade_template={self.premade_template}, cull={self.cull}, supports_multiple_images={self.supports_multiple_images}, do_sample={self.do_sample}, prompt_method={self.prompt_method}, response_method={self.response_method}")
+        self.split_prefix = mod_config.get('output_split_prefix', "")
+        self.template = mod_config.get('custom_chat_template', None)
+        self.premade_template = 'premade_chat_template' in mod_config
+        self.cull = mod_config.get('eos_to_cull', None)
+        self.supports_multiple_images = 'multiple_images' in mod_config.get('multimodality', {})
+        self.do_sample = mod_config.get('do_sample', None)
+        self.prompt_method = mod_config.get('prompt', None)
+        self.response_method = mod_config.get('response', None)
+
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
