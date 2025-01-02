@@ -2872,11 +2872,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -2888,6 +2883,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -2908,11 +2908,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -2924,6 +2919,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -2944,11 +2944,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -2960,6 +2955,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -2980,11 +2980,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaNextForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -2996,6 +2991,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -3016,11 +3016,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaNextForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3032,6 +3027,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -3052,11 +3052,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaNextForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3068,6 +3063,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -3088,11 +3088,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaNextForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3104,6 +3099,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -3124,11 +3124,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaNextForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3140,6 +3135,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -3160,11 +3160,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaNextForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3176,6 +3171,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -3196,11 +3196,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaNextForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto",
-                "torch_dtype": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3212,6 +3207,11 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto",
+                "torch_dtype": "auto"
             }
         }
     },
@@ -3233,10 +3233,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaOnevisionForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3248,6 +3244,10 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto"
             }
         }
     },
@@ -3269,10 +3269,6 @@
         },
         "model_config": {
             "model_class": "transformers.LlavaOnevisionForConditionalGeneration",
-            "model_config": {
-                "low_cpu_mem_usage": true,
-                "device_map": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3284,6 +3280,10 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "low_cpu_mem_usage": true,
+                "device_map": "auto"
             }
         }
     },
@@ -3304,10 +3304,6 @@
         },
         "model_config": {
             "model_class": "transformers.IdeficsForVisionText2Text",
-            "model_config": {
-                "torch_dtype": "auto",
-                "device_map": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
@@ -3319,6 +3315,10 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "device_map": "auto"
             }
         }
     },
@@ -3339,10 +3339,6 @@
         },
         "model_config": {
             "model_class": "transformers.IdeficsForVisionText2Text",
-            "model_config": {
-                "torch_dtype": "auto",
-                "device_map": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
@@ -3354,6 +3350,10 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "device_map": "auto"
             }
         }
     },
@@ -3375,13 +3375,6 @@
         },
         "model_config": {
             "model_class": "transformers.AutoModel",
-            "model_config": {
-                "torch_dtype": "auto",
-                "load_in_8bit": true,
-                "low_cpu_mem_usage": true,
-                "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
-            },
             "processor_class": "transformers.AutoTokenizer",
             "processor_config": {
                 "use_fast": false
@@ -3395,6 +3388,13 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "load_in_8bit": true,
+                "low_cpu_mem_usage": true,
+                "use_flash_attn": true,
+                "device_map": "backends.multimodal_utils.split_model"
             }
         }
     },
@@ -3416,13 +3416,6 @@
         },
         "model_config": {
             "model_class": "transformers.AutoModel",
-            "model_config": {
-                "torch_dtype": "auto",
-                "load_in_8bit": true,
-                "low_cpu_mem_usage": true,
-                "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
-            },
             "processor_class": "transformers.AutoTokenizer",
             "processor_config": {
                 "use_fast": false
@@ -3436,6 +3429,13 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "load_in_8bit": true,
+                "low_cpu_mem_usage": true,
+                "use_flash_attn": true,
+                "device_map": "backends.multimodal_utils.split_model"
             }
         }
     },
@@ -3457,13 +3457,6 @@
         },
         "model_config": {
             "model_class": "transformers.AutoModel",
-            "model_config": {
-                "torch_dtype": "auto",
-                "load_in_8bit": true,
-                "low_cpu_mem_usage": true,
-                "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
-            },
             "processor_class": "transformers.AutoTokenizer",
             "processor_config": {
                 "use_fast": false
@@ -3477,6 +3470,13 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "load_in_8bit": true,
+                "low_cpu_mem_usage": true,
+                "use_flash_attn": true,
+                "device_map": "backends.multimodal_utils.split_model"
             }
         }
     },
@@ -3498,13 +3498,6 @@
         },
         "model_config": {
             "model_class": "transformers.AutoModel",
-            "model_config": {
-                "torch_dtype": "auto",
-                "load_in_8bit": true,
-                "low_cpu_mem_usage": true,
-                "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
-            },
             "processor_class": "transformers.AutoTokenizer",
             "processor_config": {
                 "use_fast": false
@@ -3518,6 +3511,13 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "load_in_8bit": true,
+                "low_cpu_mem_usage": true,
+                "use_flash_attn": true,
+                "device_map": "backends.multimodal_utils.split_model"
             }
         }
     },
@@ -3570,10 +3570,6 @@
         },
         "model_config": {
             "model_class": "transformers.AutoModelForVision2Seq",
-            "model_config": {
-                "torch_dtype": "auto",
-                "device_map": "auto"
-            },
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
@@ -3585,6 +3581,10 @@
                 "multiple_images": true,
                 "audio": false,
                 "video": false
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "device_map": "auto"
             }
         }
     },
