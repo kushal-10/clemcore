@@ -139,7 +139,7 @@ def load_processor(model_spec: backends.ModelSpec):
 
     processor_class = import_method(processor_class_str)
 
-    if "trust_remote_code" in model_spec:
+    if "trust_remote_code" in model_spec['model_config']:
         processor = processor_class.from_pretrained(hf_model_str, trust_remote_code=True, **processor_config) # Load the processor with trust_remote_code=True
     else:
         processor = processor_class.from_pretrained(hf_model_str, **processor_config) # Load the processor with defined args
@@ -165,7 +165,7 @@ def load_model(model_spec: backends.ModelSpec):
     logger.info(f'Start loading huggingface model weights: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id']  # Get the model name
     model_class_str = model_spec['model_config']['model_class']  # Model Loader Class
-    model_config = model_spec['model_config']['model_config']  # Model kwargs
+    model_config = model_spec['model_config']['mm_model_config']  # Model kwargs
 
     model_class = import_method(model_class_str)
 
@@ -176,7 +176,7 @@ def load_model(model_spec: backends.ModelSpec):
         device_map = split_model(model_spec['model_name'])
         model_config['device_map'] = device_map
         
-    if 'trust_remote_code' in model_spec:
+    if 'trust_remote_code' in model_spec['model_config']:
         model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
     else:
         model = model_class.from_pretrained(hf_model_str, **model_config)  # Load the model using from_pretrained
@@ -240,14 +240,16 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.context_size = get_context_limit(model_spec)
         self.model_name = model_spec['model_name']
 
-        self.split_prefix = model_spec.output_split_prefix if hasattr(model_spec['model_config'], 'output_split_prefix') else ""
-        self.template = model_spec.custom_chat_template if hasattr(model_spec['model_config'], 'custom_chat_template') else None
-        self.premade_template = True if hasattr(model_spec['model_config'], 'premade_chat_template') else False
-        self.cull = model_spec.eos_to_cull if hasattr(model_spec['model_config'], 'eos_to_cull') else None
-        self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec['model_config']['multimodality'], 'multiple_images') else False
-        self.do_sample = model_spec.do_sample if hasattr(model_spec['model_config'], 'do_sample') else None
-        self.prompt_method = model_spec.prompt if hasattr(model_spec['model_config'], 'prompt') else None
-        self.response_method = model_spec.response if hasattr(model_spec['model_config'], 'response') else None 
+        mod_config = model_spec['model_config']
+        self.split_prefix = mod_config.output_split_prefix if hasattr(mod_config, 'output_split_prefix') else ""
+        self.template = mod_config.custom_chat_template if hasattr(mod_config, 'custom_chat_template') else None
+        self.premade_template = True if hasattr(mod_config, 'premade_chat_template') else False
+        self.cull = mod_config.eos_to_cull if hasattr(mod_config, 'eos_to_cull') else None
+        self.supports_multiple_images = True if hasattr(mod_config['multimodality'], 'multiple_images') else False
+        self.do_sample = mod_config.do_sample if hasattr(mod_config, 'do_sample') else None
+        self.prompt_method = mod_config.prompt if hasattr(mod_config, 'prompt') else None
+        self.response_method = mod_config.response if hasattr(mod_config, 'response') else None
+        print(f"Values: split_prefix={self.split_prefix}, template={self.template}, premade_template={self.premade_template}, cull={self.cull}, supports_multiple_images={self.supports_multiple_images}, do_sample={self.do_sample}, prompt_method={self.prompt_method}, response_method={self.response_method}")
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
