@@ -3711,14 +3711,13 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "4096",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "model_config": {
             "number_gpus": 1,
-            "context_limit": 4096,
             "premade_chat_template": true,
             "eos_to_cull": "<\\|eot_id\\|>"
         }
@@ -3733,14 +3732,13 @@
         "languages": [
             "en"
         ],
-        "context_size": "",
+        "context_size": "8192",
         "license": {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0"
         },
         "model_config": {
             "number_gpus": 1,
-            "context_limit": 8192,
             "premade_chat_template": true,
             "eos_to_cull": "<\\|eot_id\\|>"
         }
