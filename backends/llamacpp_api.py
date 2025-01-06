@@ -76,7 +76,7 @@ def get_chat_formatter(model: Llama, model_spec: backends.ModelSpec) -> llama_cp
     print(f"MODEL METADATA{model.metadata}")
     print("^"*100)
     # check chat template:
-    if 'premade_chat_template' in model_spec.model_config:
+    if 'premade_chat_template' in model_spec.model_config and model_spec.model_config.premade_chat_template:
         # jinja chat template available in metadata
         chat_template = model.metadata['tokenizer.chat_template']
     else:
