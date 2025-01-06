@@ -110,7 +110,7 @@ def load_model(model_spec: backends.ModelSpec) -> Any:
         # if number of GPUs to use is not set in the modelSpec, default to one:
         number_gpus = 1
 
-    if 'context_size' in model_spec.model_config and model_spec['context_size']:
+    if 'context_size' in model_spec and model_spec['context_size']:
         max_model_len = int(model_spec['context_size'])
         use_context_limit = True
     else:
