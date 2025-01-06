@@ -30,7 +30,7 @@ def load_model(model_spec: backends.ModelSpec) -> Any:
     # default to GPU offload:
     gpu_layers_offloaded = -1  # -1 = offload all model layers to GPU
     # check for optional execute_on flag:
-    if hasattr(model_spec.model_config, 'execute_on'):
+    if 'execute_on' in model_spec.model_config:
         if model_spec.model_config.execute_on == "gpu":
             gpu_layers_offloaded = -1
         elif model_spec.model_config.execute_on == "cpu":
@@ -73,7 +73,7 @@ def get_chat_formatter(model: Llama, model_spec: backends.ModelSpec) -> llama_cp
     eos_string = None
 
     # check chat template:
-    if model_spec.model_config.premade_chat_template:
+    if 'premade_chat_template' in model_spec.model_config:
         # jinja chat template available in metadata
         chat_template = model.metadata['tokenizer.chat_template']
     else:
