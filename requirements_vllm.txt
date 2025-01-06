@@ -1,3 +1,6 @@
 # This requires compilation - make sure a working compiler is available!
 vllm==0.5.4 # vLLM
 transformers==4.43.2 # Huggingface
+nltk==3.9.1 # init backends
+matplotlib==3.10.0 # bencheval
+seaborn==0.13.2 # bencheval
