@@ -31,17 +31,17 @@ def load_model(model_spec: backends.ModelSpec) -> Any:
     gpu_layers_offloaded = -1  # -1 = offload all model layers to GPU
     # check for optional execute_on flag:
     if 'execute_on' in model_spec.model_config:
-        if model_spec.model_config.execute_on == "gpu":
+        if model_spec.model_config['execute_on'] == "gpu":
             gpu_layers_offloaded = -1
-        elif model_spec.model_config.execute_on == "cpu":
+        elif model_spec.model_config['execute_on'] == "cpu":
             gpu_layers_offloaded = 0
     # check for optional gpu_layers_offloaded value:
-    elif hasattr(model_spec.model_config, 'gpu_layers_offloaded'):
-        gpu_layers_offloaded = model_spec.model_config.gpu_layers_offloaded
+    elif 'gpu_layers_offloaded' in model_spec.model_config:
+        gpu_layers_offloaded = model_spec.model_config['gpu_layers_offloaded']
 
     additional_files = []
-    if hasattr(model_spec.model_config, 'additional_files'):
-        additional_files = model_spec.model_config.additional_files
+    if 'additional_files' in model_spec.model_config:
+        additional_files = model_spec.model_config['additional_files']
 
     if 'requires_api_key' in model_spec.model_config and model_spec['model_config']['requires_api_key']:
         # load HF API key:
@@ -71,10 +71,7 @@ def get_chat_formatter(model: Llama, model_spec: backends.ModelSpec) -> llama_cp
     # placeholders for BOS/EOS:
     bos_string = None
     eos_string = None
-    print(f"MODEL {model}")
-    print("^"*100)
-    print(f"MODEL METADATA{model.metadata}")
-    print("^"*100)
+
     # check chat template:
     if 'premade_chat_template' in model_spec.model_config and model_spec.model_config['premade_chat_template']:
         # jinja chat template available in metadata
@@ -105,9 +102,9 @@ def get_chat_formatter(model: Llama, model_spec: backends.ModelSpec) -> llama_cp
 
     # get BOS/EOS strings for template from registry if not available from model file:
     if not bos_string:
-        bos_string = model_spec.model_config.bos_string
+        bos_string = model_spec.model_config['bos_string']
     if not eos_string:
-        eos_string = model_spec.model_config.eos_string
+        eos_string = model_spec.model_config['eos_string']
 
     # init llama-cpp-python jinja chat formatter:
     chat_formatter = llama_cpp.llama_chat_format.Jinja2ChatFormatter(
