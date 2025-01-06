@@ -73,6 +73,8 @@ def get_chat_formatter(model: Llama, model_spec: backends.ModelSpec) -> llama_cp
     eos_string = None
     print(f"MODEL {model}")
     print("^"*100)
+    print(f"MODEL METADATA{model.metadata}")
+    print("^"*100)
     # check chat template:
     if 'premade_chat_template' in model_spec.model_config:
         # jinja chat template available in metadata
