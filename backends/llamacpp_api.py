@@ -80,7 +80,7 @@ def get_chat_formatter(model: Llama, model_spec: backends.ModelSpec) -> llama_cp
         # jinja chat template available in metadata
         chat_template = model.metadata['tokenizer.chat_template']
     else:
-        chat_template = model_spec.model_config.custom_chat_template
+        chat_template = model_spec.model_config['custom_chat_template']
 
     if hasattr(model, 'chat_format'):
         if not model.chat_format:
