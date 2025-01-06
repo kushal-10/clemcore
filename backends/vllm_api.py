@@ -117,9 +117,6 @@ def load_model(model_spec: backends.ModelSpec) -> Any:
         # if context limit is not set in the modelSpec, default to model config:
         use_context_limit = False
 
-    print(f"USING  CONTXT LIMIT???: {use_context_limit}")
-    print("^"*100)
-
     hf_model_str = model_spec['huggingface_id']
 
     if use_context_limit:
