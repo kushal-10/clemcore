@@ -179,14 +179,14 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.context_size = int(model_spec['context_size'].replace("k", ""))
         self.model_name = model_spec['model_name']
 
-        self.split_prefix = model_spec.model_config.output_split_prefix if hasattr(model_spec.model_config, 'output_split_prefix') else ""
-        self.template = model_spec.model_config.custom_chat_template if hasattr(model_spec.model_config, 'custom_chat_template') else None
+        self.split_prefix = model_spec.model_config['output_split_prefix'] if hasattr(model_spec.model_config, 'output_split_prefix') else ""
+        self.template = model_spec.model_config['custom_chat_template'] if hasattr(model_spec.model_config, 'custom_chat_template') else None
         self.premade_template = True if hasattr(model_spec.model_config, 'premade_chat_template') else False
-        self.cull = model_spec.model_config.eos_to_cull if hasattr(model_spec.model_config, 'eos_to_cull') else None
+        self.cull = model_spec.model_config['eos_to_cull'] if hasattr(model_spec.model_config, 'eos_to_cull') else None
         self.supports_multiple_images = model_spec.model_config['multimodality']['multiple_images'] if hasattr(model_spec.model_config['multimodality'], 'multiple_images') else False
-        self.do_sample = model_spec.model_config.do_sample if hasattr(model_spec.model_config, 'do_sample') else None
-        self.prompt_method = model_spec.model_config.prompt if hasattr(model_spec.model_config, 'prompt') else None
-        self.response_method = model_spec.model_config.response if hasattr(model_spec.model_config, 'response') else None
+        self.do_sample = model_spec.model_config['do_sample'] if hasattr(model_spec.model_config, 'do_sample') else None
+        self.prompt_method = model_spec.model_config['prompt'] if hasattr(model_spec.model_config, 'prompt') else None
+        self.response_method = model_spec.model_config['response'] if hasattr(model_spec.model_config, 'response') else None
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
