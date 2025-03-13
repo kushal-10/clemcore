@@ -4580,7 +4580,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4616,7 +4616,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4652,7 +4652,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4688,7 +4688,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4724,7 +4724,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4760,7 +4760,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4796,7 +4796,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4832,7 +4832,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4868,7 +4868,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4904,7 +4904,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4941,7 +4941,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "assistant:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -4977,7 +4977,7 @@
             "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
             "response": "backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "assistant:",
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -5084,7 +5084,7 @@
             "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
             "response": "backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -5125,7 +5125,7 @@
             "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
             "response": "backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -5166,7 +5166,7 @@
             "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
             "response": "backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,
@@ -5207,7 +5207,7 @@
             "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
             "response": "backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
-            "do_sample": true,
+            "do_sample": false,
             "multimodality": {
                 "single_image": true,
                 "multiple_images": true,

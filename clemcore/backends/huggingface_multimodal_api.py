@@ -13,66 +13,6 @@ FALLBACK_CONTEXT_SIZE = 256
 
 logger = logging.getLogger(__name__)
 
-def get_context_limit(model_spec: backends.ModelSpec) -> int:
-    """
-    Get the context limit of the model.
-
-    Args:
-        model_spec (backends.ModelSpec): Contains definitions/args for the model.
-
-    Returns:
-        int: Context limit of the model.
-
-    Raises:
-        Warning: If no context limit is found, a warning is raised and the fallback value is used.
-    """
-    hf_model_str = model_spec['huggingface_id']
-    if 'trust_remote_code' in model_spec:
-        model_config = AutoConfig.from_pretrained(hf_model_str, trust_remote_code=True)
-    else:
-        model_config = AutoConfig.from_pretrained(hf_model_str)
-
-    def find_context_limit(config) -> int:
-        """Recursively search for max_sequence_length or max_position_embeddings."""
-        # Check if the desired keys are directly in the config
-        if hasattr(config, 'max_position_embeddings'):
-            return config.max_position_embeddings
-        if hasattr(config, 'max_sequence_length'):
-            return config.max_sequence_length
-
-        # Recursively search through the attributes of the config object
-        for attr in dir(config):
-            # Skip callable attributes and private attributes
-            if attr.startswith('_') or callable(getattr(config, attr)):
-                continue
-
-            value = getattr(config, attr)
-            if isinstance(value, dict):
-                result = find_context_limit(value)
-                if result is not None:
-                    return result
-            elif isinstance(value, list):
-                for item in value:
-                    if isinstance(item, dict):
-                        result = find_context_limit(item)
-                        if result is not None:
-                            return result
-            elif hasattr(value, '__dict__'):  # Check if the value is an object with attributes
-                result = find_context_limit(value)
-                if result is not None:
-                    return result
-        return None
-
-    context = find_context_limit(model_config)
-
-    if context is None:
-        warnings.warn(f"No context limit found for model - {hf_model_str}. Using fallback value: {FALLBACK_CONTEXT_SIZE}.")
-        context = FALLBACK_CONTEXT_SIZE
-
-    logger.info(f"Context limit for model - {hf_model_str} is {context}")
-
-    return context
-
 
 def check_context_limit(context_size: int, prompt_tokens: list, max_new_tokens: int = 100) -> Tuple[
     bool, int, int, int]:
@@ -132,12 +72,12 @@ def load_processor(model_spec: backends.ModelSpec):
         ImportError: If the processor type cannot be imported.
     """
     hf_model_str = model_spec['huggingface_id']  # Get the model name
-    processor_class_str = model_spec['processor_class']  # Processor type - AutoProcessor/AutoTokenizer
-    processor_config = model_spec['processor_config']  # Processor kwargs
+    processor_class_str = model_spec['model_config']['processor_class']  # Processor type - AutoProcessor/AutoTokenizer
+    processor_config = model_spec['model_config']['processor_config']  # Processor kwargs
 
     processor_class = import_method(processor_class_str)
 
-    if "trust_remote_code" in model_spec:
+    if "trust_remote_code" in model_spec.model_config:
         processor = processor_class.from_pretrained(hf_model_str, trust_remote_code=True, **processor_config) # Load the processor with trust_remote_code=True
     else:
         processor = processor_class.from_pretrained(hf_model_str, **processor_config) # Load the processor with defined args
@@ -162,8 +102,8 @@ def load_model(model_spec: backends.ModelSpec):
     """
     logger.info(f'Start loading huggingface model weights: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id']  # Get the model name
-    model_class_str = model_spec['model_class']  # Model Loader Class
-    model_config = model_spec['model_config']  # Model kwargs
+    model_class_str = model_spec['model_config']['model_class']  # Model Loader Class
+    model_config = model_spec['model_config']['mm_model_config']  # Model kwargs
 
     model_class = import_method(model_class_str)
 
@@ -174,7 +114,7 @@ def load_model(model_spec: backends.ModelSpec):
         device_map = split_model(model_spec['model_name'])
         model_config['device_map'] = device_map
 
-    if 'trust_remote_code' in model_spec:
+    if 'trust_remote_code' in model_spec.model_config:
         model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
     else:
         model = model_class.from_pretrained(hf_model_str, **model_config)  # Load the model using from_pretrained
@@ -235,17 +175,17 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.processor = load_processor(model_spec)
         self.multimodal_model = load_model(model_spec)
-        self.context_size = get_context_limit(model_spec)
+        self.context_size = int(model_spec['context_size'].replace("k", ""))
         self.model_name = model_spec['model_name']
 
-        self.split_prefix = model_spec.output_split_prefix if hasattr(model_spec, 'output_split_prefix') else ""
-        self.template = model_spec.custom_chat_template if hasattr(model_spec, 'custom_chat_template') else None
-        self.premade_template = True if hasattr(model_spec, 'premade_chat_template') else False
-        self.cull = model_spec.eos_to_cull if hasattr(model_spec, 'eos_to_cull') else None
-        self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec, 'supports_multiple_images') else False
-        self.do_sample = model_spec.do_sample if hasattr(model_spec, 'do_sample') else None
-        self.prompt_method = model_spec.prompt if hasattr(model_spec, 'prompt') else None
-        self.response_method = model_spec.response if hasattr(model_spec, 'response') else None
+        self.split_prefix = model_spec.model_config.output_split_prefix if hasattr(model_spec.model_config, 'output_split_prefix') else ""
+        self.template = model_spec.model_config.custom_chat_template if hasattr(model_spec.model_config, 'custom_chat_template') else None
+        self.premade_template = True if hasattr(model_spec.model_config, 'premade_chat_template') else False
+        self.cull = model_spec.model_config.eos_to_cull if hasattr(model_spec.model_config, 'eos_to_cull') else None
+        self.supports_multiple_images = model_spec.model_config.multimodality.multiple_images if hasattr(model_spec.model_config.multimodality, 'multiple_images') else False
+        self.do_sample = model_spec.model_config.do_sample if hasattr(model_spec.model_config, 'do_sample') else None
+        self.prompt_method = model_spec.model_config.prompt if hasattr(model_spec.model_config, 'prompt') else None
+        self.response_method = model_spec.model_config.response if hasattr(model_spec.model_config, 'response') else None
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
