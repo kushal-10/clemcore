@@ -186,7 +186,18 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.supports_multiple_images = model_spec.model_config['multimodality']['multiple_images'] if hasattr(model_spec.model_config['multimodality'], 'multiple_images') else False
         self.do_sample = model_spec.model_config['do_sample'] if hasattr(model_spec.model_config, 'do_sample') else None
         self.prompt_method = model_spec.model_config['prompt'] if hasattr(model_spec.model_config, 'prompt') else None
+        print(f"TYPE of medel_spec.model_config: {type(model_spec.model_config)}")
         self.response_method = model_spec.model_config['response'] if hasattr(model_spec.model_config, 'response') else None
+        print(f"Set1 :\n {self.response_method}")
+        self.response_method = model_spec.model_config['response'] if 'response' in model_spec.model_config else None
+        print(f"Set2 :\n {self.response_method}")
+        self.response_method = model_spec.model_config['response'] if 'response' in dict(model_spec.model_config) else None
+        print(f"Set3 :\n {self.response_method}")
+        self.response_method = model_spec['model_config'].get('response', None)
+        print(f"Set4 :\n {self.response_method}")
+        model_cfg = model_spec['model_config']
+        self.response_method = model_cfg.get('response', None)
+        print(f"Set5 :\n {self.response_method}")
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
