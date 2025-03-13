@@ -38,10 +38,11 @@ def check_context_limit(context_size: int, prompt_tokens: list, max_new_tokens: 
     return fits, tokens_used, tokens_left, context_size
 
 def import_method(method_path: str):
-    """Import the method from the specified module path.
-
+    """
+    Import the method from the specified module path.
+    
     Args:
-        model_type_str (str): The method path separated by dots. Example - transformers.AutoModel or backends.multimodal_utils.device_map
+        method_path (str): The method path separated by dots. Example - clemcore.backends.multimodal_utils.generate_internvl2_prompt_text
 
     Returns:
         type: The imported method.
@@ -54,7 +55,7 @@ def import_method(method_path: str):
         module = importlib.import_module(module_path)
         return getattr(module, method_name)
     except (ImportError, AttributeError) as e:
-        raise ImportError(f"Could not import method '{method_name}' from module '{module_path}'.") from e
+        raise ImportError(f"Could not import method '{method_name}' from module '{module_path}'. Error: {e}") from e
 
 
 
