@@ -4577,8 +4577,8 @@
             "model_class": "transformers.LlavaForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4613,8 +4613,8 @@
             "model_class": "transformers.LlavaForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4649,8 +4649,8 @@
             "model_class": "transformers.LlavaForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4685,8 +4685,8 @@
             "model_class": "transformers.LlavaNextForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4721,8 +4721,8 @@
             "model_class": "transformers.LlavaNextForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4757,8 +4757,8 @@
             "model_class": "transformers.LlavaNextForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4793,8 +4793,8 @@
             "model_class": "transformers.LlavaNextForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4829,8 +4829,8 @@
             "model_class": "transformers.LlavaNextForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4865,8 +4865,8 @@
             "model_class": "transformers.LlavaNextForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4901,8 +4901,8 @@
             "model_class": "transformers.LlavaNextForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "ASSISTANT:",
             "do_sample": false,
             "multimodality": {
@@ -4938,8 +4938,8 @@
             "model_class": "transformers.LlavaOnevisionForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "assistant:",
             "do_sample": false,
             "multimodality": {
@@ -4974,8 +4974,8 @@
             "model_class": "transformers.LlavaOnevisionForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "output_split_prefix": "assistant:",
             "do_sample": false,
             "multimodality": {
@@ -5009,8 +5009,8 @@
             "model_class": "transformers.IdeficsForVisionText2Text",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
-            "response": "backends.multimodal_utils.generate_idefics_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_idefics_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_idefics_response",
             "eos_to_cull": "<end_of_utterance>",
             "output_split_prefix": "Assistant:",
             "multimodality": {
@@ -5044,8 +5044,8 @@
             "model_class": "transformers.IdeficsForVisionText2Text",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_idefics_prompt_text",
-            "response": "backends.multimodal_utils.generate_idefics_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_idefics_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_idefics_response",
             "eos_to_cull": "<end_of_utterance>",
             "output_split_prefix": "Assistant:",
             "multimodality": {
@@ -5081,8 +5081,8 @@
             "processor_config": {
                 "use_fast": false
             },
-            "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
-            "response": "backends.multimodal_utils.generate_internvl2_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_internvl2_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
             "do_sample": false,
             "multimodality": {
@@ -5096,7 +5096,7 @@
                 "load_in_8bit": true,
                 "low_cpu_mem_usage": true,
                 "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
+                "device_map": "clemcore.backends.multimodal_utils.split_model"
             }
         }
     },
@@ -5122,8 +5122,8 @@
             "processor_config": {
                 "use_fast": false
             },
-            "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
-            "response": "backends.multimodal_utils.generate_internvl2_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_internvl2_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
             "do_sample": false,
             "multimodality": {
@@ -5137,7 +5137,7 @@
                 "load_in_8bit": true,
                 "low_cpu_mem_usage": true,
                 "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
+                "device_map": "clemcore.backends.multimodal_utils.split_model"
             }
         }
     },
@@ -5163,8 +5163,8 @@
             "processor_config": {
                 "use_fast": false
             },
-            "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
-            "response": "backends.multimodal_utils.generate_internvl2_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_internvl2_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
             "do_sample": false,
             "multimodality": {
@@ -5178,7 +5178,7 @@
                 "load_in_8bit": true,
                 "low_cpu_mem_usage": true,
                 "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
+                "device_map": "clemcore.backends.multimodal_utils.split_model"
             }
         }
     },
@@ -5204,8 +5204,8 @@
             "processor_config": {
                 "use_fast": false
             },
-            "prompt": "backends.multimodal_utils.generate_internvl2_prompt_text",
-            "response": "backends.multimodal_utils.generate_internvl2_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_internvl2_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_internvl2_response",
             "trust_remote_code": true,
             "do_sample": false,
             "multimodality": {
@@ -5219,7 +5219,7 @@
                 "load_in_8bit": true,
                 "low_cpu_mem_usage": true,
                 "use_flash_attn": true,
-                "device_map": "backends.multimodal_utils.split_model"
+                "device_map": "clemcore.backends.multimodal_utils.split_model"
             }
         }
     },
@@ -5241,7 +5241,7 @@
         },
         "model_config": {
             "automodel_type": "transformers.AutoModel",
-            "model_class": "backends.multimodal_utils.intern_utils.InternlmMLLM",
+            "model_class": "clemcore.backends.multimodal_utils.intern_utils.InternlmMLLM",
             "use_tokenizer": true,
             "trust_remote_code": true,
             "use_bf16": true,
@@ -5274,8 +5274,8 @@
             "model_class": "transformers.AutoModelForVision2Seq",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
             "trust_remote_code": true,
             "output_split_prefix": "Assistant:",
             "multimodality": {
@@ -5307,7 +5307,7 @@
         },
         "model_config": {
             "automodel_type": "transformers.AutoModelForCausalLM",
-            "model_class": "backends.multimodal_utils.dolphin_utils.DolphinMLLM",
+            "model_class": "clemcore.backends.multimodal_utils.dolphin_utils.DolphinMLLM",
             "use_tokenizer": true,
             "trust_remote_code": true,
             "use_bf16": true,
@@ -5338,7 +5338,7 @@
         },
         "model_config": {
             "automodel_type": "transformers.AutoModelForCausalLM",
-            "model_class": "backends.multimodal_utils.phi_utils.PhiMLLM",
+            "model_class": "clemcore.backends.multimodal_utils.phi_utils.PhiMLLM",
             "trust_remote_code": true,
             "output_split_prefix": "",
             "low_cpu_mem_usage": true,
@@ -5375,7 +5375,7 @@
         },
         "model_config": {
             "automodel_type": "vllm.LLM",
-            "model_class": "backends.multimodal_utils.pixtral_utils.PixtralMLLM",
+            "model_class": "clemcore.backends.multimodal_utils.pixtral_utils.PixtralMLLM",
             "trust_remote_code": false,
             "output_split_prefix": "",
             "low_cpu_mem_usage": true,
