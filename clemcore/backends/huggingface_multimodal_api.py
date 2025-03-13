@@ -3,76 +3,17 @@ Backend using HuggingFace transformers for open-weight multimodal models.
 """
 from typing import List, Dict, Tuple, Any
 import torch
-import clemcore.backends as backends
+import backends
+from PIL import Image
+import requests
 from transformers import AutoTokenizer, AutoConfig
 from jinja2 import Template
 import warnings
 import importlib
-import logging
+
 FALLBACK_CONTEXT_SIZE = 256
 
-logger = logging.getLogger(__name__)
-
-def get_context_limit(model_spec: backends.ModelSpec) -> int:
-    """
-    Get the context limit of the model.
-
-    Args:
-        model_spec (backends.ModelSpec): Contains definitions/args for the model.
-
-    Returns:
-        int: Context limit of the model.
-
-    Raises:
-        Warning: If no context limit is found, a warning is raised and the fallback value is used.
-    """
-    hf_model_str = model_spec['huggingface_id']
-    if 'trust_remote_code' in model_spec:
-        model_config = AutoConfig.from_pretrained(hf_model_str, trust_remote_code=True)
-    else:
-        model_config = AutoConfig.from_pretrained(hf_model_str)
-
-    def find_context_limit(config) -> int:
-        """Recursively search for max_sequence_length or max_position_embeddings."""
-        # Check if the desired keys are directly in the config
-        if hasattr(config, 'max_position_embeddings'):
-            return config.max_position_embeddings
-        if hasattr(config, 'max_sequence_length'):
-            return config.max_sequence_length
-
-        # Recursively search through the attributes of the config object
-        for attr in dir(config):
-            # Skip callable attributes and private attributes
-            if attr.startswith('_') or callable(getattr(config, attr)):
-                continue
-
-            value = getattr(config, attr)
-            if isinstance(value, dict):
-                result = find_context_limit(value)
-                if result is not None:
-                    return result
-            elif isinstance(value, list):
-                for item in value:
-                    if isinstance(item, dict):
-                        result = find_context_limit(item)
-                        if result is not None:
-                            return result
-            elif hasattr(value, '__dict__'):  # Check if the value is an object with attributes
-                result = find_context_limit(value)
-                if result is not None:
-                    return result
-        return None
-
-    context = find_context_limit(model_config)
-
-    if context is None:
-        warnings.warn(f"No context limit found for model - {hf_model_str}. Using fallback value: {FALLBACK_CONTEXT_SIZE}.")
-        context = FALLBACK_CONTEXT_SIZE
-
-    logger.info(f"Context limit for model - {hf_model_str} is {context}")
-
-    return context
-
+logger = backends.get_logger(__name__)
 
 def check_context_limit(context_size: int, prompt_tokens: list, max_new_tokens: int = 100) -> Tuple[
     bool, int, int, int]:
@@ -92,7 +33,7 @@ def check_context_limit(context_size: int, prompt_tokens: list, max_new_tokens: 
             - int: The total context token limit.
     """
     prompt_size = len(prompt_tokens)
-    tokens_used = prompt_size + max_new_tokens
+    tokens_used = prompt_size + max_new_tokens 
     tokens_left = context_size - tokens_used
     fits = tokens_used <= context_size
     return fits, tokens_used, tokens_left, context_size
@@ -110,8 +51,8 @@ def import_method(method_path: str):
         ImportError: If the method cannot be imported.
     """
     try:
-        module_path, method_name = method_path.rsplit('.', 1)
-        module = importlib.import_module(module_path)
+        module_path, method_name = method_path.rsplit('.', 1) 
+        module = importlib.import_module(module_path)  
         return getattr(module, method_name)
     except (ImportError, AttributeError) as e:
         raise ImportError(f"Could not import method '{method_name}' from module '{module_path}'.") from e
@@ -132,12 +73,12 @@ def load_processor(model_spec: backends.ModelSpec):
         ImportError: If the processor type cannot be imported.
     """
     hf_model_str = model_spec['huggingface_id']  # Get the model name
-    processor_class_str = model_spec['processor_class']  # Processor type - AutoProcessor/AutoTokenizer
-    processor_config = model_spec['processor_config']  # Processor kwargs
+    processor_class_str = model_spec['model_config']['processor_class']  # Processor type - AutoProcessor/AutoTokenizer
+    processor_config = model_spec['model_config']['processor_config']  # Processor kwargs
 
     processor_class = import_method(processor_class_str)
 
-    if "trust_remote_code" in model_spec:
+    if "trust_remote_code" in model_spec['model_config']:
         processor = processor_class.from_pretrained(hf_model_str, trust_remote_code=True, **processor_config) # Load the processor with trust_remote_code=True
     else:
         processor = processor_class.from_pretrained(hf_model_str, **processor_config) # Load the processor with defined args
@@ -162,8 +103,8 @@ def load_model(model_spec: backends.ModelSpec):
     """
     logger.info(f'Start loading huggingface model weights: {model_spec.model_name}')
     hf_model_str = model_spec['huggingface_id']  # Get the model name
-    model_class_str = model_spec['model_class']  # Model Loader Class
-    model_config = model_spec['model_config']  # Model kwargs
+    model_class_str = model_spec['model_config']['model_class']  # Model Loader Class
+    model_config = model_spec['model_config']['mm_model_config']  # Model kwargs
 
     model_class = import_method(model_class_str)
 
@@ -173,8 +114,8 @@ def load_model(model_spec: backends.ModelSpec):
         split_model = import_method(model_config['device_map'])
         device_map = split_model(model_spec['model_name'])
         model_config['device_map'] = device_map
-
-    if 'trust_remote_code' in model_spec:
+        
+    if 'trust_remote_code' in model_spec['model_config']:
         model = model_class.from_pretrained(hf_model_str, trust_remote_code=True, **model_config)  # Load the model using from_pretrained
     else:
         model = model_class.from_pretrained(hf_model_str, **model_config)  # Load the model using from_pretrained
@@ -195,7 +136,7 @@ def check_multiple_image(messages: List[Dict]):
     Check if a single message contains multiple images.
 
     Args:
-        messages (List[Dict]): A list of dictionaries passed to the backend,
+        messages (List[Dict]): A list of dictionaries passed to the backend, 
                                 each containing 'role', 'content', and possibly 'image'.
 
     Returns:
@@ -235,17 +176,19 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.processor = load_processor(model_spec)
         self.multimodal_model = load_model(model_spec)
-        self.context_size = get_context_limit(model_spec)
+        self.context_size = int(model_spec['context_size'].replace("k", ""))
         self.model_name = model_spec['model_name']
 
-        self.split_prefix = model_spec.output_split_prefix if hasattr(model_spec, 'output_split_prefix') else ""
-        self.template = model_spec.custom_chat_template if hasattr(model_spec, 'custom_chat_template') else None
-        self.premade_template = True if hasattr(model_spec, 'premade_chat_template') else False
-        self.cull = model_spec.eos_to_cull if hasattr(model_spec, 'eos_to_cull') else None
-        self.supports_multiple_images = model_spec.supports_multiple_images if hasattr(model_spec, 'supports_multiple_images') else False
-        self.do_sample = model_spec.do_sample if hasattr(model_spec, 'do_sample') else None
-        self.prompt_method = model_spec.prompt if hasattr(model_spec, 'prompt') else None
-        self.response_method = model_spec.response if hasattr(model_spec, 'response') else None
+        mod_config = model_spec['model_config']
+        self.split_prefix = mod_config.get('output_split_prefix', "")
+        self.template = mod_config.get('custom_chat_template', None)
+        self.premade_template = 'premade_chat_template' in mod_config
+        self.cull = mod_config.get('eos_to_cull', None)
+        self.supports_multiple_images = 'multiple_images' in mod_config.get('multimodality', {})
+        self.do_sample = mod_config.get('do_sample', None)
+        self.prompt_method = mod_config.get('prompt', None)
+        self.response_method = mod_config.get('response', None)
+
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
@@ -262,7 +205,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         Raises:
             AttributeError: If neither 'tokenizer.tokenize' nor 'processor.tokenize' exists.
             backends.ContextExceededError: If the context token limit is exceeded.
-            ValueError: If neither custom chat template or custom prompt method is provided
+            ValueError: If neither custom chat template or custom prompt method is provided 
         """
         # Check to see if game passes multiple images in a single turn
         # Proceed only if model supports multiple images, else return blanks for prompt, response and response_text
@@ -296,7 +239,7 @@ class HuggingfaceMultimodalModel(backends.Model):
             prompt_tokens = self.processor.tokenizer.tokenize(prompt_text)
         else:
             raise AttributeError("Neither 'tokenizer.tokenize' nor 'processor.tokenize' exists.")
-
+        
         context_check = check_context_limit(self.context_size, prompt_tokens, max_new_tokens=self.get_max_tokens())
         if not context_check[0]:  # if context is exceeded, context_check[0] is False
             logger.info(f"Context token limit for {self.model_spec.model_name} exceeded: "
@@ -306,8 +249,7 @@ class HuggingfaceMultimodalModel(backends.Model):
                                                 tokens_used=context_check[1], tokens_left=context_check[2],
                                                 context_size=context_check[3])
 
-        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
-
+        
         response_method = import_method(self.response_method)
         response_kwargs = {
             'model': self.multimodal_model,
@@ -320,8 +262,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         }
         generated_response = response_method(**response_kwargs)
 
-        logger.info("*" * 50 + "  Generated Response  " + "*" * 50)
-        logger.info(f"\n : {generated_response} \n")
+        prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
+
         # Store generated text
         response = {"response": generated_response}
 
@@ -334,5 +276,12 @@ class HuggingfaceMultimodalModel(backends.Model):
             response_text = rt_split[0]
         response_text = response_text.strip()
 
+        logger.info("*" * 50)
+        logger.info(f"\n\n RESPONSE : {response} \n\n")
+        logger.info("*" * 50)
+
+        logger.info("*" * 50)
+        logger.info(f"\n\n RESPONSETEXT : {response_text} \n\n")
+        logger.info("*" * 50)
 
         return prompt, response, response_text
