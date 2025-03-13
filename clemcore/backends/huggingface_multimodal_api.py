@@ -186,6 +186,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.supports_multiple_images = model_spec.model_config['multimodality']['multiple_images'] if 'multiple_images' in model_spec.model_config['multimodality'] else False
         self.do_sample = model_spec.model_config['do_sample'] if 'do_sample' in model_spec.model_config else None
         self.prompt_method = model_spec.model_config['prompt'] if 'prompt' in model_spec.model_config else None
+        self.response_method = model_spec.model_config['response'] if 'response' in model_spec.model_config else None
 
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
