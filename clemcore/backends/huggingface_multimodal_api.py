@@ -176,7 +176,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.processor = load_processor(model_spec)
         self.multimodal_model = load_model(model_spec)
-        self.context_size = int(model_spec['context_size'].replace("k", ""))
+        self.context_size = int(model_spec['context_size'].replace("k", ""))*1000
         self.model_name = model_spec['model_name']
 
         self.split_prefix = model_spec.model_config['output_split_prefix'] if 'output_split_prefix' in model_spec.model_config else ""
@@ -186,7 +186,7 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.supports_multiple_images = model_spec.model_config['multimodality']['multiple_images'] if 'multiple_images' in model_spec.model_config['multimodality'] else False
         self.do_sample = model_spec.model_config['do_sample'] if 'do_sample' in model_spec.model_config else None
         self.prompt_method = model_spec.model_config['prompt'] if 'prompt' in model_spec.model_config else None
-        
+
 
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
