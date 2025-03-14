@@ -27,6 +27,15 @@ messages = [
     }
 ]
 
+messages = [
+    {
+        'role': 'user', 
+        'content': [
+            {'type': 'text', 'text': 'Please help me with the following task. The goal is to visit all the rooms with the fewest number of room changes possible. In each room, you need to decide the direction to go in. Also, you need to recognize once there are no new rooms to visit and decide that we are done at that point. Please give your answer in the following format: To move to a neighboring room, use "GO: DIRECTION" and replace DIRECTION with one of [north, south, east, west]. To stop the exploration, answer with "DONE" instead. Omit any other text.\nHere is an example:\nYou are in the Kitchen. Currently available directions: south, west. What is your next command?\nGO: west\nYou have made a step and entered a Lobby. Currently available directions: east, north. What is your next command?\nGO: north\n...\nYou have made a step and entered a Bedroom. Currently available directions: south. What is your next command?\nDONE\nLet us start. You are in the Cellar. Currently available directions: south, west, east. What is your next command?'}
+        ]
+    }
+]
+
 inputs = processor.apply_chat_template(
     messages, add_generation_prompt=True, tokenize=True,
     return_dict=True, return_tensors="pt"
