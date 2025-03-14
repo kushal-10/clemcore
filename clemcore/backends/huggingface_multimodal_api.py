@@ -122,8 +122,9 @@ def load_model(model_spec: backends.ModelSpec):
 
     # Check if model's generation_config has pad_token_id set:
     if not model.generation_config.pad_token_id:
-        # Set pad_token_id to tokenizer's eos_token_id to prevent excessive warnings:
-        model.generation_config.pad_token_id = model.generation_config.eos_token_id  # Same as processor.tokenizer.pad_token_id
+        if model.generation_config.pad_token_id != 0: # Additional check for models that have preset pad_token_id = 0, example Gemma
+            # Set pad_token_id to tokenizer's eos_token_id to prevent excessive warnings:
+            model.generation_config.pad_token_id = model.generation_config.eos_token_id  # Same as processor.tokenizer.pad_token_id
 
     logger.info(f"Finished loading huggingface model: {model_spec.model_name}")
     logger.info(f"Device Map: {model.hf_device_map}")
