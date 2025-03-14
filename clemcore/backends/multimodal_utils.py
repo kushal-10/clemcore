@@ -443,11 +443,12 @@ def generate_llava_response(**response_kwargs) -> str:
     return response
 
 """
-Gemma
+##### GEMMA TYPE MODELS #####
 """
 
 def generate_gemma_messages(messages: List[str]) -> Tuple[List, List]:
 
+    print(f"INPUT MESSAGES {messages}")
     gemma_message = []
     for msg in messages:
         gemma_msg = {"role": msg['role']}
@@ -464,9 +465,12 @@ def generate_gemma_messages(messages: List[str]) -> Tuple[List, List]:
                 raise ValueError("Invalid image type in message - should be str or List[str]")
         gemma_msg['content'] = content_list
 
+
         gemma_message.append(gemma_msg)
 
-        return gemma_message
+    print(f"GEMMA MESSAGES {gemma_message}")
+
+    return gemma_message
 
 def generate_gemma_prompt_text(messages: List[str], **prompt_kwargs) -> str:
 
