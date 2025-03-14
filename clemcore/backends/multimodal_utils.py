@@ -448,7 +448,6 @@ def generate_llava_response(**response_kwargs) -> str:
 
 def generate_gemma_messages(messages: List[str]) -> Tuple[List, List]:
 
-    print(f"INPUT MESSAGES {messages}")
     gemma_message = []
     for msg in messages:
         gemma_msg = {"role": msg['role']}
@@ -467,8 +466,6 @@ def generate_gemma_messages(messages: List[str]) -> Tuple[List, List]:
 
 
         gemma_message.append(gemma_msg)
-
-    print(f"GEMMA MESSAGES {gemma_message}")
 
     return gemma_message
 
