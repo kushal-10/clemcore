@@ -250,6 +250,9 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
+        logger.info("*" * 50 + "  Prompt Text  " + "*" * 50)
+        logger.info(f"\n : {prompt_text} \n")
+
         response_method = import_method(self.response_method)
         response_kwargs = {
             'model': self.multimodal_model,
