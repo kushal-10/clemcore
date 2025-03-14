@@ -16,6 +16,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 """
+##### GENERAL TYPE MODELS #####
+For most use cases
+"""
+
+def generate_prompt_text():
+
+    pass
+
+def generate_response():
+
+    pass
+
+
+"""
 ##### INTERNVL2 TYPE MODELS #####
 """
 
@@ -520,3 +534,5 @@ def generate_idefics_response(**response_kwargs) -> str:
         raise RuntimeError("Failed to generate response from the IDEFICS model.") from e
 
     return generated_text[0]
+
+
