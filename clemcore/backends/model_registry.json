@@ -5456,8 +5456,8 @@
             "model_class": "transformers.Gemma3ForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {},
-            "prompt": "clemcore.backends.multimodal_utils.generate_llava_prompt_text",
-            "response": "clemcore.backends.multimodal_utils.generate_llava_response",
+            "prompt": "clemcore.backends.multimodal_utils.generate_gemma_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_gemma_response",
             "output_split_prefix": "model",
             "do_sample": false,
             "multimodality": {

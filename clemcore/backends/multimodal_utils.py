@@ -442,6 +442,95 @@ def generate_llava_response(**response_kwargs) -> str:
 
     return response
 
+"""
+Gemma
+"""
+def generate_gemma_prompt_text(messages: List[str], **prompt_kwargs) -> str:
+
+    """
+            messages = [
+            {
+                "role": "system",
+                "content": [{"type": "text", "text": "You are a helpful assistant."}]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/bee.jpg"},
+                    {"type": "text", "text": "Describe this image in detail."}
+                ]
+            }
+        ]
+    """
+    gemma_message = []
+    for msg in messages:
+        gemma_msg = {"role": msg['role']}
+        content_list = [{"type": "text", "text": msg['content']}]
+        if 'image' in msg:
+            if isinstance(msg['image'], str):
+                # Single image
+                content_list.append({"type": "image", "image": msg['image']})
+            elif isinstance(msg['image'], list):
+                # List of images
+                for img in msg['image']:
+                    content_list.append({"type": "image", "image": img})
+            else:
+                raise ValueError("Invalid image type in message - should be str or List[str]")
+        gemma_msg['content'] = content_list
+
+        gemma_message.append(gemma_msg)
+
+    processor = prompt_kwargs['processor']
+    model = prompt_kwargs['model']
+
+    inputs = processor.apply_chat_template(
+                gemma_message, add_generation_prompt=True, tokenize=False,
+                return_dict=True, return_tensors="pt"
+            ).to(model.device, dtype=torch.bfloat16)
+
+    return inputs
+
+
+def generate_gemma_response(**response_kwargs) -> str:
+    """Generates a response from the LLAVA model based on the provided messages and configuration.
+
+    Args:
+        **response_kwargs: A dictionary containing the following keys:
+            - messages (List[str]): A list of message dictionaries.
+            - device (str): The device to which the image tensors will be moved (e.g., 'cuda' or 'cpu').
+            - max_tokens (int): The maximum number of tokens to generate.
+            - model: The model instance used for generating responses.
+            - processor: The processor instance used for processing images.
+
+    Returns:
+        str: The generated response from the LLAVA model.
+
+    Raises:
+        RuntimeError: If the model fails to generate a response.
+    """
+
+    
+    messages = response_kwargs['messages']
+
+    input_text = generate_gemma_prompt_text(messages, **response_kwargs)
+
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+    do_sample = response_kwargs['do_sample']
+
+    inputs = processor.tokenize(input_text)
+
+    input_len = inputs["input_ids"].shape[-1]
+
+    with torch.inference_mode():
+        generation = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample)
+        generation = generation[0][input_len:]
+
+    decoded = processor.decode(generation, skip_special_tokens=True)
+    print(decoded)
+
+    return decoded
 
 """
 ##### IDEFICS TYPE MODELS #####
