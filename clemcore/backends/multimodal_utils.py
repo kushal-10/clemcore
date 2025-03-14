@@ -486,7 +486,7 @@ def generate_gemma_prompt_text(messages: List[str], **prompt_kwargs) -> str:
     inputs = processor.apply_chat_template(
                 gemma_message, add_generation_prompt=True, tokenize=False,
                 return_dict=True, return_tensors="pt"
-            ).to(model.device, dtype=torch.bfloat16)
+            )
 
     return inputs
 
@@ -519,7 +519,7 @@ def generate_gemma_response(**response_kwargs) -> str:
     processor = response_kwargs['processor']
     do_sample = response_kwargs['do_sample']
 
-    inputs = processor.tokenize(input_text)
+    inputs = processor.tokenize(input_text).to(model.device, dtype=torch.bfloat16)
 
     input_len = inputs["input_ids"].shape[-1]
 
