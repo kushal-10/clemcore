@@ -520,11 +520,11 @@ def generate_gemma_response(**response_kwargs) -> str:
 
     with torch.inference_mode():
         generation = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample)
-        generation = generation[0]
+        generation = generation[0][input_len:]
 
     decoded = processor.decode(generation, skip_special_tokens=True)
 
-    return decoded
+    return decoded[3:] # Trim initial characters-" : "
 
 """
 ##### IDEFICS TYPE MODELS #####
