@@ -502,17 +502,18 @@ def generate_gemma_response(**response_kwargs) -> str:
 
     
     messages = response_kwargs['messages']
+    device = response_kwargs['device']
     max_tokens = response_kwargs['max_tokens']
     model = response_kwargs['model']
     processor = response_kwargs['processor']
     do_sample = response_kwargs['do_sample']
 
     gemma_messages = generate_gemma_messages(messages)
-    print(gemma_messages)
+
     inputs = processor.apply_chat_template(
                 gemma_messages, add_generation_prompt=True, tokenize=True,
                 return_dict=True, return_tensors="pt"
-            ).to(model.device, dtype=torch.bfloat16)
+            ).to(device, dtype=torch.bfloat16)
 
     input_len = inputs["input_ids"].shape[-1]
 
