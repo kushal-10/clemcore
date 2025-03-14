@@ -5467,7 +5467,6 @@
                 "video": true
             },
             "mm_model_config": {
-                "low_cpu_mem_usage": true,
                 "device_map": "auto"
             }
         }

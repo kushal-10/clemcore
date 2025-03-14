@@ -251,8 +251,8 @@ class HuggingfaceMultimodalModel(backends.Model):
 
         prompt = {"inputs": prompt_text, "max_new_tokens": self.get_max_tokens(), "temperature": self.get_temperature()}
 
-        logger.info("*" * 50 + "  Prompt Text  " + "*" * 50)
-        logger.info(f"\n : {prompt_text} \n")
+        print("*" * 50 + "  Prompt Text  " + "*" * 50)
+        print(f"\n : {prompt_text} \n")
 
         response_method = import_method(self.response_method)
         response_kwargs = {
@@ -266,8 +266,8 @@ class HuggingfaceMultimodalModel(backends.Model):
         }
         generated_response = response_method(**response_kwargs)
 
-        logger.info("*" * 50 + "  Generated Response  " + "*" * 50)
-        logger.info(f"\n : {generated_response} \n")
+        print("*" * 50 + "  Generated Response  " + "*" * 50)
+        print(f"\n : {generated_response} \n")
         # Store generated text
         response = {"response": generated_response}
 
