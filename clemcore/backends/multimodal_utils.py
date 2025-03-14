@@ -445,23 +445,9 @@ def generate_llava_response(**response_kwargs) -> str:
 """
 Gemma
 """
-def generate_gemma_prompt_text(messages: List[str], **prompt_kwargs) -> str:
 
-    """
-            messages = [
-            {
-                "role": "system",
-                "content": [{"type": "text", "text": "You are a helpful assistant."}]
-            },
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image", "image": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/bee.jpg"},
-                    {"type": "text", "text": "Describe this image in detail."}
-                ]
-            }
-        ]
-    """
+def generate_gemma_messages(messages: List[str]) -> Tuple[List, List]:
+
     gemma_message = []
     for msg in messages:
         gemma_msg = {"role": msg['role']}
@@ -480,15 +466,20 @@ def generate_gemma_prompt_text(messages: List[str], **prompt_kwargs) -> str:
 
         gemma_message.append(gemma_msg)
 
-    processor = prompt_kwargs['processor']
-    model = prompt_kwargs['model']
+        return gemma_message
 
-    inputs = processor.apply_chat_template(
+def generate_gemma_prompt_text(messages: List[str], **prompt_kwargs) -> str:
+
+    gemma_message = generate_gemma_messages(messages)
+
+    processor = prompt_kwargs['processor']
+
+    prompt_text = processor.apply_chat_template(
                 gemma_message, add_generation_prompt=True, tokenize=False,
                 return_dict=True, return_tensors="pt"
             )
 
-    return inputs
+    return prompt_text
 
 
 def generate_gemma_response(**response_kwargs) -> str:
@@ -511,15 +502,17 @@ def generate_gemma_response(**response_kwargs) -> str:
 
     
     messages = response_kwargs['messages']
-
-    input_text = generate_gemma_prompt_text(messages, **response_kwargs)
-
     max_tokens = response_kwargs['max_tokens']
     model = response_kwargs['model']
     processor = response_kwargs['processor']
     do_sample = response_kwargs['do_sample']
 
-    inputs = processor.tokenize(input_text).to(model.device, dtype=torch.bfloat16)
+    gemma_messages = generate_gemma_messages(messages)
+    
+    inputs = processor.apply_chat_template(
+                gemma_messages, add_generation_prompt=True, tokenize=True,
+                return_dict=True, return_tensors="pt"
+            ).to(model.device, dtype=torch.bfloat16)
 
     input_len = inputs["input_ids"].shape[-1]
 
