@@ -508,7 +508,7 @@ def generate_gemma_response(**response_kwargs) -> str:
     do_sample = response_kwargs['do_sample']
 
     gemma_messages = generate_gemma_messages(messages)
-    
+    print(gemma_messages)
     inputs = processor.apply_chat_template(
                 gemma_messages, add_generation_prompt=True, tokenize=True,
                 return_dict=True, return_tensors="pt"
