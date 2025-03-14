@@ -524,11 +524,6 @@ def generate_gemma_response(**response_kwargs) -> str:
 
     decoded = processor.decode(generation, skip_special_tokens=True)
 
-    print("DDDDDDDDDDDD")
-    print(type(decoded))
-    print(decoded[1:])
-    print("DDDDDDDDDDDD")
-
     return decoded
 
 """
