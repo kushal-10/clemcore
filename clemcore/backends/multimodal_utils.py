@@ -506,7 +506,7 @@ def generate_gemma_response(**response_kwargs) -> str:
     input_len = inputs["input_ids"].shape[-1]
 
     with torch.inference_mode():
-        generation = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample)
+        generation = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=do_sample, max_length=input_len + max_tokens)
         generation = generation[0][input_len:]
 
     decoded = processor.decode(generation, skip_special_tokens=True)
