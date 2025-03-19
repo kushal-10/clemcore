@@ -509,7 +509,7 @@ def generate_gemma_response(**response_kwargs) -> str:
     stdout_logger.info(f"\n\nINPUT TOKEN COUNT : {input_len} \n\n")
 
     with torch.inference_mode():
-        generation = model.generate(**inputs, do_sample=do_sample, max_length=input_len + max_tokens)
+        generation = model.generate(**inputs, do_sample=do_sample, max_length=input_len + max_tokens, top_p=False, top_k=False)
         generation = generation[0][input_len:]
 
     decoded = processor.decode(generation, skip_special_tokens=True)
