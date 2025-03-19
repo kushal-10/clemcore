@@ -14,6 +14,7 @@ from io import BytesIO
 import logging
 
 logger = logging.getLogger(__name__)
+stdout_logger = logging.getLogger("huggingface.multimodal.utils")
 
 """
 ##### INTERNVL2 TYPE MODELS #####
@@ -238,7 +239,7 @@ def get_internvl2_image(messages: List[str], device: str):
         , dim=0)
     else:
         pixel_values = None
-        logger.info("*" * 50 + "  Pixel Values not found  " + "*" * 50)
+        stdout_logger.info("*" * 50 + "  Pixel Values not found  " + "*" * 50)
 
     return pixel_values
 
@@ -497,7 +498,7 @@ def generate_gemma_response(**response_kwargs) -> str:
 
     gemma_messages = generate_gemma_messages(messages)
 
-    logger.info(f"\n\n INPUT Messages: \n{gemma_messages}\n\n")
+    stdout_logger.info(f"\n\n INPUT Messages: \n{gemma_messages}\n\n")
     inputs = processor.apply_chat_template(
                 gemma_messages, add_generation_prompt=True, tokenize=True,
                 return_dict=True, return_tensors="pt"
@@ -505,7 +506,7 @@ def generate_gemma_response(**response_kwargs) -> str:
 
     input_len = inputs["input_ids"].shape[-1]
 
-    logger.info(f"\n\nINPUT TOKEN COUNT : {input_len} \n\n")
+    stdout_logger.info(f"\n\nINPUT TOKEN COUNT : {input_len} \n\n")
 
     with torch.inference_mode():
         generation = model.generate(**inputs, do_sample=do_sample, max_length=input_len + max_tokens)
