@@ -11,6 +11,9 @@ import importlib
 import logging
 FALLBACK_CONTEXT_SIZE = 256
 
+torch.backends.cuda.enable_mem_efficient_sdp(False)
+torch.backends.cuda.enable_flash_sdp(False)
+
 logger = logging.getLogger(__name__)
 stdout_logger = logging.getLogger("huggingface.multimodal.api")
 
