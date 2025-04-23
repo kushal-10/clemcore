@@ -104,13 +104,6 @@ def load_model(model_spec: backends.ModelSpec) -> Any:
     assert "model_config" in model_spec, "vllm model requires model_config entry in model spec"
     model_config = model_spec.model_config
 
-    if 'requires_api_key' in model_config and model_config['requires_api_key']:
-        # NOTE: this is left here in case some issue with gated models comes up later
-        # load HF API key:
-        creds = backends.load_credentials("huggingface")
-        api_key = creds["huggingface"]["api_key"]
-        ...
-
     default_args = dict(tensor_parallel_size=model_config['number_gpus'] if 'number_gpus' in model_config else 1)
     max_model_len = int(model_spec.context_size) if 'context_size' in model_spec and model_spec.context_size else None
     if max_model_len is not None:
