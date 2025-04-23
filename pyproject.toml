@@ -24,7 +24,7 @@ dependencies = [
     "tqdm>=4.65.0",
     "nltk==3.8.1", # pin due to transformers==4.51.1 requires nltk<=3.8.1
     "aleph-alpha-client==7.0.1",
-    "openai==1.12.0",
+    "openai==1.75.0",
     "anthropic==0.47.1",
     "cohere==4.48",
     "google-generativeai==0.8.4",
@@ -38,7 +38,7 @@ dependencies = [
 vllm = [
     "torch==2.6.0",
     "transformers==4.51.1",
-    "vllm==0.8.4" # requires: torch==2.6.0 transformers>=4.51.1 cuda==12.4
+    "vllm==0.8.4" # requires: torch==2.6.0 transformers>=4.51.1 cuda==12.4 openai>=1.52.0
 ]
 huggingface = [
     "torch==2.1.1",
