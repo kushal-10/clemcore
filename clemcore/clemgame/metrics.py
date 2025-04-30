@@ -62,7 +62,7 @@ could NOT be succesfully parsed.
 Record level: episode (and optionally also turn)
 """
 
-METRIC_REQUEST_SUCCESS = "Request Success Ratio"
+METRIC_REQUEST_SUCCESS_RATIO = "Request Success Ratio"
 """
 METRIC_REQUEST_COUNT_PARSED / METRIC_REQUEST_COUNT
 Record level: episode (and optionally also turn)
@@ -197,18 +197,32 @@ class GameScorer:
     def score_rounds(self, interactions: Dict) -> None:
         """Iterate over episode rounds, calculate and log round scores.
         Args:
-            interactions: Dict containing the episode's interactions. This contains the actions recorded during
-                a benchmark run.
+            interactions: Dict containing the episode's actions recorded during a benchmark run.
         """
         for round_idx, round_events in enumerate(interactions["turns"]):
+            # compute standard framework metrics for the round
+            round_request_count = interactions[METRIC_REQUEST_COUNT][round_idx]
+            self.log_round_score(round_idx, METRIC_REQUEST_COUNT, round_request_count)
+
+            round_violated_request_count = interactions[METRIC_REQUEST_COUNT_VIOLATED][round_idx]
+            self.log_round_score(round_idx, METRIC_REQUEST_COUNT_VIOLATED, round_violated_request_count)
+
+            round_parsed_request_count = interactions[METRIC_REQUEST_COUNT_PARSED][round_idx]
+            self.log_round_score(round_idx, METRIC_REQUEST_COUNT_PARSED, round_parsed_request_count)
+
+            round_request_success_ratio = round_parsed_request_count / round_request_count
+            self.log_round_score(METRIC_REQUEST_SUCCESS_RATIO, round_request_success_ratio)
+
+            # compute game specific round metrics
             self.compute_round_score(round_idx, round_events)
 
     @abc.abstractmethod
-    def compute_round_score(self, round_events: List[Dict]) -> None:
+    def compute_round_score(self, round_idx, round_events: List[Dict]) -> None:
         """Calculate and log round scores/metrics. This method is intended to contain any game-specific round scoring.
 
         Note: Use the log_turn_score helper method to log values.
         Args:
+            round_idx: The index for the round the score is to be recorded for.
             round_events: List of player actions logged during the round.
         """
         pass
@@ -220,16 +234,24 @@ class GameScorer:
             interactions: Dict containing the episode's interactions. This contains the actions recorded during
                 a benchmark run.
         """
-        self.log_episode_score(METRIC_REQUEST_COUNT, interactions[METRIC_REQUEST_COUNT])
-        self.log_episode_score(METRIC_REQUEST_COUNT_PARSED, interactions[METRIC_REQUEST_COUNT_PARSED])
-        self.log_episode_score(METRIC_REQUEST_COUNT_VIOLATED, interactions[METRIC_REQUEST_COUNT_VIOLATED])
-        self.log_episode_score(METRIC_REQUEST_SUCCESS,
-                               interactions[METRIC_REQUEST_COUNT_PARSED] / interactions[METRIC_REQUEST_COUNT])
+        # compute standard framework metrics for the overall episode
+        overall_request_count = sum(interactions[METRIC_REQUEST_COUNT])
+        self.log_episode_score(METRIC_REQUEST_COUNT, overall_request_count)
+
+        overall_request_parsed = sum(interactions[METRIC_REQUEST_COUNT_PARSED])
+        self.log_episode_score(METRIC_REQUEST_COUNT_PARSED, overall_request_parsed)
+
+        overall_request_violated = sum(interactions[METRIC_REQUEST_COUNT_VIOLATED])
+        self.log_episode_score(METRIC_REQUEST_COUNT_VIOLATED, overall_request_violated)
+
+        overall_success_ratio = overall_request_parsed / overall_request_count
+        self.log_episode_score(METRIC_REQUEST_SUCCESS_RATIO, overall_success_ratio)
 
         self.log_episode_score(METRIC_ABORTED, interactions[METRIC_ABORTED])
         self.log_episode_score(METRIC_LOSE, interactions[METRIC_LOSE])
         self.log_episode_score(METRIC_SUCCESS, interactions[METRIC_SUCCESS])
 
+        # compute game specific episode metrics
         self.compute_episode_scores(interactions)
 
     @abc.abstractmethod

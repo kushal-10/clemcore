@@ -138,8 +138,7 @@ from clemcore.clemgame import GameInstanceGenerator
 from clemcore.backends import Model
 from clemcore.clemgame import GameSpec, GameBenchmark, Player, DialogueGameMaster, GameScorer
 
-from clemcore.clemgame.metrics import METRIC_ABORTED, METRIC_SUCCESS, METRIC_LOSE, METRIC_REQUEST_COUNT, \
-    METRIC_REQUEST_COUNT_VIOLATED, METRIC_REQUEST_COUNT_PARSED, METRIC_REQUEST_SUCCESS, BENCH_SCORE
+from clemcore.clemgame.metrics import METRIC_ABORTED, METRIC_SUCCESS, METRIC_LOSE, METRIC_REQUEST_COUNT, METRIC_REQUEST_COUNT_VIOLATED, METRIC_REQUEST_COUNT_PARSED, METRIC_REQUEST_SUCCESS_RATIO, BENCH_SCORE
 # or 
 import clemcore.clemgame.metrics as ms
 
