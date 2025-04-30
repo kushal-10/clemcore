@@ -68,7 +68,7 @@ def load_packaged_file(file_path: str):
 
 
 def store_results_file(game_name, data, file_name: str, dialogue_pair: str,
-                       sub_dir: str = None, results_dir: str = None):
+                       sub_dir: str = None, results_dir: str = None) -> str:
     """Store a results file in your game results' directory. The top-level directory is 'results'.
     Args:
         game_name: the game name to store the results file for
@@ -79,12 +79,15 @@ def store_results_file(game_name, data, file_name: str, dialogue_pair: str,
         sub_dir: The subdirectory to store the results file in. Automatically created when given; otherwise an
             error will be thrown.
         results_dir: An (alternative) results directory structure given as a relative or absolute path.
+    Returns:
+        file_path: the path to the stored file
     """
     if results_dir is None:
         results_dir = "results"  # default to a results directory in current terminal workspace
     game_results_path = os.path.join(results_dir, dialogue_pair, game_name)
     fp = store_file(data, file_name, game_results_path, sub_dir)
     module_logger.info(f"Results file stored to {fp}")
+    return fp
 
 
 class GameResourceLocator(abc.ABC):

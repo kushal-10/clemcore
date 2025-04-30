@@ -5,8 +5,9 @@ This constants should be used so that the naming is standardised across games.
 Important: If the game is aborted, all episode-level scores must be set to numpy.nan 
 and turn-level scores can be computed for the valid turns before the abortion action.
 """
+import abc
 import logging
-from typing import Dict
+from typing import Dict, final, Any, List
 
 from clemcore.clemgame.resources import store_results_file
 
@@ -87,9 +88,36 @@ Record level: episode
 
 module_logger = logging.getLogger(__name__)
 
+KEY_ROUND_SCORES = "round scores"
+KEY_EPISODE_SCORES = "episode scores"
+
 
 class GameScorer:
-    """Calculates scores based on interaction logs."""
+    """Calculates scores based on interaction logs. The resulting scores.json is structured like, for example:
+
+    {
+      "turn scores": {
+        "0": { # here come your metrics
+          "Accuracy": 0, # exemplary game specific metric
+          "Violated Request Count": 0, # framework metric
+          "Parsed Request Count": 1, # framework metric
+          "Request Count": 1 # framework metric
+        },
+        ...
+      "episode scores": {
+        "Violated Request Count": 0, # framework metric
+        "Parsed Request Count": 3, # framework metric
+        "Request Count": 3, # framework metric
+        "Request Success Ratio": 1.0, # framework metric
+        "Aborted": 0, # framework metric
+        "Success": 0, # framework metric
+        "Lose": 1, # framework metric
+        "Main Score": 0, # exemplary game specific metric
+        "Repetition-Guesser": 0, # exemplary game specific metric
+        "Repetition-Describer": 0 # exemplary game specific metric
+      }
+    }
+    """
 
     def __init__(self, name: str, experiment: Dict, game_instance: Dict):
         """
@@ -103,19 +131,11 @@ class GameScorer:
         self.game_instance = game_instance
         """ Stores values of score computation """
         self.scores = {
-            "turn scores": {},
-            "episode scores": {},
+            KEY_ROUND_SCORES: {},
+            KEY_EPISODE_SCORES: {},
         }
 
-    # mapworld games use this method directly ... because they overwrite store_scores to store images
-    # we should maybe add an on_store_scores hook for this already providing the full path to the episode dir
-    def store_results_file(self, data, file_name: str, dialogue_pair: str,
-                           sub_dir: str = None, results_dir: str = None):
-        store_results_file(self.game_name, data, file_name,
-                           dialogue_pair=dialogue_pair,
-                           sub_dir=sub_dir,
-                           results_dir=results_dir)
-
+    @final
     def store_scores(self, results_root: str, dialogue_pair: str, game_record_dir: str):
         """Store calculated scores to scores.json file.
         Args:
@@ -123,111 +143,102 @@ class GameScorer:
             dialogue_pair: A string path to the Player pair results directory.
             game_record_dir: The game's record directory path.
         """
-        store_results_file(self.game_name, self.scores, "scores.json",
-                           dialogue_pair=dialogue_pair,
-                           sub_dir=game_record_dir,
-                           results_dir=results_root)
+        assert BENCH_SCORE in self.scores[KEY_EPISODE_SCORES], \
+            "BENCH_SCORE is mandatory for evaluation, but missing in the calculated scores"
+        file_path = store_results_file(self.game_name, self.scores, "scores.json",
+                                       dialogue_pair=dialogue_pair,
+                                       sub_dir=game_record_dir,
+                                       results_dir=results_root)
+        self._on_store_scores(file_path)
 
-    def log_turn_score(self, turn_idx, score_name, score_value):
-        """Record a turn-level score for a single turn.
+    def _on_store_scores(self, file_path: str):
+        """Hook to perform additional stuff after file has been saved"""
+        pass
+
+    @final
+    def log_round_score(self, round_idx: int, score_name: str, score_value: Any):
+        """Helper method to record a round (former 'turn') score/metric.
         Args:
-            turn_idx: The turn index for the turn the score is to be recorded for.
-            score_name: The name of the turn-level score to record.
-            score_value: The value to be recorded for the turn-level score for this turn.
+            round_idx: The index for the round the score is to be recorded for.
+            score_name: The name of the turn-level score/metric to record.
+            score_value: The value to be recorded for the turn-level score/metric for this turn.
         """
         if isinstance(score_value, bool):
             module_logger.warning(f"{self.game_name}: Score {score_name} value is boolean, this can break the eval!")
-        if turn_idx not in self.scores["turn scores"]:
-            self.scores["turn scores"][turn_idx] = {}
-        if score_name in self.scores["turn scores"][turn_idx]:
-            module_logger.warning(f"{self.game_name}: Score {score_name} overwritten at turn {turn_idx}!")
-        self.scores["turn scores"][turn_idx][score_name] = score_value
-        module_logger.info(f"{self.game_name}: Logged turn {turn_idx} score {score_name}={score_value}.")
+        if round_idx not in self.scores[KEY_ROUND_SCORES]:
+            self.scores[KEY_ROUND_SCORES][round_idx] = {}
+        if score_name in self.scores[KEY_ROUND_SCORES][round_idx]:
+            module_logger.warning(f"{self.game_name}: Score {score_name} overwritten at round {round_idx}!")
+        self.scores[KEY_ROUND_SCORES][round_idx][score_name] = score_value
+        module_logger.info(f"{self.game_name}: Logged round {round_idx} score {score_name}={score_value}.")
 
+    @final
     def log_episode_score(self, score_name, score_value):
-        """Record an episode-level score for a single turn.
+        """Helper method to tecord an episode-level score/metric for the whole episode.
         Args:
-            score_name: The name of the episode-level score to record.
-            score_value: The value to be recorded for the episode-level score.
+            score_name: The name of the episode-level score/metric to record.
+            score_value: The value to be recorded for the episode-level score/metric.
         """
-        if score_name in self.scores["episode scores"]:
+        if score_name in self.scores[KEY_ROUND_SCORES]:
             module_logger.warning(f"{self.game_name}: Episode score {score_name} overwritten!")
-        self.scores["episode scores"][score_name] = score_value
+        self.scores[KEY_ROUND_SCORES][score_name] = score_value
         module_logger.info(f"{self.game_name}: Logged episode score {score_name}={score_value}.")
 
-    def compute_scores(self, episode_interactions: Dict) -> None:
-        """Compute and log scores for a game episode.
-        This method is used to perform complete scoring of an episode.
+    @final
+    def compute_scores(self, interactions: Dict) -> None:
+        """Compute and log scores for a game episode. This method is used to perform complete scoring of an episode.
         Args:
-            episode_interactions: Dict containing the episode's interactions. This contains the actions recorded during
+            interactions: Dict containing the episode's interactions recorded during a benchmark run.
+        """
+        self.score_rounds(interactions)
+        self.score_episode(interactions)
+
+    @final
+    def score_rounds(self, interactions: Dict) -> None:
+        """Iterate over episode rounds, calculate and log round scores.
+        Args:
+            interactions: Dict containing the episode's interactions. This contains the actions recorded during
                 a benchmark run.
         """
-        self.score_turns(episode_interactions)
-        self.score_game(episode_interactions)
+        for round_idx, round_events in enumerate(interactions["turns"]):
+            self.compute_round_score(round_idx, round_events)
 
-    def score_turns(self, episode_interactions: Dict) -> None:
-        """Iterate over episode turns, calculate and log turn-level scores.
-        This method is intended to contain any game-specific turn-level scoring. Must be implemented!
-        Use the log_turn_score method to log turn-level scores.
+    @abc.abstractmethod
+    def compute_round_score(self, round_events: List[Dict]) -> None:
+        """Calculate and log round scores/metrics. This method is intended to contain any game-specific round scoring.
+
+        Note: Use the log_turn_score helper method to log values.
         Args:
-            episode_interactions: Dict containing the episode's interactions. This contains the actions recorded during
+            round_events: List of player actions logged during the round.
+        """
+        pass
+
+    @final
+    def score_episode(self, interactions: Dict) -> None:
+        """Calculate and record standard scores/metrics for the overall episode.
+        Args:
+            interactions: Dict containing the episode's interactions. This contains the actions recorded during
                 a benchmark run.
         """
-        # Loop over turns, calculate and log turn-specific scores
-        raise NotImplementedError()
+        self.log_episode_score(METRIC_REQUEST_COUNT, interactions[METRIC_REQUEST_COUNT])
+        self.log_episode_score(METRIC_REQUEST_COUNT_PARSED, interactions[METRIC_REQUEST_COUNT_PARSED])
+        self.log_episode_score(METRIC_REQUEST_COUNT_VIOLATED, interactions[METRIC_REQUEST_COUNT_VIOLATED])
+        self.log_episode_score(METRIC_REQUEST_SUCCESS,
+                               interactions[METRIC_REQUEST_COUNT_PARSED] / interactions[METRIC_REQUEST_COUNT])
 
-    def score_game(self, episode_interactions: Dict) -> None:
-        """Calculate and record standard clembench metric scores for an episode.
+        self.log_episode_score(METRIC_ABORTED, interactions[METRIC_ABORTED])
+        self.log_episode_score(METRIC_LOSE, interactions[METRIC_LOSE])
+        self.log_episode_score(METRIC_SUCCESS, interactions[METRIC_SUCCESS])
+
+        self.compute_episode_scores(interactions)
+
+    @abc.abstractmethod
+    def compute_episode_scores(self, interactions: Dict):
+        """Compute any game specific game episode scores/metrics e.g. an overall accuracy metric.
+
+        Note: This method must log the game's main BENCH_SCORE
+
         Args:
-            episode_interactions: Dict containing the episode's interactions. This contains the actions recorded during
-                a benchmark run.
+            interactions: Dict containing the logged episode's interactions.
         """
-        self.score_game_end(episode_interactions)
-        self.score_requests(episode_interactions)
-        self.log_main_score(episode_interactions)
-
-    def score_game_end(self, episode_interactions: Dict) -> None:
-        """Calculate and record the ABORTED, LOSE and SUCCESS standard clembench metric scores.
-        Convenience method to cover mandatory clembench metric scores, so their calculation does not need to be
-        implemented anew for each new clemgame.
-        Args:
-            episode_interactions: Dict containing the episode's interactions. This contains the actions recorded during
-                a benchmark run.
-        """
-        aborted = int(episode_interactions[METRIC_ABORTED])
-        lose = int(episode_interactions[METRIC_LOSE]) if not aborted else 0
-        success = 1 - lose if not aborted else 0
-
-        self.log_episode_score(METRIC_ABORTED, aborted)
-        self.log_episode_score(METRIC_LOSE, lose)
-        self.log_episode_score(METRIC_SUCCESS, success)
-
-    def score_requests(self, episode_interactions: Dict):
-        """Calculate and record standard request-based clembench metric scores.
-        Records total request count, parsed, violated, and success ratio of parsed requests over all requests in an
-        episode.
-        Convenience method to cover mandatory clembench metric scores, so their calculation does not need to be
-        implemented anew for each new clemgame.
-        Args:
-            episode_interactions: Dict containing the episode's interactions. This contains the actions recorded during
-                a benchmark run.
-        """
-        request_count = episode_interactions[
-            METRIC_REQUEST_COUNT]  # could also be calculated by adding parsed and violated requests
-        parsed_requests = episode_interactions[METRIC_REQUEST_COUNT_PARSED]
-        violated_requests = episode_interactions[METRIC_REQUEST_COUNT_VIOLATED]
-
-        self.log_episode_score(METRIC_REQUEST_COUNT, request_count)
-        self.log_episode_score(METRIC_REQUEST_COUNT_PARSED, parsed_requests)
-        self.log_episode_score(METRIC_REQUEST_COUNT_VIOLATED, violated_requests)
-        self.log_episode_score(METRIC_REQUEST_SUCCESS, parsed_requests / request_count)
-
-    def log_main_score(self, episode_interactions: Dict):
-        """Record the game's main score.
-        Replace this method with a method that calculates and logs the clemgame's main score aka BENCH_SCORE.
-        Must be implemented! Recording BENCH_SCORE is mandatory.
-        Args:
-            episode_interactions: Dict containing the episode's interactions. This contains the actions recorded during
-                a benchmark run.
-        """
-        raise NotImplementedError()
+        pass
