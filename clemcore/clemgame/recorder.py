@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, Tuple, Any, List
 
+from clemcore.clemgame.metrics import METRIC_REQUEST_COUNT, METRIC_REQUEST_COUNT_VIOLATED, METRIC_REQUEST_COUNT_PARSED
+
 from clemcore.clemgame.resources import store_results_file
 
 module_logger = logging.getLogger(__name__)
@@ -11,9 +13,18 @@ module_logger = logging.getLogger(__name__)
 
 class GameRecorder(ABC):
     """Generic class for creating game records."""
+
     @abstractmethod
     def log_next_round(self):
         """Call this method to group interactions per turn."""
+        pass
+
+    @abstractmethod
+    def count_request(self):
+        pass
+
+    @abstractmethod
+    def count_request_violation(self):
         pass
 
     @abstractmethod
@@ -61,11 +72,18 @@ class GameRecorder(ABC):
 
 class NoopGameRecorder(GameRecorder):
     """Placeholder class for GameMaster initialization, does not actually record anything."""
+
     def __init__(self):
         self.interactions = []
         self.requests = []
 
     def log_next_round(self):
+        pass
+
+    def count_request(self):
+        pass
+
+    def count_request_violation(self):
         pass
 
     def log_key(self, key, value):
@@ -83,9 +101,10 @@ class NoopGameRecorder(GameRecorder):
 
 class DefaultGameRecorder(GameRecorder):
     """Default game recorder with common methods for recording game episodes."""
+
     def __init__(self, game_name: str, experiment_name: str, game_id: int, dialogue_pair: str):
         self._game_name = game_name
-        self._log_current_turn = 0
+        self._current_round = 0
         """ Stores players and turn during the runs """
         self.interactions = {
             "meta": dict(experiment_name=experiment_name, game_id=game_id, dialogue_pair=dialogue_pair),
@@ -94,11 +113,26 @@ class DefaultGameRecorder(GameRecorder):
         }
         """ Stores calls to the API """
         self.requests = []
+        """ Keep track of player response metrics"""
+        self.requests_counts = [0]  # count per round (initially zero)
+        self.violated_requests_counts = [0]  # count per round (initially zero)
+        self.successful_requests_counts = [0]  # count per round (initially zero)
 
     def log_next_round(self):
         """Call this method to group interactions per turn."""
-        self._log_current_turn += 1
+        self._current_round += 1
         self.interactions["turns"].append([])
+        self.requests_counts.append(0)
+        self.violated_requests_counts.append(0)
+        self.successful_requests_counts.append(0)
+
+    def count_request_violation(self):
+        self.violated_requests_counts[self._current_round] += 1
+        self.successful_requests_counts[self._current_round] -= 1
+
+    def count_request(self):
+        self.requests_counts[self._current_round] += 1
+        self.successful_requests_counts[self._current_round] += 1  # until parse error detected
 
     def log_key(self, key: str, value: Any):
         """Add a key and value to the internal log.
@@ -135,7 +169,7 @@ class DefaultGameRecorder(GameRecorder):
             "timestamp": timestamp,
             "action": action
         }
-        self.interactions["turns"][self._log_current_turn].append(copy.deepcopy(action_obj))
+        self.interactions["turns"][self._current_round].append(copy.deepcopy(action_obj))
         module_logger.info(
             f"{self._game_name}: Logged {action['type']} action ({from_}->{to}).")
         if call:
@@ -182,6 +216,12 @@ class DefaultGameRecorder(GameRecorder):
             module_logger.warning(f"Interaction logs are missing!")
         if not self.requests:
             module_logger.warning(f"No calls logged!")
+
+        # add default framework metrics
+        self.log_key(METRIC_REQUEST_COUNT, self.requests_counts)
+        self.log_key(METRIC_REQUEST_COUNT_VIOLATED, self.violated_requests_counts)
+        self.log_key(METRIC_REQUEST_COUNT_PARSED, self.successful_requests_counts)
+
         store_results_file(self._game_name, self.interactions,
                            "interactions.json",
                            dialogue_pair_desc,

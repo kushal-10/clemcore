@@ -299,6 +299,7 @@ class DialogueGameMaster(GameMaster):
             parsed_response = self._parse_response(self.current_player, response)  # throws ParseError
             self._advance_game(self.current_player, parsed_response)  # throws GameError
         except ParseError as error:
+            self._game_recorder.count_request_violation()
             self._on_parse_error(error)
         except GameError as error:
             self._on_game_error(error)

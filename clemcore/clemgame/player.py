@@ -16,6 +16,7 @@ class Player(abc.ABC):
     - human players are called via the _terminal_response() method
     - backend players are called via the generate_response() method of a backend
     """
+
     def __init__(self, model: backends.Model, name: str = None, game_recorder: GameRecorder = None,
                  initial_prompt: Union[str, Dict] = None, forget_extras: List[str] = None):
         """
@@ -201,6 +202,7 @@ class Player(abc.ABC):
         else:
             prompt, response_object, response_text = self.model.generate_response(self._messages + [context])
             # TODO: add default ContextExceededError handling here or above
+        self._game_recorder.count_request()
         return prompt, response_object, response_text
 
     def _terminal_response(self, context: Dict) -> str:
