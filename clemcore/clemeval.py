@@ -131,7 +131,6 @@ def load_scores(path: str) -> dict:
         if naming not in scores:
             data = load_json(path)
             scores[naming] = {}
-            scores[naming]['turns'] = data['turn scores']
             scores[naming]['episodes'] = data['episode scores']
         else:
             print(f'Repeated file {naming}!')
