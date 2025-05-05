@@ -179,9 +179,9 @@ class GameScorer:
             score_name: The name of the episode-level score/metric to record.
             score_value: The value to be recorded for the episode-level score/metric.
         """
-        if score_name in self.scores[KEY_ROUND_SCORES]:
+        if score_name in self.scores[KEY_EPISODE_SCORES]:
             module_logger.warning(f"{self.game_name}: Episode score {score_name} overwritten!")
-        self.scores[KEY_ROUND_SCORES][score_name] = score_value
+        self.scores[KEY_EPISODE_SCORES][score_name] = score_value
         module_logger.info(f"{self.game_name}: Logged episode score {score_name}={score_value}.")
 
     @final
@@ -211,7 +211,7 @@ class GameScorer:
             self.log_round_score(round_idx, METRIC_REQUEST_COUNT_PARSED, round_parsed_request_count)
 
             round_request_success_ratio = round_parsed_request_count / round_request_count
-            self.log_round_score(METRIC_REQUEST_SUCCESS_RATIO, round_request_success_ratio)
+            self.log_round_score(round_idx, METRIC_REQUEST_SUCCESS_RATIO, round_request_success_ratio)
 
             # compute game specific round metrics
             self.compute_round_score(round_idx, round_events)
