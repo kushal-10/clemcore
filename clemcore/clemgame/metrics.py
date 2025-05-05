@@ -7,9 +7,10 @@ and turn-level scores can be computed for the valid turns before the abortion ac
 """
 import abc
 import logging
-from typing import Dict, final, Any, List
+from pathlib import Path
+from typing import Dict, Union, final, Any, List
 
-from clemcore.clemgame.resources import store_results_file
+from clemcore.clemgame.resources import store_file
 
 # common names
 METRIC_ABORTED = "Aborted"
@@ -136,19 +137,14 @@ class GameScorer:
         }
 
     @final
-    def store_scores(self, results_root: str, dialogue_pair: str, game_record_dir: str):
+    def store_scores(self, interactions_dir: Union[str, Path]):
         """Store calculated scores to scores.json file.
         Args:
-            results_root: The root path to the results directory.
-            dialogue_pair: A string path to the Player pair results directory.
-            game_record_dir: The game's record directory path.
+            interactions_dir: The game's record directory path.
         """
         assert BENCH_SCORE in self.scores[KEY_EPISODE_SCORES], \
             "BENCH_SCORE is mandatory for evaluation, but missing in the calculated scores"
-        file_path = store_results_file(self.game_name, self.scores, "scores.json",
-                                       dialogue_pair=dialogue_pair,
-                                       sub_dir=game_record_dir,
-                                       results_dir=results_root)
+        file_path = store_file(self.scores, "scores.json", interactions_dir)
         self._on_store_scores(file_path)
 
     def _on_store_scores(self, file_path: str):
