@@ -196,7 +196,7 @@ class Player(abc.ABC):
             # TODO: add default ContextExceededError handling here or above
         call_duration = datetime.now() - call_start
         self._game_recorder.count_request()
-        self._response_object["clem_player"] = {
+        response_object["clem_player"] = {
             "call_start": str(call_start),
             "call_duration": str(call_duration),
             "response": response_text,
