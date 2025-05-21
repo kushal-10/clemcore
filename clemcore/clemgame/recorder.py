@@ -1,3 +1,4 @@
+import collections
 import copy
 import logging
 from abc import ABC, abstractmethod
@@ -5,7 +6,7 @@ from datetime import datetime
 from typing import Dict, Tuple, Any, List
 
 from clemcore.clemgame.metrics import METRIC_REQUEST_COUNT, METRIC_REQUEST_COUNT_VIOLATED, METRIC_REQUEST_COUNT_PARSED
-
+from clemcore import get_version
 from clemcore.clemgame.resources import store_results_file
 
 module_logger = logging.getLogger(__name__)
@@ -37,10 +38,12 @@ class GameRecorder(ABC):
         pass
 
     @abstractmethod
-    def log_players(self, players_dic):
-        """Log/record the players in this game episode.
+    def log_player(self, player_name: str, game_role: str, model_name: str):
+        """Log a player of this game episode.
         Args:
-            players_dic: Dictionary of players in this game episode.
+            player_name: The player's name, usually "Player 1", "Player 2" or "Game Master"
+            game_role: the role in the game e.g. Guesser or Answerer
+            model_name: the name of the used model; CustomResponseModels resolve to "programmatic"
         """
         pass
 
@@ -89,7 +92,7 @@ class NoopGameRecorder(GameRecorder):
     def log_key(self, key, value):
         pass
 
-    def log_players(self, players_dic):
+    def log_player(self, player_name: str, game_role: str, model_name: str):
         pass
 
     def log_event(self, from_, to, action, call=None):
@@ -107,9 +110,15 @@ class DefaultGameRecorder(GameRecorder):
         self._current_round = 0
         """ Stores players and turn during the runs """
         self.interactions = {
-            "meta": dict(experiment_name=experiment_name, game_id=game_id, dialogue_pair=dialogue_pair),
-            "players": {},
-            "turns": [[]]  # already prepared to log the first round of turns
+            "meta": dict(game_name=game_name,
+                         experiment_name=experiment_name,
+                         game_id=game_id,
+                         dialogue_pair=dialogue_pair,
+                         clem_version=get_version()),
+            # already add Game Master
+            "players": collections.OrderedDict(GM=dict(game_role="Game Master", model_name="programmatic")),
+            # already prepare to log the first round of turns
+            "turns": [[]]
         }
         """ Stores calls to the API """
         self.requests = []
@@ -143,13 +152,20 @@ class DefaultGameRecorder(GameRecorder):
         self.interactions[key] = value
         module_logger.info(f"{self._game_name}: Logged a game-specific interaction key: {key}.")
 
-    def log_players(self, players_dic: Dict):
-        """Log/record the players in this game episode.
+    def log_player(self, player_name: str, game_role: str, model_name: str):
+        """Log a player of this game episode.
+
         Args:
-            players_dic: Dictionary of players in this game episode.
+            player_name: The player's name, usually "Player 1" or "Player 2"
+            game_role: the role in the game e.g. Guesser or Answerer
+            model_name: the name of the used model; CustomResponseModels resolve to "programmatic"
         """
-        self.interactions["players"] = players_dic
-        module_logger.info(f"{self._game_name}: Logged players metadata.")
+        player_info = {
+            "game_role": game_role,
+            "model_name": model_name
+        }
+        self.interactions["players"][player_name] = player_info
+        module_logger.info(f"{self._game_name}: Logged {player_name}: {player_info}")
 
     def log_event(self, from_: str, to: str, action: Dict, call: Tuple[Any, Any] = None):
         """Add an event to the internal log.
@@ -203,15 +219,12 @@ class DefaultGameRecorder(GameRecorder):
             dialogue_pair_desc: A string combining the Player pair names to be used as directory name.
             game_record_dir: The game's record directory path.
         """
-        if not self.interactions["players"]:
-            module_logger.warning(f"Players metadada is missing!")
-        else:
-            for name in self.interactions["players"]:
-                """The transcript builder relies on specific player identifiers."""
-                try:
-                    assert name == "GM" or name.startswith("Player ")
-                except AssertionError:
-                    module_logger.warning(f"Invalid player identifiers, html builder won't work.")
+        for name in self.interactions["players"]:
+            """The transcript builder relies on specific player identifiers."""
+            try:
+                assert name == "GM" or name.startswith("Player ")
+            except AssertionError:
+                module_logger.warning(f"Invalid player identifiers, html builder won't work.")
         if not self.interactions["turns"]:
             module_logger.warning(f"Interaction logs are missing!")
         if not self.requests:
