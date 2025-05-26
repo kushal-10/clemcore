@@ -1,10 +1,8 @@
 import argparse
-import inspect
-import logging
-import os
 import textwrap
+import logging
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import List, Dict, Union
 
 import clemcore.backends as backends
 from clemcore.backends import ModelRegistry, BackendRegistry
@@ -147,6 +145,7 @@ def score(game_selector: Union[str, Dict, GameSpec], results_dir: str = None):
         results_dir: Path to the results directory in which the benchmark records are stored.
     """
     logger.info(f"Scoring game {game_selector}")
+    stdout_logger.info(f"Scoring game {game_selector}")
 
     game_registry = GameRegistry.from_directories_and_cwd_files()
     game_specs = game_registry.get_game_specs_that_unify_with(game_selector)
@@ -226,7 +225,7 @@ def cli(args: argparse.Namespace):
 
     To list available models: 
     $> clem list models
-    
+
     To list available backends: 
     $> clem list backends
 
