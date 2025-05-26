@@ -38,6 +38,7 @@ class ResponseError(Exception):
 
 class ProtocolError(ResponseError):
     """Raised when a message does not follow the communication protocol expected by the game master."""
+
     pass
 
 
@@ -50,11 +51,13 @@ class ParseError(ProtocolError):
         - taboo: clue giver messages should start with 'CLUE:'
         - wordle: guesser messages should start with 'GUESS:'
     """
+
     pass
 
 
 class GameError(ResponseError):
     """Raised when a verbal action of a player causes problems for advancing the game."""
+
     pass
 
 
@@ -65,18 +68,26 @@ class RuleViolationError(GameError):
         - taboo: mentioning the target word as the clue giver
         - wordle: guessing words that are not exactly 5 letters long
     """
+
     pass
 
 
 class NotApplicableError(GameError):
     """Raised when a verbal action of a player cannot be applied to advance the game state."""
+
     pass
 
 
 class GameMaster(abc.ABC):
     """Base class to contain game-specific functionality."""
 
-    def __init__(self, name: str, path: str, experiment: Dict, player_models: List[backends.Model]):
+    def __init__(
+        self,
+        name: str,
+        path: str,
+        experiment: Dict,
+        player_models: List[backends.Model],
+    ):
         """
         Args:
             name: The name of the game (as specified in game_registry).
@@ -88,7 +99,9 @@ class GameMaster(abc.ABC):
         self.experiment: Dict = experiment
         self.player_models: List[backends.Model] = player_models
         self._game_recorder = NoopGameRecorder()
-        self.game_resources = GameResourceLocator(name, path)  # could be obsolete, when all info is in the instances
+        self.game_resources = GameResourceLocator(
+            name, path
+        )  # could be obsolete, when all info is in the instances
 
     @property
     def game_recorder(self):
@@ -126,7 +139,9 @@ class GameMaster(abc.ABC):
         self._game_recorder.log_event(from_, to, action)
 
     def store_records(self, results_root, dialogue_pair_desc, game_record_dir):
-        self._game_recorder.store_records(results_root, dialogue_pair_desc, game_record_dir)
+        self._game_recorder.store_records(
+            results_root, dialogue_pair_desc, game_record_dir
+        )
 
     @abc.abstractmethod
     def setup(self, **kwargs):
@@ -149,7 +164,13 @@ class DialogueGameMaster(GameMaster):
     Has most logging and gameplay procedures implemented, including convenient logging methods.
     """
 
-    def __init__(self, name: str, path: str, experiment: dict, player_models: List[backends.Model]):
+    def __init__(
+        self,
+        name: str,
+        path: str,
+        experiment: dict,
+        player_models: List[backends.Model],
+    ):
         """
         Args:
             name: The name of the game (as specified in game_registry).
@@ -160,7 +181,9 @@ class DialogueGameMaster(GameMaster):
         super().__init__(name, path, experiment, player_models)
         # the logging works with an internal mapping of "Player N" -> Player
         self.players_by_names: Dict[str, Player] = collections.OrderedDict()
-        self.context_for_player: Dict[str, Dict] = dict()  # context entries look like {"role":"user", "content": ...}
+        self.context_for_player: Dict[str, Dict] = (
+            dict()
+        )  # context entries look like {"role":"user", "content": ...}
         self.current_round: int = 0
         self._current_player: Player = None
         self._current_player_idx: int = 0
@@ -168,7 +191,11 @@ class DialogueGameMaster(GameMaster):
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        for player in self.players_by_names.values():  # sync game recorders (not copied in Player)
+        for (
+            player
+        ) in (
+            self.players_by_names.values()
+        ):  # sync game recorders (not copied in Player)
             player.game_recorder = self.game_recorder
 
     @property
@@ -188,8 +215,12 @@ class DialogueGameMaster(GameMaster):
         return list(self.players_by_names.values())
 
     @final
-    def add_player(self, player: Player, initial_prompt: Union[str, Dict] = None,
-                   initial_context: Union[str, Dict] = None):
+    def add_player(
+        self,
+        player: Player,
+        initial_prompt: Union[str, Dict] = None,
+        initial_context: Union[str, Dict] = None,
+    ):
         """Add a player to the game. The same player cannot be added twice.
         The player identity is determined by the player's name.
 
@@ -204,20 +235,31 @@ class DialogueGameMaster(GameMaster):
                             to directly react to the initial prompt. Alternatively, overwrite on_before_game() and
                             use set_context_for(player) to set the player context.
         """
-        player.game_recorder = self.game_recorder  # player should record to the same interaction log
+        player.game_recorder = (
+            self.game_recorder
+        )  # player should record to the same interaction log
         player.initial_prompt = initial_prompt
         player.name = f"Player {len(self.players_by_names) + 1}"
         if player.name in self.players_by_names:
-            raise ValueError(f"Player names must be unique, "
-                             f"but there is already a player registered with name '{player.name}'.")
+            raise ValueError(
+                f"Player names must be unique, "
+                f"but there is already a player registered with name '{player.name}'."
+            )
         self.players_by_names[player.name] = player
         self.log_player(player)
         if initial_context is not None:
-            assert isinstance(initial_context, (str, dict)), \
-                f"The initial context must be a str or dict, but is {type(initial_context)}"
+            assert isinstance(
+                initial_context, (str, dict)
+            ), f"The initial context must be a str or dict, but is {type(initial_context)}"
             if isinstance(initial_context, dict):
-                assert "content" in initial_context, "The initial context requires a content entry"
-                extras = {k: v for k, v in initial_context.items() if k not in ["role", "content"]}
+                assert (
+                    "content" in initial_context
+                ), "The initial context requires a content entry"
+                extras = {
+                    k: v
+                    for k, v in initial_context.items()
+                    if k not in ["role", "content"]
+                }
                 self.set_context_for(player, initial_context["content"], **extras)
             else:
                 self.set_context_for(player, initial_context)
@@ -269,7 +311,9 @@ class DialogueGameMaster(GameMaster):
     @final
     def get_context_for(self, player) -> Dict:
         assert player is not None, "Cannot get player context for 'None'"
-        assert player.name in self.context_for_player, f"No context set for {player.name}"
+        assert (
+            player.name in self.context_for_player
+        ), f"No context set for {player.name}"
         context = self.context_for_player[player.name]
         assert "role" in context, f"Player context must have a 'role' entry"
         assert context["role"] == "user", f"Role of player context must be 'user'"
@@ -296,7 +340,9 @@ class DialogueGameMaster(GameMaster):
         :return: done, info
         """
         try:
-            parsed_response = self._parse_response(self.current_player, response)  # throws ParseError
+            parsed_response = self._parse_response(
+                self.current_player, response
+            )  # throws ParseError
             self._advance_game(self.current_player, parsed_response)  # throws GameError
         except ParseError as error:
             self._game_recorder.count_request_violation()
@@ -342,7 +388,9 @@ class DialogueGameMaster(GameMaster):
 
         :return: the new current player
         """
-        self._current_player_idx = (self._current_player_idx + 1) % len(self.players_by_names)
+        self._current_player_idx = (self._current_player_idx + 1) % len(
+            self.players_by_names
+        )
         return self.get_players()[self._current_player_idx]
 
     def _start_next_round(self) -> bool:

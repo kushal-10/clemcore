@@ -67,8 +67,8 @@ class GameEnvironment(ABC):
     """
 
     def __init__(
-            self,
-            config: Optional[Dict[str, Any]] = None,
+        self,
+        config: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize a game environment.
@@ -93,9 +93,9 @@ class GameEnvironment(ABC):
         }
 
     def reset(
-            self,
-            initial_observations: Optional[Dict[str, Observation]] = None,
-            initial_action_spaces: Optional[Dict[str, ActionSpace]] = None,
+        self,
+        initial_observations: Optional[Dict[str, Observation]] = None,
+        initial_action_spaces: Optional[Dict[str, ActionSpace]] = None,
     ):
         """
         Reset the environment to its initial state.
@@ -133,6 +133,7 @@ class GameEnvironment(ABC):
         self._update_state_through_action(player, action)
 
         logger.debug(f"[step] New game state: \n{to_pretty_json(self.state)}")
+
         if self.state["aborted"]:
             logger.warning(f"[step] Action aborted: {action}")
         elif self.state["success"]:
@@ -189,7 +190,7 @@ class GameEnvironment(ABC):
             player: The player to set the observation for
         """
         observation: Observation = {"role": "user", "content": self.state}
-
+        
         self.observations[player.name] = observation
 
         logger.info(

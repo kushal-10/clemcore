@@ -7,6 +7,7 @@ from typing import Dict, Tuple, Any, List
 
 from clemcore.clemgame.metrics import METRIC_REQUEST_COUNT, METRIC_REQUEST_COUNT_VIOLATED, METRIC_REQUEST_COUNT_PARSED
 from clemcore import get_version
+
 from clemcore.clemgame.resources import store_results_file
 
 module_logger = logging.getLogger(__name__)
@@ -150,7 +151,7 @@ class DefaultGameRecorder(GameRecorder):
             value: The content of the entry to be logged.
         """
         self.interactions[key] = value
-        module_logger.info(f"{self._game_name}: Logged a game-specific interaction key: {key}.")
+        module_logger.debug(f"{self._game_name}: Logged a game-specific interaction key: {key}.")
 
     def log_player(self, player_name: str, game_role: str, model_name: str):
         """Log a player of this game episode.
