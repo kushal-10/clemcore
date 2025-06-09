@@ -10,7 +10,7 @@ handlers:
   file_handler:
     class: logging.FileHandler
     formatter: simple
-    filename: clembench.log
+    filename: clembenchv3.log
     encoding: utf8
 loggers:
   "clemcore.run":
