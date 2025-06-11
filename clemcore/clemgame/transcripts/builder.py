@@ -106,7 +106,7 @@ def build_transcript(interactions: Dict):
         if isinstance(msg_content, dict):
             if "image" in msg_content:
                 transcript += f'<div speaker="{speaker}" class="msg {class_name}" style="{style}">\n'
-                transcript += f'  <p>{msg_raw}</p>\n'
+                # transcript += f'  <p>{msg_raw}</p>\n'
                 for image_src in msg_content["image"]:
                     if not image_src.startswith("http"):  # take the web url as it is
                         if "IMAGE_ROOT" in os.environ:
@@ -114,9 +114,12 @@ def build_transcript(interactions: Dict):
                         else:
                             # CAUTION: this only works when the project is checked out (dev mode)
                             image_src = os.path.join(file_utils.project_root(), image_src)
-                    transcript += (f'  <a title="{image_src}">'
-                                   f'<img style="width:100%" src="{image_src}" alt="{image_src}" />'
-                                   f'</a>\n')
+                    transcript += (
+                                f'<a>'
+                                f'<img style="width:150%;" '
+                                f'src="{image_src}"/>'
+                                f'</a>\n'
+                            )
                 transcript += '</div>\n'
             else:
                 transcript += patterns.HTML_TEMPLATE.format(speaker, class_name, style, msg_raw)
