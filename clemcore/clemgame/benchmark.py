@@ -9,13 +9,13 @@ from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, ContextManager, Tuple
+from typing import List, Dict, ContextManager, Tuple, Callable
 from tqdm import tqdm
 
 from clemcore import backends
 from clemcore.clemgame.master import GameMaster
 from clemcore.clemgame.metrics import GameScorer
-from clemcore.clemgame.recorder import GameRecorder, DefaultGameRecorder
+from clemcore.clemgame.recorder import DefaultGameRecorder
 from clemcore.clemgame.registry import GameSpec
 from clemcore.clemgame.resources import GameResourceLocator, store_results_file, load_json
 
@@ -142,7 +142,8 @@ class GameBenchmark(GameResourceLocator):
             stdout_logger.error(
                 f"{self.game_name}: '{error_count}' exceptions occurred: See clembench.log for details.")
 
-    def run(self, player_models: List[backends.Model], results_dir: str):
+    def run(self, player_models: List[backends.Model], results_dir: str,
+            task_selector: Callable[[str, str], List[int]] = None):
         """Runs game-play on all game instances for a game.
         There must be an instances.json with the following structure:
         "experiments": [ # this is required
@@ -199,31 +200,35 @@ class GameBenchmark(GameResourceLocator):
             episode_counter = 0
             error_count = 0
             time_experiment_start = datetime.now()
-            game_instances: List = experiment["game_instances"]
-            module_logger.info("Activity: %s Experiment: %s Partners: %s Episodes: %d",
-                               self.game_name, experiment_name, dialogue_pair_desc, len(game_instances))
-            for game_instance in tqdm(game_instances, desc="Playing games"):
-                game_id = game_instance["game_id"]
-                module_logger.info("Activity: %s Experiment: %s Episode: %d Game: %s",
-                                   self.game_name, experiment_name, episode_counter, game_id)
+            tasks: List[Dict] = experiment["game_instances"]  # by default run all
+            if task_selector is not None:
+                task_ids = task_selector(self.game_name, experiment_name)
+                stdout_logger.info("Sub-select only instances with game_ids: %s", task_ids)
+                tasks = [t for t in tasks if t["game_id"] in task_ids]
+            module_logger.info("Activity: %s Experiment: %s Partners: %s Tasks: %d",
+                               self.game_name, experiment_name, dialogue_pair_desc, len(tasks))
+            for task in tqdm(tasks, desc="Playing games"):
+                task_id = task["game_id"]
+                module_logger.info("Activity: %s Experiment: %s Task: %s",
+                                   self.game_name, experiment_name, task_id)
                 episode_dir = experiment_record_dir + f"/episode_{episode_counter}"
-                store_results_file(self.game_name, game_instance,
+                store_results_file(self.game_name, task,
                                    f"instance.json",
                                    dialogue_pair_desc,
                                    sub_dir=episode_dir,
                                    results_dir=results_root)
                 game_recorder = DefaultGameRecorder(self.game_name,
                                                     experiment_name,  # meta info for transcribe
-                                                    game_id,  # meta info for transcribe
+                                                    task_id,  # meta info for transcribe
                                                     dialogue_pair_desc)  # meta info for transcribe
                 try:
                     game_master = self.create_game_master(experiment_config, player_models)
                     game_master.game_recorder = game_recorder
-                    game_master.setup(**game_instance)
+                    game_master.setup(**task)
                     game_master.play()
                     game_master.store_records(results_root, dialogue_pair_desc, episode_dir)
                 except Exception:  # continue with other episodes if something goes wrong
-                    module_logger.exception(f"{self.game_name}: Exception for episode {game_id} (but continue)")
+                    module_logger.exception(f"{self.game_name}: Exception for task {task_id} (but continue)")
                     error_count += 1
                 episode_counter += 1
             if error_count > 0:
