@@ -192,6 +192,8 @@ class GameScorer:
         """
         if KEY_META in interactions:  # if given, copy over meta info
             self.scores[KEY_META] = interactions[KEY_META]
+        if "player_models" in interactions:  # if given, copy over players info
+            self.scores["player_models"] = interactions["player_models"]
         if KEY_PLAYERS in interactions:  # if given, copy over players info
             self.scores[KEY_PLAYERS] = interactions[KEY_PLAYERS]
         self.score_rounds(interactions)
