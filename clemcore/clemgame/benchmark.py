@@ -1,4 +1,5 @@
 import glob
+import hashlib
 import importlib.util
 import inspect
 import logging
@@ -17,22 +18,15 @@ from clemcore.clemgame.master import GameMaster
 from clemcore.clemgame.metrics import GameScorer
 from clemcore.clemgame.recorder import DefaultGameRecorder
 from clemcore.clemgame.registry import GameSpec
-from clemcore.clemgame.resources import GameResourceLocator, store_results_file, load_json
+from clemcore.clemgame.resources import GameResourceLocator, store_results_file, load_json, store_json
 
 module_logger = logging.getLogger(__name__)
 stdout_logger = logging.getLogger("clemcore.run")
 
 
 class GameInstanceIterator:
-    """Class to iterate over game instances."""
+
     def __init__(self, instances, do_shuffle=False, reset=True):
-        """
-        Args:
-            instances: A list of instances.
-            do_shuffle: If True, the order of instances will be randomly shuffled on resetting a GameInstanceIterator
-                object.
-            reset: If True, GameInstanceIterator object gets reset when in initialized.
-        """
         assert instances is not None, "Instances must be given"
         self._instances = instances
         self._do_shuffle = do_shuffle
@@ -53,13 +47,11 @@ class GameInstanceIterator:
         return len(self._queue)
 
     def clone(self) -> "GameInstanceIterator":
-        """Clone GameInstanceIterator object, creating an exact copy without references to the original."""
         _clone = GameInstanceIterator(self._instances, do_shuffle=self._do_shuffle, reset=False)
         _clone._queue = deepcopy(self._queue)
         return _clone
 
     def reset(self) -> "GameInstanceIterator":
-        """Reset GameInstanceIterator object."""
         self._queue = []
         for index, experiment in enumerate(self._instances["experiments"]):
             filtered_experiment = {k: experiment[k] for k in experiment if k != 'game_instances'}
@@ -69,6 +61,18 @@ class GameInstanceIterator:
         if self._do_shuffle:
             random.shuffle(self._queue)
         return self
+
+
+def to_model_results_folder(player_models: List[backends.Model]):
+    def to_descriptor(model: backends.Model):
+        return f"{model.get_name()}-t{model.get_temperature()}"
+
+    model_descriptors = [to_descriptor(m) for m in player_models]
+    folder_name = "--".join(model_descriptors)
+    if len(player_models) <= 2:
+        return folder_name
+    _hash = hashlib.sha1(folder_name.encode()).hexdigest()[:8]
+    return f"group-{len(player_models)}p-{_hash}"
 
 
 class GameBenchmark(GameResourceLocator):
@@ -81,11 +85,10 @@ class GameBenchmark(GameResourceLocator):
         Args:
             game_spec: The name of the game (as specified in game_registry)
         """
-        super().__init__(game_spec["game_name"], game_spec["game_path"])
+        super().__init__(game_spec.game_name, game_spec.game_path)
         self.game_spec = game_spec
         self.instances = None
         self.filter_experiment: List[str] = []
-        self.is_single_player = True if game_spec["players"] == "one" else False
 
     def setup(self, instances_filename: str = None):
         """Set up a benchmark run of a clemgame.
@@ -100,12 +103,6 @@ class GameBenchmark(GameResourceLocator):
             self.instances = self.load_instances("instances")  # fallback to instances.json default
 
     def create_game_instance_iterator(self, shuffle_instances: bool = False):
-        """Create a GameInstanceIterator object for running a game.
-        Args:
-            shuffle_instances: If True, instances are randomly shuffled.
-        Returns:
-            A GameInstanceIterator object.
-        """
         return GameInstanceIterator(self.instances, do_shuffle=shuffle_instances)
 
     def compute_scores(self, results_dir: str):
@@ -177,7 +174,9 @@ class GameBenchmark(GameResourceLocator):
         if not experiments:
             module_logger.warning(f"{self.game_name}: No experiments for %s", self.game_name)
             return
-        dialogue_pair_desc = self.get_dialogue_pair_descriptor(player_models)
+        player_models_folder = to_model_results_folder(player_models)
+        player_models_infos = {idx: m.model_spec.to_dict() for idx, m in enumerate(player_models)}
+        store_json(player_models_infos, "player_models.json", os.path.join(results_dir, player_models_folder))
         total_experiments = len(experiments)
         for experiment_idx, experiment in enumerate(experiments):
             experiment_name = experiment['name']
@@ -188,12 +187,14 @@ class GameBenchmark(GameResourceLocator):
 
             experiment_config = {k: experiment[k] for k in experiment if k != 'game_instances'}
             experiment_config["timestamp"] = datetime.now().isoformat()
-            experiment_config["dialogue_partners"] = dialogue_pair_desc
+            experiment_config["game_name"] = self.game_name
+            experiment_config["experiment_name"] = experiment_name
+            experiment_config["player_models"] = player_models_infos
 
             experiment_record_dir = f"{experiment_idx}_{experiment_name}"
             store_results_file(self.game_name, experiment_config,
                                f"experiment.json",
-                               dialogue_pair_desc,
+                               player_models_folder,
                                sub_dir=experiment_record_dir,
                                results_dir=results_root)
 
@@ -206,7 +207,7 @@ class GameBenchmark(GameResourceLocator):
                 stdout_logger.info("Sub-select only instances with game_ids: %s", task_ids)
                 tasks = [t for t in tasks if t["game_id"] in task_ids]
             module_logger.info("Activity: %s Experiment: %s Partners: %s Tasks: %d",
-                               self.game_name, experiment_name, dialogue_pair_desc, len(tasks))
+                               self.game_name, experiment_name, player_models_folder, len(tasks))
             for task in tqdm(tasks, desc="Playing games"):
                 task_id = task["game_id"]
                 module_logger.info("Activity: %s Experiment: %s Task: %s",
@@ -214,19 +215,19 @@ class GameBenchmark(GameResourceLocator):
                 episode_dir = experiment_record_dir + f"/episode_{episode_counter}"
                 store_results_file(self.game_name, task,
                                    f"instance.json",
-                                   dialogue_pair_desc,
+                                   player_models_folder,
                                    sub_dir=episode_dir,
                                    results_dir=results_root)
                 game_recorder = DefaultGameRecorder(self.game_name,
                                                     experiment_name,  # meta info for transcribe
                                                     task_id,  # meta info for transcribe
-                                                    dialogue_pair_desc)  # meta info for transcribe
+                                                    player_models_folder)  # meta info for transcribe
                 try:
                     game_master = self.create_game_master(experiment_config, player_models)
                     game_master.game_recorder = game_recorder
                     game_master.setup(**task)
                     game_master.play()
-                    game_master.store_records(results_root, dialogue_pair_desc, episode_dir)
+                    game_master.store_records(results_root, player_models_folder, episode_dir)
                 except Exception:  # continue with other episodes if something goes wrong
                     module_logger.exception(f"{self.game_name}: Exception for task {task_id} (but continue)")
                     error_count += 1
@@ -239,33 +240,9 @@ class GameBenchmark(GameResourceLocator):
             experiment_config["duration"] = str(time_experiment_end)
             store_results_file(self.game_name, experiment_config,
                                f"experiment.json",
-                               dialogue_pair_desc,
+                               player_models_folder,
                                sub_dir=experiment_record_dir,
                                results_dir=results_root)
-
-    def get_dialogue_pair_descriptor(self, player_models: List[backends.Model]):
-        if self.is_single_player:
-            if len(player_models) > 1:
-                message = f"Too many player for singe-player game '{self.game_name}': '{len(player_models)}'"
-                stdout_logger.error(message)
-                raise ValueError(message)
-            model_0 = player_models[0]
-            model_0 = f"{model_0.get_name()}-t{model_0.get_temperature()}"
-            # still we store to model--model dir (virtual self-play)
-            dialogue_pair_desc = f"{model_0}--{model_0}"
-        else:  # 2-players
-            if len(player_models) > 2:
-                message = f"Too many player for two-player game '{self.game_name}': '{len(player_models)}'"
-                stdout_logger.error(message)
-                raise ValueError(message)
-            if len(player_models) == 1:
-                player_models.append(player_models[0])  # model expansion
-            model_0 = player_models[0]
-            model_0 = f"{model_0.get_name()}-t{model_0.get_temperature()}"
-            model_1 = player_models[1]
-            model_1 = f"{model_1.get_name()}-t{model_1.get_temperature()}"
-            dialogue_pair_desc = f"{model_0}--{model_1}"
-        return dialogue_pair_desc
 
     def create_game_master(self, experiment: Dict, player_models: List[backends.Model]) -> GameMaster:
         """Create a game-specific GameMaster subclass instance to run the game with.
