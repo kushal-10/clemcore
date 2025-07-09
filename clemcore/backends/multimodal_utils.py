@@ -579,7 +579,7 @@ def generate_gemma_response(**response_kwargs) -> str:
     gemma_messages = generate_gemma_messages(messages)
 
 
-    inputs = processor.apply_chat_template(
+    raw_inputs = processor.apply_chat_template(
                 gemma_messages, add_generation_prompt=True, tokenize=True,
                 return_dict=True, return_tensors="pt"
             )
