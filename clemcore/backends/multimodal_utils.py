@@ -581,7 +581,7 @@ def generate_gemma_response(**response_kwargs) -> str:
     inputs = processor.apply_chat_template(
         gemma_messages, add_generation_prompt=True, tokenize=True,
         return_dict=True, return_tensors="pt"
-    ).to(model.device)
+    ).to(model.device,  dtype=torch.bfloat16)
 
     input_len = inputs["input_ids"].shape[-1]
 
