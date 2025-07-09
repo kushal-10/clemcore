@@ -578,22 +578,15 @@ def generate_gemma_response(**response_kwargs) -> str:
 
     gemma_messages = generate_gemma_messages(messages)
 
-
-    raw_inputs = processor.apply_chat_template(
-                gemma_messages, add_generation_prompt=True, tokenize=True,
-                return_dict=True, return_tensors="pt"
-            )
-
-    inputs = {}
-    for k, v in raw_inputs.items():
-        # ensure the memory is contiguous in CPU before the move
-        v = v.contiguous()
-        inputs[k] = v.to(device=model.device, dtype=torch.bfloat16)
+    inputs = processor.apply_chat_template(
+        gemma_messages, add_generation_prompt=True, tokenize=True,
+        return_dict=True, return_tensors="pt"
+    ).to(model.device)
 
     input_len = inputs["input_ids"].shape[-1]
 
     with torch.inference_mode():
-        generation = model.generate(**inputs, max_new_tokens=100, do_sample=False, top_p=False, top_k=False)
+        generation = model.generate(**inputs, max_new_tokens=100, do_sample=False)
         generation = generation[0][input_len:]
 
     decoded = processor.decode(generation, skip_special_tokens=True)
