@@ -7,6 +7,7 @@ from typing import List, Dict, Tuple, Any, Union, final, Optional
 
 from clemcore import backends
 from clemcore.clemgame.environment import Action, GameEnvironment
+from clemcore.clemgame.errors import ParseError, GameError
 from clemcore.clemgame.registry import GameSpec
 from clemcore.clemgame.player import Player
 from clemcore.clemgame.recorder import NoopGameRecorder
@@ -14,64 +15,6 @@ from clemcore.clemgame.resources import GameResourceLocator
 from clemcore.utils.string_utils import to_pretty_json
 
 module_logger = logging.getLogger(__name__)
-
-
-class ResponseError(Exception):
-    """
-    General error class for problems with the player response.
-
-    Developers can introduce more specific error types by subclassing this error.
-    Alternatively, the 'reason' attribute can be used to define more granular error types.
-    """
-
-    def __init__(self, reason: str = None, response: str = None):
-        """
-        :param reason: (optional) a brief description of the cause
-        :param response: (optional) the player's response
-        """
-        super().__init__(reason)
-        self.reason = reason
-        self.response = response
-
-    def __str__(self):
-        return f"{self.__class__.__name__}: {self.reason}"
-
-
-class ProtocolError(ResponseError):
-    """Raised when a message does not follow the communication protocol expected by the game master."""
-    pass
-
-
-class ParseError(ProtocolError):
-    """
-    This error is supposed to be raised when player messages cannot be parsed or understood by the game master e.g.
-    because the response does not start with a specified prefix.
-
-    For example:
-        - taboo: clue giver messages should start with 'CLUE:'
-        - wordle: guesser messages should start with 'GUESS:'
-    """
-    pass
-
-
-class GameError(ResponseError):
-    """Raised when a verbal action of a player causes problems for advancing the game."""
-    pass
-
-
-class RuleViolationError(GameError):
-    """Raised when a verbal action of a player violates the specified game rules.
-
-    For example:
-        - taboo: mentioning the target word as the clue giver
-        - wordle: guessing words that are not exactly 5 letters long
-    """
-    pass
-
-
-class NotApplicableError(GameError):
-    """Raised when a verbal action of a player cannot be applied to advance the game state."""
-    pass
 
 
 class GameMaster(abc.ABC):
@@ -138,7 +81,7 @@ class GameMaster(abc.ABC):
     @abc.abstractmethod
     def setup(self, **kwargs):
         """Load resources and prepare everything to play the game.
-        Needs to log the players dictionary via self.log_players(players_dict).
+        Needs to log the player infos via self.log_player().
         Called by the game's GameBenchmark run method for each game instance.
         Args:
             kwargs: Keyword arguments used to set up the GameMaster instance.
@@ -292,10 +235,10 @@ class DialogueGameMaster(GameMaster):
         while not done:
             context = self.get_context_for(self.current_player)
             response = self.current_player(context)
-            done, _ = self.process_turn(response)
+            done, _ = self.step(response)
 
     @final
-    def process_turn(self, response: str) -> Tuple[bool, Dict]:
+    def step(self, response: str) -> Tuple[bool, Dict]:
         """
         Verifies the response and transitions the game by applying the current player's response for the turn.
 
@@ -348,7 +291,7 @@ class DialogueGameMaster(GameMaster):
         Default: The gamer master passes the turn to the next player in the player list (order as added).
         Starting again with the first player, when all players have had their turn(s).
 
-        :return: the new current player
+        :return: the next (current) player
         """
         self._current_player_idx = (self._current_player_idx + 1) % len(self.players_by_names)
         return self.get_players()[self._current_player_idx]
@@ -359,15 +302,11 @@ class DialogueGameMaster(GameMaster):
 
         Default: Start next round when we cycled through the whole list i.e. it is again the first player's turn.
 
-        :return: True, when it's the first player's turn to start a new round
+        :return: True, when to start a new round
         """
         return self._current_player_idx == 0
 
     def __prepare_next_round(self):
-        """
-        Logs moving to next round and calls self._on_before_round().
-        Do not override.
-        """
         self.log_next_round()  # add record entry for player turns
         self._on_before_round()
 
@@ -489,11 +428,11 @@ class EnvGameMaster(GameMaster):
     """Extended GameMaster, integrating a GameEnvironment as self-contained object for state management."""
 
     def __init__(
-        self,
-        game_spec: GameSpec,
-        experiment: dict,
-        player_models: List[backends.Model],
-        game_environment: GameEnvironment,
+            self,
+            game_spec: GameSpec,
+            experiment: dict,
+            player_models: List[backends.Model],
+            game_environment: GameEnvironment,
     ):
         """
         Args:
@@ -554,7 +493,7 @@ class EnvGameMaster(GameMaster):
                 read from the game's instances.json.
         """
         self._on_setup(**kwargs)
-        if self.players_by_names: # todo: why should this be empty here?
+        if self.players_by_names:  # todo: why should this be empty here?
             self.current_player = self.get_players()[self.current_player_idx]
 
     @abc.abstractmethod
