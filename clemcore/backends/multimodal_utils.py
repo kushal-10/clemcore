@@ -776,4 +776,4 @@ def generate_glm_response(**response_kwargs) -> str:
     #NOTE: Here output_text is in the format - <think>thinking</think><answer>response</answer>
     Handle this in parse response - In Game.
     """
-    return decoded
+    return output_text
