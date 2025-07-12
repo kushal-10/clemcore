@@ -685,3 +685,95 @@ def generate_idefics_response(**response_kwargs) -> str:
 
     return generated_text[0]
 
+
+
+"""
+##### THUDM - GLM 9B THINKING TYPE MODELS #####
+"""
+
+def generate_glm_messages(messages: List[str]) -> Tuple[List, List]:
+
+    glm_messages = []
+    for msg in messages:
+        msg_dict = {}
+        if msg["role"] == "user":
+            msg_dict["role"] = "user"
+            msg_dict["content"] = [
+                {
+                    "type": "text",
+                    "content": msg["content"],
+                }
+            ]
+            if "image" in msg:
+                for img in msg["image"]:
+                    msg_dict["content"].append({"type": "image", "content": img})
+        elif msg["role"] == "assistant":
+            msg_dict["role"] = "assistant"
+            msg_dict["content"] = [
+                {
+                    "type": "text",
+                    "content": msg["content"],
+                }
+            ]
+
+        glm_messages.append(msg_dict)
+    return glm_messages
+
+def generate_glm_prompt_text(messages: List[str], **prompt_kwargs) -> str:
+
+    glm_message = generate_glm_messages(messages)
+
+    processor = prompt_kwargs['processor']
+
+    prompt_text = processor.apply_chat_template(
+                glm_message, add_generation_prompt=True, tokenize=False,
+                return_dict=True, return_tensors="pt"
+            )
+
+    return prompt_text
+
+
+def generate_glm_response(**response_kwargs) -> str:
+    """Generates a response from the GLM model based on the provided messages and configuration.
+
+    Args:
+        **response_kwargs: A dictionary containing the following keys:
+            - messages (List[str]): A list of message dictionaries.
+            - device (str): The device to which the image tensors will be moved (e.g., 'cuda' or 'cpu').
+            - max_tokens (int): The maximum number of tokens to generate.
+            - model: The model instance used for generating responses.
+            - processor: The processor instance used for processing images.
+
+    Returns:
+        str: The generated response from the LLAVA model.
+
+    Raises:
+        RuntimeError: If the model fails to generate a response.
+    """
+
+
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+    do_sample = response_kwargs['do_sample']
+
+    glm_message = generate_glm_messages(messages)
+
+    inputs = processor.apply_chat_template(
+        glm_message, add_generation_prompt=True, tokenize=True,
+        return_dict=True, return_tensors="pt"
+    ).to(model.device,  dtype=torch.bfloat16)
+
+    input_len = inputs["input_ids"].shape[-1]
+
+    with torch.inference_mode():
+        generated_ids = model.generate(**inputs, max_new_tokens=100)
+        output_text = processor.decode(generated_ids[0][inputs["input_ids"].shape[1]:], skip_special_tokens=False)
+
+    """
+    #NOTE: Here output_text is in the format - <think>thinking</think><answer>response</answer>
+    Handle this in parse response - In Game.
+    """
+    return decoded

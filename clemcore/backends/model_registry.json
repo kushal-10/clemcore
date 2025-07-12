@@ -6353,5 +6353,43 @@
                 "device_map": "clemcore.backends.multimodal_utils.split_internvl3_model"
             }
         }
+    },
+    {
+        "model_name": "thethinker",
+        "backend": "huggingface_multimodal",
+        "huggingface_id": "THUDM/GLM-4.1V-9B-Thinking",
+        "release_date": "2025-04-11",
+        "open_weight": true,
+        "parameters": "9B",
+        "languages": [
+            "en",
+            "zh"
+        ],
+        "context_size": "64k",
+        "license": {
+            "name": "MIT",
+            "url": "https://choosealicense.com/licenses/mit/"
+        },
+        "model_config": {
+            "model_class": "transformers.Glm4vForConditionalGeneration",
+            "processor_class": "transformers.AutoProcessor",
+            "processor_config": {
+                "use_fast": false
+            },
+            "prompt": "clemcore.backends.multimodal_utils.generate_glm_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_glm_response",
+            "trust_remote_code": false,
+            "do_sample": false,
+            "multimodality": {
+                "single_image": true,
+                "multiple_images": true,
+                "audio": false,
+                "video": true
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "device_map": "auto"
+            }
+        }
     }
 ]
