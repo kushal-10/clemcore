@@ -6374,11 +6374,10 @@
             "model_class": "transformers.Glm4vForConditionalGeneration",
             "processor_class": "transformers.AutoProcessor",
             "processor_config": {
-                "use_fast": false
+                "use_fast": true
             },
             "prompt": "clemcore.backends.multimodal_utils.generate_glm_prompt_text",
             "response": "clemcore.backends.multimodal_utils.generate_glm_response",
-            "trust_remote_code": false,
             "do_sample": false,
             "multimodality": {
                 "single_image": true,
