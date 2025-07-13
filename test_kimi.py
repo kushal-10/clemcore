@@ -21,7 +21,7 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
 
-image_paths = ["url"]
+image_paths = [url]
 images = [Image.open(path) for path in image_paths]
 messages = [
     {
