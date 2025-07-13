@@ -710,9 +710,6 @@ def generate_glm_messages(messages: List[str]) -> Tuple[List, List]:
 
         glm_messages.append(glm_message)
 
-        print("*"*100)
-        print(f"\nGLM Messages - {glm_messages}\n")
-
     return glm_messages
 
 def generate_glm_prompt_text(messages: List[str], **prompt_kwargs) -> str:
@@ -725,9 +722,6 @@ def generate_glm_prompt_text(messages: List[str], **prompt_kwargs) -> str:
                 glm_message, add_generation_prompt=True, tokenize=False,
                 return_dict=True, return_tensors="pt"
             )
-
-    print("*" * 100)
-    print(f"\nGLM PROMPT TEXT - {prompt_text}\n")
 
     return prompt_text
 
