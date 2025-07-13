@@ -1,4 +1,7 @@
+import requests
 from PIL import Image
+from io import BytesIO
+
 from transformers import AutoModelForCausalLM, AutoProcessor
 
 def extract_thinking_and_summary(text: str, bot: str = "◁think▷", eot: str = "◁/think▷") -> str:
@@ -22,12 +25,12 @@ model = AutoModelForCausalLM.from_pretrained(
 processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
 
 image_paths = [url]
-images = [Image.open(path) for path in image_paths]
+images = [Image.open(BytesIO(requests.get(url).content)) for url in image_paths]
 messages = [
     {
         "role": "user",
         "content": [
-            {"type": "image", "image": image_path} for image_path in image_paths
+            {"type": "image", "url": image_path} for image_path in image_paths
         ] + [{"type": "text", "text": "What kind of cat is this? Answer with one word."}],
     },
 ]
