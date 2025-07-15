@@ -96,12 +96,17 @@ class DefaultGameRecorder(GameRecorder):
         }
         """ Stores calls to the API """
         self.requests = []
-        self.thoughts = []
+        self.thoughts = {
+            "meta": dict(experiment_name=experiment_name, game_id=game_id, dialogue_pair=dialogue_pair),
+            "players": {},
+            "turns": [[]]  # already prepared to log the first round of turns
+        }
 
     def log_next_round(self):
         """Call this method to group interactions per turn."""
         self._log_current_turn += 1
         self.interactions["turns"].append([])
+        self.thoughts["turns"].append([])
 
     def log_key(self, key: str, value: Any):
         """Add a key and value to the internal log.
@@ -110,6 +115,8 @@ class DefaultGameRecorder(GameRecorder):
             value: The content of the entry to be logged.
         """
         self.interactions[key] = value
+        self.thoughts[key] = value
+
         module_logger.info(f"{self._game_name}: Logged a game-specific interaction key: {key}.")
 
     def log_players(self, players_dic: Dict):
@@ -118,35 +125,10 @@ class DefaultGameRecorder(GameRecorder):
             players_dic: Dictionary of players in this game episode.
         """
         self.interactions["players"] = players_dic
+        self.thoughts["players"] = players_dic
+
         module_logger.info(f"{self._game_name}: Logged players metadata.")
 
-    @staticmethod
-    def clean_thinking_response(response :str):
-
-        # GLM type responses
-        # Try to extract between <answer>...</answer>
-        match = re.search(r"<answer>(.*?)</answer>", response, re.DOTALL)
-        if match:
-            content = match.group(1).strip()
-            if content:  # Not empty
-                module_logger.info(f"Thinking tag found for GLM")
-                return content
-            # If empty, keep looking
-
-        # Try to extract between <\|begin_of_box\|>...\|end_of_box\|>
-        box_match = re.search(r"<\|begin_of_box\|>(.*?)<\|end_of_box\|>", response, re.DOTALL)
-        if box_match:
-            module_logger.info(f"Thinking tag found for GLM")
-            return box_match.group(1).strip()
-
-        # If neither found -> Check for Thinking type responses
-        responses_splits = response.split("◁/think▷")
-        if len(responses_splits) == 2:
-            module_logger.info(f"Thinking tag found for KimiVL")
-            return responses_splits[-1].strip()
-        else:
-            module_logger.info(f"No Thinking tags found, returning base response")
-            return response
 
 
     def log_event(self, from_: str, to: str, action: Dict, call: Tuple[Any, Any] = None):
@@ -177,19 +159,24 @@ class DefaultGameRecorder(GameRecorder):
                 "raw_response_obj": self._needs_copy(call[1])
             }
 
-            temp_raw_obj = self._needs_copy(call[1])
-            temp_raw_obj["response"] = self.clean_thinking_response(
-                temp_raw_obj["response"]
-            )
-            self.thoughts.append(call_obj)
-            self.requests.append(
-                {
-                    "timestamp": timestamp,
-                    "manipulated_prompt_obj": self._needs_copy(call[0]),
-                    "raw_response_obj": temp_raw_obj
-                }
-            )
+            self.requests.append(call_obj)
             module_logger.info(f"{self._game_name}: Logged a call with timestamp {timestamp}")
+
+    def log_thought(self, from_: str, to: str, action: Dict, call: Tuple[Any, Any] = None):
+        """Add an event to the internal log with thinking text from the model.
+        Ref - log_event()
+        """
+        timestamp = datetime.now().isoformat()
+        action_obj = {
+            "from": from_,
+            "to": to,
+            "timestamp": timestamp,
+            "action": action
+        }
+        self.thoughts["turns"][self._log_current_turn].append(copy.deepcopy(action_obj))
+        module_logger.info(
+            f"{self._game_name}: Logged {action['type']} THOUGHT ({from_}->{to}).")
+
 
     @staticmethod
     def _needs_copy(call_obj):

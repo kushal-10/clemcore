@@ -1,4 +1,5 @@
 import abc
+import re
 from copy import deepcopy
 from datetime import datetime
 from typing import List, Dict, Union
@@ -102,16 +103,49 @@ class Player(abc.ABC):
         """
         return f"{self.name} ({self.__class__.__name__}): {self.model}"
 
+    @staticmethod
+    def clean_thinking_response(response :str):
+
+        # GLM type responses
+        # Try to extract between <answer>...</answer>
+        match = re.search(r"<answer>(.*?)</answer>", response, re.DOTALL)
+        if match:
+            content = match.group(1).strip()
+            if content:  # Not empty
+                module_logger.info(f"Thinking tag found for GLM")
+                return content
+            # If empty, keep looking
+
+        # Try to extract between <\|begin_of_box\|>...\|end_of_box\|>
+        box_match = re.search(r"<\|begin_of_box\|>(.*?)<\|end_of_box\|>", response, re.DOTALL)
+        if box_match:
+            module_logger.info(f"Thinking tag found for GLM")
+            return box_match.group(1).strip()
+
+        # If neither found -> Check for Thinking type responses
+        responses_splits = response.split("◁/think▷")
+        if len(responses_splits) == 2:
+            module_logger.info(f"Thinking tag found for KimiVL")
+            return responses_splits[-1].strip()
+        else:
+            module_logger.info(f"No Thinking tags found, returning base response")
+            return response
+
     def __log_send_context_event(self, content: str, label=None):
         assert self._game_recorder is not None, "Cannot log player event, because game_recorder has not been set"
         action = {'type': 'send message', 'content': content, 'label': label}
         self._game_recorder.log_event(from_='GM', to=self.name, action=action)
+        self._game_recorder.log_thought(from_='GM', to=self.name, action=action)
 
+    # WE ARE HERE!!!
     def __log_response_received_event(self, response, label=None):
         assert self._game_recorder is not None, "Cannot log player event, because game_recorder has not been set"
         action = {'type': 'get message', 'content': response, 'label': label}
+        no_thought_action = {'type': 'get message', 'content': self.clean_thinking_response(response), 'label': label}
         _prompt, _response = self.get_last_call_info()  # log 'get message' event including backend/API call
-        self._game_recorder.log_event(from_=self.name, to="GM", action=action,
+        self._game_recorder.log_event(from_=self.name, to="GM", action=no_thought_action,
+                                      call=(deepcopy(_prompt), deepcopy(_response)))
+        self._game_recorder.log_thought(from_=self.name, to="GM", action=action,
                                       call=(deepcopy(_prompt), deepcopy(_response)))
 
     def get_last_call_info(self):
