@@ -119,7 +119,7 @@ class DefaultGameRecorder(GameRecorder):
         self.interactions["players"] = players_dic
         module_logger.info(f"{self._game_name}: Logged players metadata.")
 
-    @abstractmethod
+    @staticmethod
     def clean_thinking_response(response_str:str):
 
         # GLM type responses
