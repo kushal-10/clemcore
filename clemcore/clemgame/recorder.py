@@ -121,10 +121,9 @@ class DefaultGameRecorder(GameRecorder):
         module_logger.info(f"{self._game_name}: Logged players metadata.")
 
     @staticmethod
-    def clean_thinking_response(response_str:str):
+    def clean_thinking_response(response :str):
 
         # GLM type responses
-
         # Try to extract between <answer>...</answer>
         match = re.search(r"<answer>(.*?)</answer>", response, re.DOTALL)
         if match:
@@ -147,7 +146,7 @@ class DefaultGameRecorder(GameRecorder):
             return responses_splits[-1].strip()
         else:
             module_logger.info(f"No Thinking tags found, returning base response")
-            return response_str
+            return response
 
 
     def log_event(self, from_: str, to: str, action: Dict, call: Tuple[Any, Any] = None):
