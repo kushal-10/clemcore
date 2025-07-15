@@ -1,3 +1,48 @@
+// Helper to make the javascript debuggable in web tools
+function injectDebuggableScript(code, name) {
+  const script = document.createElement("script");
+  script.type = "text/javascript";
+  script.textContent = `${code}\n//# sourceURL=${name}`;
+  document.documentElement.appendChild(script);
+}
+
+window.show_toast = function(text) {
+    const toast = document.createElement("div");
+    toast.textContent = text;
+    toast.style.position = "fixed";
+    toast.style.top = "30px";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.background = "rgba(0, 0, 0, 0.8)";
+    toast.style.color = "white";
+    toast.style.padding = "12px 20px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "16px";
+    toast.style.zIndex = "9999";
+    toast.style.transition = "opacity 0.5s ease";
+    toast.style.opacity = "1";
+    document.body.appendChild(toast);
+
+    // Fade out and remove
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => {
+            toast.remove();
+        }, 500); // Wait for fade-out to complete
+    }, 3000); // Show for 3 seconds
+}
+
+// Clear history when episode is done
+injectDebuggableScript(`
+    socket.on("command", (data) => {
+        if (data.command === "done") {
+            $("#chat-area").empty();
+            window.show_toast("Episode done! You have been connected to a new player to play the next episode.")
+        }
+    });
+`, name="on-done.js");
+
+
 // Hide the sidebar
 $('#sidebar').hide();
 
