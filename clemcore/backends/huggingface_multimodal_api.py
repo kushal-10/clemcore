@@ -190,7 +190,33 @@ class HuggingfaceMultimodalModel(backends.Model):
         self.prompt_method = model_spec.model_config['prompt'] if 'prompt' in model_spec.model_config else None
         self.response_method = model_spec.model_config['response'] if 'response' in model_spec.model_config else None
 
+    @staticmethod
+    def clean_thinking_response(response :str):
+        # GLM type responses
+        # Try to extract between <answer>...</answer>
+        match = re.search(r"<answer>(.*?)</answer>", response, re.DOTALL)
+        if match:
+            content = match.group(1).strip()
+            if content:  # Not empty
+                stdout_logger.info(f"Thinking tag found for GLM")
+                return content
+            # If empty, keep looking
 
+        # Try to extract between <\|begin_of_box\|>...\|end_of_box\|>
+        box_match = re.search(r"<\|begin_of_box\|>(.*?)<\|end_of_box\|>", response, re.DOTALL)
+        if box_match:
+            stdout_logger.info(f"Thinking tag found for GLM")
+            return box_match.group(1).strip()
+
+        # If neither found -> Check for Thinking type responses
+        responses_splits = response.split("◁/think▷")
+        if len(responses_splits) == 2:
+            stdout_logger.info(f"Thinking tag found for KimiVL")
+            return responses_splits[-1].strip()
+        else:
+            stdout_logger.info(f"No Thinking tags found, returning base response")
+            return response
+        
     def generate_response(self, messages: List[Dict]) -> Tuple[Any, Any, str]:
         """Generate a response based on the provided messages.
 
@@ -266,11 +292,12 @@ class HuggingfaceMultimodalModel(backends.Model):
         }
         generated_response = response_method(**response_kwargs)
 
+        cleaned_response = self.clean_thinking_response(generated_response)
         # Store generated text
-        response = {"response": generated_response}
+        response = {"thinking_response": generated_response, "response": cleaned_response}
 
         # Check if split_prefix is not empty before splitting
-        response_text = generated_response
+        response_text = cleaned_response
         if self.split_prefix:
             response_text = generated_response.split(self.split_prefix)[-1]  # Get the last assistant response
         if self.cull:

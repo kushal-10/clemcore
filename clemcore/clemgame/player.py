@@ -139,16 +139,21 @@ class Player(abc.ABC):
         self._game_recorder.log_event(from_='GM', to=self.name, action=action)
         self._game_recorder.log_thought(from_='GM', to=self.name, action=action)
 
-    # WE ARE HERE!!!
-    def __log_response_received_event(self, response, label=None):
+    def __log_response_received_event(self, response_object, label=None):
         assert self._game_recorder is not None, "Cannot log player event, because game_recorder has not been set"
+
+        response = response_object["response"]
+        thinking_response = response["thinking_response"]
+
         action = {'type': 'get message', 'content': response, 'label': label}
-        no_thought_action = {'type': 'get message', 'content': self.clean_thinking_response(response), 'label': label}
+        thinking_action = {'type': 'get message', 'content': thinking_response, 'label': label}
+
         _prompt, _response = self.get_last_call_info()  # log 'get message' event including backend/API call
-        self._game_recorder.log_event(from_=self.name, to="GM", action=no_thought_action,
+        self._game_recorder.log_event(from_=self.name, to="GM", action=action,
                                       call=(deepcopy(_prompt), deepcopy(_response)))
-        self._game_recorder.log_thought(from_=self.name, to="GM", action=action,
+        self._game_recorder.log_thought(from_=self.name, to="GM", action=thinking_action,
                                       call=(deepcopy(_prompt), deepcopy(_response)))
+
 
     def get_last_call_info(self):
         return self._prompt, self._response_object
@@ -174,7 +179,7 @@ class Player(abc.ABC):
         call_start = datetime.now()
         self._prompt, self._response_object, response_text = self.__call_model(context)
         call_duration = datetime.now() - call_start
-        self.__log_response_received_event(response_text, label="response" if memorize else "forget")
+        self.__log_response_received_event(self._response_object, label="response" if memorize else "forget")
 
         self._response_object["clem_player"] = {
             "call_start": str(call_start),
