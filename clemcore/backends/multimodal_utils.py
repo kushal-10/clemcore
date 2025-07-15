@@ -792,13 +792,12 @@ def get_kimi_images(messages: List[str]) -> List:
     for msg in messages:
         if 'image' in msg:
             for img in msg['image']:
-                images.append(img)
-    loaded_image = Image.open(BytesIO(requests.get(images[-1]).content))
+                images.append(Image.open(BytesIO(requests.get(img).content)))
 
-    if not loaded_image:
+    if not images:
         raise ValueError("Could not find any image in images list")
 
-    return [loaded_image]
+    return images
 
 
 def generate_kimi_response(**response_kwargs) -> str:
