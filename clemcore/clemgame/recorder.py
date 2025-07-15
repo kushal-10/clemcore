@@ -64,6 +64,7 @@ class NoopGameRecorder(GameRecorder):
     def __init__(self):
         self.interactions = []
         self.requests = []
+        self.thoughts = []
 
     def log_next_round(self):
         pass
@@ -94,6 +95,7 @@ class DefaultGameRecorder(GameRecorder):
         }
         """ Stores calls to the API """
         self.requests = []
+        self.thoughts = []
 
     def log_next_round(self):
         """Call this method to group interactions per turn."""
@@ -116,6 +118,36 @@ class DefaultGameRecorder(GameRecorder):
         """
         self.interactions["players"] = players_dic
         module_logger.info(f"{self._game_name}: Logged players metadata.")
+
+    @abstractmethod
+    def clean_thinking_response(response_str:str):
+
+        # GLM type responses
+
+        # Try to extract between <answer>...</answer>
+        match = re.search(r"<answer>(.*?)</answer>", response, re.DOTALL)
+        if match:
+            content = match.group(1).strip()
+            if content:  # Not empty
+                module_logger.info(f"Thinking tag found for GLM")
+                return content
+            # If empty, keep looking
+
+        # Try to extract between <\|begin_of_box\|>...\|end_of_box\|>
+        box_match = re.search(r"<\|begin_of_box\|>(.*?)<\|end_of_box\|>", response, re.DOTALL)
+        if box_match:
+            module_logger.info(f"Thinking tag found for GLM")
+            return box_match.group(1).strip()
+
+        # If neither found -> Check for Thinking type responses
+        responses_splits = response_str.split("◁/think▷")
+        if len(responses_splits) == 2:
+            module_logger.info(f"Thinking tag found for KimiVL")
+            return responses_splits[-1].strip()
+        else:
+            module_logger.info(f"No Thinking tags found, returning base response")
+            return response_str
+
 
     def log_event(self, from_: str, to: str, action: Dict, call: Tuple[Any, Any] = None):
         """Add an event to the internal log.
@@ -144,7 +176,19 @@ class DefaultGameRecorder(GameRecorder):
                 "manipulated_prompt_obj": self._needs_copy(call[0]),
                 "raw_response_obj": self._needs_copy(call[1])
             }
-            self.requests.append(call_obj)
+
+            temp_raw_obj = self._needs_copy(call[1])
+            temp_raw_obj["choices"][0]["message"]["content"] = self.clean_thinking_response(
+                temp_raw_obj["choices"][0]["message"]["content"]
+            )
+            self.thoughts.append(call_obj)
+            self.requests.append(
+                {
+                    "timestamp": timestamp,
+                    "manipulated_prompt_obj": self._needs_copy(call[0]),
+                    "raw_response_obj": temp_raw_obj
+                }
+            )
             module_logger.info(f"{self._game_name}: Logged a call with timestamp {timestamp}")
 
     @staticmethod
@@ -189,6 +233,11 @@ class DefaultGameRecorder(GameRecorder):
                            results_dir=results_root)
         store_results_file(self._game_name, self.requests,
                            "requests.json",
+                           dialogue_pair_desc,
+                           sub_dir=game_record_dir,
+                           results_dir=results_root)
+        store_results_file(self._game_name, self.thoughts,
+                           "thoughts.json",
                            dialogue_pair_desc,
                            sub_dir=game_record_dir,
                            results_dir=results_root)

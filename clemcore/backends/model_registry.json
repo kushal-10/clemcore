@@ -6390,5 +6390,42 @@
                 "device_map": "auto"
             }
         }
+    },
+    {
+        "model_name": "KimiVL-A3B-Thinking",
+        "backend": "huggingface_multimodal",
+        "huggingface_id": "moonshotai/Kimi-VL-A3B-Thinking-2506",
+        "release_date": "2025-04-11",
+        "open_weight": true,
+        "parameters": "16B",
+        "languages": [
+            "en",
+            "zh"
+        ],
+        "context_size": "128k",
+        "license": {
+            "name": "MIT",
+            "url": "https://choosealicense.com/licenses/mit/"
+        },
+        "model_config": {
+            "model_class": "transformers.AutoModelForCausalLM",
+            "processor_class": "transformers.AutoProcessor",
+            "processor_config": {
+            },
+            "prompt": "clemcore.backends.multimodal_utils.generate_kimi_prompt_text",
+            "response": "clemcore.backends.multimodal_utils.generate_kimi_response",
+            "trust_remote_code": true,
+            "do_sample": false,
+            "multimodality": {
+                "single_image": true,
+                "multiple_images": true,
+                "audio": false,
+                "video": true
+            },
+            "mm_model_config": {
+                "torch_dtype": "auto",
+                "device_map": "auto"
+            }
+        }
     }
 ]

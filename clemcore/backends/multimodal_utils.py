@@ -770,3 +770,80 @@ def generate_glm_response(**response_kwargs) -> str:
     Handle this in parse response - In Game.
     """
     return output_text
+
+"""
+##### KIMI VL THINKING TYPE MODELS #####
+"""
+
+def generate_kimi_prompt_text(messages: List[str], **prompt_kwargs) -> str:
+    # Same format as GLM/Gemma
+    kimi_message = generate_glm_messages(messages)
+
+    processor = prompt_kwargs['processor']
+
+    prompt_text = processor.apply_chat_template(
+                kimi_message, add_generation_prompt=True, tokenize=False, return_tensors="pt"
+            )
+
+    return prompt_text
+
+def get_kimi_images(messages: List[str]) -> List:
+    images = []
+    for msg in messages:
+        if 'image' in message:
+            for img in msg['image']:
+                images.append(img)
+    loaded_image = Image.open(BytesIO(requests.get(images[-1]).content))
+
+    if not loaded_image:
+        raise ValueError("Could not find any image in images list")
+
+    return [loaded_image]
+
+
+def generate_kimi_response(**response_kwargs) -> str:
+    """Generates a response from the Kimi VL model based on the provided messages and configuration.
+
+    Args:
+        **response_kwargs: A dictionary containing the following keys:
+            - messages (List[str]): A list of message dictionaries.
+            - device (str): The device to which the image tensors will be moved (e.g., 'cuda' or 'cpu').
+            - max_tokens (int): The maximum number of tokens to generate.
+            - model: The model instance used for generating responses.
+            - processor: The processor instance used for processing images.
+
+    Returns:
+        str: The generated response from the LLAVA model.
+
+    Raises:
+        RuntimeError: If the model fails to generate a response.
+    """
+
+
+    messages = response_kwargs['messages']
+    device = response_kwargs['device']
+    max_tokens = response_kwargs['max_tokens']
+    model = response_kwargs['model']
+    processor = response_kwargs['processor']
+    do_sample = response_kwargs['do_sample']
+
+    kimi_message = generate_glm_messages(messages)
+    images = get_kimi_images(messages)
+    text = processor.apply_chat_template(
+        kimi_message, add_generation_prompt=True, return_tensors="pt"
+    )
+
+    inputs = processor(images=images, text=text, return_tensors="pt", padding=True, truncation=True).to(model.device)
+    generated_ids = model.generate(**inputs, max_new_tokens=max_tokens, temperature=0)
+    generated_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    response = processor.batch_decode(
+        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+    )[0]
+
+    """
+    #NOTE: Here output_text is in the format - ◁think▷text◁/think▷response
+    Handle this in parse response - In Game.
+    """
+    return response
