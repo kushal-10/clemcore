@@ -105,33 +105,6 @@ class Player(abc.ABC):
         """
         return f"{self.name} ({self.__class__.__name__}): {self.model}"
 
-    @staticmethod
-    def clean_thinking_response(response :str):
-
-        # GLM type responses
-        # Try to extract between <answer>...</answer>
-        match = re.search(r"<answer>(.*?)</answer>", response, re.DOTALL)
-        if match:
-            content = match.group(1).strip()
-            if content:  # Not empty
-                module_logger.info(f"Thinking tag found for GLM")
-                return content
-            # If empty, keep looking
-
-        # Try to extract between <\|begin_of_box\|>...\|end_of_box\|>
-        box_match = re.search(r"<\|begin_of_box\|>(.*?)<\|end_of_box\|>", response, re.DOTALL)
-        if box_match:
-            module_logger.info(f"Thinking tag found for GLM")
-            return box_match.group(1).strip()
-
-        # If neither found -> Check for Thinking type responses
-        responses_splits = response.split("◁/think▷")
-        if len(responses_splits) == 2:
-            module_logger.info(f"Thinking tag found for KimiVL")
-            return responses_splits[-1].strip()
-        else:
-            module_logger.info(f"No Thinking tags found, returning base response")
-            return response
 
     def __log_send_context_event(self, content: str, label=None):
         assert self._game_recorder is not None, "Cannot log player event, because game_recorder has not been set"
@@ -143,7 +116,7 @@ class Player(abc.ABC):
         assert self._game_recorder is not None, "Cannot log player event, because game_recorder has not been set"
 
         response = response_object["response"]
-        thinking_response = response["thinking_response"]
+        thinking_response = response_object["thinking_response"]
 
         action = {'type': 'get message', 'content': response, 'label': label}
         thinking_action = {'type': 'get message', 'content': thinking_response, 'label': label}
