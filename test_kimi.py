@@ -59,7 +59,7 @@ messages = generate_glm_messages(clem_messages)
 
 text = processor.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt")
 inputs = processor(images=images, text=text, return_tensors="pt", padding=True, truncation=True).to(model.device)
-generated_ids = model.generate(**inputs, max_new_tokens=1000, temperature=0)
+generated_ids = model.generate(**inputs, max_new_tokens=1000, temperature=0.0)
 generated_ids_trimmed = [
     out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
 ]
