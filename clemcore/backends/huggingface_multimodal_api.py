@@ -3,6 +3,7 @@ Backend using HuggingFace transformers for open-weight multimodal models.
 """
 from typing import List, Dict, Tuple, Any
 import torch
+import re
 import clemcore.backends as backends
 from transformers import AutoTokenizer, AutoConfig
 from jinja2 import Template
