@@ -191,3 +191,7 @@ class SlurkModel(backends.Model):  # todo: make this HumanModel when HumanModel 
         """
         response_text = self.wait_for_user_response(messages)
         return messages, {"response": "slurk"}, response_text
+
+    def reset(self):
+        # notify slurk user about the episode's end
+        self.sio.emit("message_command", {"command": "done", "room": self.room_id})
