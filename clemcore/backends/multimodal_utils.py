@@ -790,7 +790,7 @@ def generate_kimi_prompt_text(messages: List[str], **prompt_kwargs) -> str:
 def get_kimi_images(messages: List[str]) -> List:
     images = []
     for msg in messages:
-        if 'image' in message:
+        if 'image' in msg:
             for img in msg['image']:
                 images.append(img)
     loaded_image = Image.open(BytesIO(requests.get(images[-1]).content))
