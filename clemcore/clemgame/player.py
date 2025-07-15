@@ -49,6 +49,14 @@ class Player(abc.ABC):
         self._response_object = None  # internal state
         self._last_context = None  # internal state
 
+    def reset(self):
+        """ Called at the end of the interaction.
+
+        This hook can be used to potentially reset the player's state for further interactions.
+
+        By default, we delegate to the underlying model."""
+        self._model.reset()
+
     def __deepcopy__(self, memo):
         """Deepcopy override method.
         Deepcopies Player class object, but keeps backend model and game recorder references intact.

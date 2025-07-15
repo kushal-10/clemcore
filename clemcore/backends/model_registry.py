@@ -354,6 +354,10 @@ class Model(abc.ABC):
         """
         pass
 
+    def reset(self):
+        """ Hook to perform cleanup operations after an interaction, if necessary."""
+        pass
+
 
 class CustomResponseModel(Model):
     """Model child class to handle custom programmatic responses."""
