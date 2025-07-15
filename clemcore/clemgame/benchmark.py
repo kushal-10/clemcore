@@ -299,7 +299,7 @@ def load_from_spec(game_spec: GameSpec, do_setup: bool = True, instances_filenam
     parent_dir_name = os.path.basename(os.path.normpath(parent_path))
     game_dir_name = os.path.basename(os.path.normpath(game_spec.game_path))
     if game_dir_name.startswith(parent_dir_name):
-        stdout_logger.debug("Temporarily added game parent directory to python path: %s", parent_path)
+        module_logger.debug("Temporarily added game parent directory to python path: %s", parent_path)
         sys.path.insert(0, parent_path)
 
     # append game directory to system path for loading game specific dependencies
@@ -317,12 +317,12 @@ def load_from_spec(game_spec: GameSpec, do_setup: bool = True, instances_filenam
     if game_dir_name.startswith(parent_dir_name):
         sys.path.remove(parent_path)
     sys.path.remove(game_spec.game_path)
-    stdout_logger.info("Removed temporarily added python paths")
+    module_logger.debug("Removed temporarily added python paths")
 
     after_load = set(sys.modules.keys())
     extra_modules = after_load - before_load
     if extra_modules:
-        stdout_logger.info("Temporarily loaded additional game modules: %s", extra_modules)
+        module_logger.debug("Temporarily loaded additional game modules: %s", extra_modules)
 
     try:
         # extract game class from master.py (is_game checks inheritance from GameBenchmark)
@@ -342,4 +342,4 @@ def load_from_spec(game_spec: GameSpec, do_setup: bool = True, instances_filenam
     finally:
         for mod in extra_modules:
             del sys.modules[mod]
-        stdout_logger.info("Removed temporarily loaded additional game modules")
+        module_logger.debug("Removed temporarily loaded additional game modules")
