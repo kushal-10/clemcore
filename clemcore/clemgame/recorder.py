@@ -178,8 +178,8 @@ class DefaultGameRecorder(GameRecorder):
             }
 
             temp_raw_obj = self._needs_copy(call[1])
-            temp_raw_obj["choices"][0]["message"]["content"] = self.clean_thinking_response(
-                temp_raw_obj["choices"][0]["message"]["content"]
+            temp_raw_obj["response"] = self.clean_thinking_response(
+                temp_raw_obj["response"]
             )
             self.thoughts.append(call_obj)
             self.requests.append(
