@@ -835,7 +835,7 @@ def generate_kimi_response(**response_kwargs) -> str:
     )
 
     inputs = processor(images=images, text=text, return_tensors="pt", padding=True, truncation=True).to(model.device)
-    generated_ids = model.generate(**inputs, max_new_tokens=max_tokens, temperature=temperature)
+    generated_ids = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=False)
     generated_ids_trimmed = [
         out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
     ]
