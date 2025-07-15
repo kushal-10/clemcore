@@ -1,5 +1,6 @@
 import abc
 import re
+import logging
 from copy import deepcopy
 from datetime import datetime
 from typing import List, Dict, Union
@@ -7,6 +8,7 @@ from typing import List, Dict, Union
 from clemcore import backends
 from clemcore.clemgame.recorder import GameRecorder, NoopGameRecorder
 
+module_logger = logging.getLogger(__name__)
 
 class Player(abc.ABC):
     """A participant of a game.
