@@ -140,7 +140,7 @@ class DefaultGameRecorder(GameRecorder):
             return box_match.group(1).strip()
 
         # If neither found -> Check for Thinking type responses
-        responses_splits = response_str.split("◁/think▷")
+        responses_splits = response.split("◁/think▷")
         if len(responses_splits) == 2:
             module_logger.info(f"Thinking tag found for KimiVL")
             return responses_splits[-1].strip()
