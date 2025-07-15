@@ -236,6 +236,8 @@ class DialogueGameMaster(GameMaster):
             context = self.get_context_for(self.current_player)
             response = self.current_player(context)
             done, _ = self.step(response)
+        for player in self.get_players():
+            player.reset()
 
     @final
     def step(self, response: str) -> Tuple[bool, Dict]:
