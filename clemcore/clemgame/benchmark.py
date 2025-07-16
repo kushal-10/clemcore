@@ -294,6 +294,7 @@ def load_from_spec(game_spec: GameSpec, do_setup: bool = True, instances_filenam
         instances_filename: The name of the instances file to be used for the clemgame's setup if do_setup is True.
     """
     stdout_logger.info("Loading game benchmark for %s", game_spec.game_name)
+    time_start = datetime.now()
     # add parent directory to python path if matching naming convention to load additional files if necessary
     parent_path = os.path.dirname(os.path.abspath(game_spec.game_path))
     parent_dir_name = os.path.basename(os.path.normpath(parent_path))
@@ -337,7 +338,7 @@ def load_from_spec(game_spec: GameSpec, do_setup: bool = True, instances_filenam
 
         if do_setup:
             game_cls.setup(instances_filename)
-
+        stdout_logger.info(f'Loading game benchmark for {game_spec["game_name"]} took: %s', datetime.now() - time_start)
         yield game_cls
     finally:
         for mod in extra_modules:
