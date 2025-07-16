@@ -5,6 +5,6 @@
   "scripts": {
     "incoming-text": "display-text",
     "submit-message": "send-message",
-    "document-ready": "https://raw.githubusercontent.com/clp-research/clemcore/refs/heads/maintenance/2.x/clemcore/resources/slurk_api/task_room_layout.js"
+    "document-ready": "https://raw.githubusercontent.com/clp-research/clemcore/refs/heads/main/clemcore/resources/slurk_api/task_room_layout.js"
   }
 }
