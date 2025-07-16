@@ -199,6 +199,10 @@ class HuggingfaceMultimodalModel(backends.Model):
         if match:
             content = match.group(1).strip()
             if content:  # Not empty
+                box_match = re.search(r"<\|begin_of_box\|>(.*?)<\|end_of_box\|>", content, re.DOTALL)
+                if box_match:
+                    stdout_logger.info(f"Thinking tag found for GLM")
+                    return box_match.group(1).strip()
                 stdout_logger.info(f"Thinking tag found for GLM")
                 return content
             # If empty, keep looking

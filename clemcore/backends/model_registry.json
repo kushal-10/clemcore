@@ -6355,7 +6355,7 @@
         }
     },
     {
-        "model_name": "thethinker",
+        "model_name": "GLM-4.1V-9B-Thinking",
         "backend": "huggingface_multimodal",
         "huggingface_id": "THUDM/GLM-4.1V-9B-Thinking",
         "release_date": "2025-04-11",
