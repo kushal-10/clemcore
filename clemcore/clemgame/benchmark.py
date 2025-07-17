@@ -173,14 +173,12 @@ class GameBenchmark(GameResourceLocator):
             player_models: A list of backends.Model instances to run the game with.
             results_dir: Path to the results directory.
         """
-        results_root = results_dir
         experiments: List = self.instances["experiments"]
         if not experiments:
             module_logger.warning(f"{self.game_name}: No experiments for %s", self.game_name)
             return
         player_models_folder = to_model_results_folder(player_models)
         player_models_infos = to_player_model_infos(player_models)
-        store_json(player_models_infos, "player_models.json", os.path.join(results_dir, player_models_folder))
         total_experiments = len(experiments)
         for experiment_idx, experiment in enumerate(experiments):
             experiment_name = experiment['name']
@@ -196,11 +194,8 @@ class GameBenchmark(GameResourceLocator):
             experiment_config["player_models"] = player_models_infos
 
             experiment_record_dir = f"{experiment_idx}_{experiment_name}"
-            store_results_file(self.game_name, experiment_config,
-                               f"experiment.json",
-                               player_models_folder,
-                               sub_dir=experiment_record_dir,
-                               results_dir=results_root)
+            store_json(experiment_config, "experiment.json",
+                       os.path.join(results_dir, player_models_folder, self.game_name, experiment_record_dir))
 
             episode_counter = 0
             error_count = 0
@@ -217,11 +212,9 @@ class GameBenchmark(GameResourceLocator):
                 module_logger.info("Activity: %s Experiment: %s Task: %s",
                                    self.game_name, experiment_name, task_id)
                 episode_dir = experiment_record_dir + f"/episode_{episode_counter}"
-                store_results_file(self.game_name, task,
-                                   f"instance.json",
-                                   player_models_folder,
-                                   sub_dir=episode_dir,
-                                   results_dir=results_root)
+                store_json(task, "instance.json", os.path.join(results_dir, player_models_folder,
+                                                               self.game_name, experiment_record_dir,
+                                                               f"episode_{episode_counter}"))
                 game_recorder = DefaultGameRecorder(self.game_name,
                                                     experiment_name,  # meta info for transcribe
                                                     task_id,  # meta info for transcribe
@@ -232,7 +225,7 @@ class GameBenchmark(GameResourceLocator):
                     game_master.game_recorder = game_recorder
                     game_master.setup(**task)
                     game_master.play()
-                    game_master.store_records(results_root, player_models_folder, episode_dir)
+                    game_master.store_records(results_dir, player_models_folder, episode_dir)
                 except Exception:  # continue with other episodes if something goes wrong
                     module_logger.exception(f"{self.game_name}: Exception for task {task_id} (but continue)")
                     error_count += 1
@@ -243,11 +236,8 @@ class GameBenchmark(GameResourceLocator):
             # Add experiment duration and overwrite file
             time_experiment_end = datetime.now() - time_experiment_start
             experiment_config["duration"] = str(time_experiment_end)
-            store_results_file(self.game_name, experiment_config,
-                               f"experiment.json",
-                               player_models_folder,
-                               sub_dir=experiment_record_dir,
-                               results_dir=results_root)
+            store_json(experiment_config, "experiment.json",
+                       os.path.join(results_dir, player_models_folder, self.game_name, experiment_record_dir))
 
     def create_game_master(self, experiment: Dict, player_models: List[backends.Model]) -> GameMaster:
         """Create a game-specific GameMaster subclass instance to run the game with.
