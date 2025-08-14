@@ -315,7 +315,7 @@ def __run_game_sessions(game_sessions: List[GameSession], callbacks: GameBenchma
         context_response_by_session_id = Player.batch_response(batch_players, batch_contexts, row_ids=session_ids)
 
         # Use session_ids to map outputs back to game sessions for stepping
-        for sid, context, response in context_response_by_session_id.items():
+        for sid, (context, response) in context_response_by_session_id.items():
             session = game_sessions[sid]  # assuming session_id is an index (see __prepare_game_sessions)
             done, info = session.game_master.step(response)
             game_step = GameStep(context, response, done, info)
