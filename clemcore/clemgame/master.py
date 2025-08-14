@@ -223,7 +223,7 @@ class DialogueGameMaster(GameMaster):
             content: The text content to be added to the initial prompt.
             extras: Additional content to be merged into the context e.g. information about images
         """
-        if self.is_running():
+        if self.has_started():
             raise RuntimeError("The initial_prompt cannot be set when the game is already running."
                                "This feature only usable during game setup.")
         if player is None:
