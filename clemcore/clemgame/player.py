@@ -63,6 +63,7 @@ class Player(GameEventSource):
             if key not in ["_model", "_loggers"]:
                 setattr(_copy, key, deepcopy(value, memo))
         _copy._model = self._model
+        _copy._loggers = []  # we don't want to copy loggers, but the list must be initialized
         return _copy
 
     @property
