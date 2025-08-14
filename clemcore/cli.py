@@ -7,9 +7,9 @@ from pathlib import Path
 from typing import List, Dict, Union, Callable, Optional
 
 import clemcore.backends as backends
-from clemcore.backends import ModelRegistry, BackendRegistry
+from clemcore.backends import ModelRegistry, BackendRegistry, Model
 from clemcore.clemgame import GameRegistry, GameSpec, InstanceFileSaver, ExperimentFileSaver, \
-    InteractionsFileSaver, GameBenchmarkCallbackList, ImageFileSaver, RunFileSaver, GameInstanceIterator
+    InteractionsFileSaver, GameBenchmarkCallbackList, ImageFileSaver, RunFileSaver, GameInstanceIterator, ResultsFolder
 from clemcore.clemgame import benchmark
 from clemcore import clemeval, get_version
 from clemcore.clemgame.runners import dispatch
@@ -142,13 +142,15 @@ def run(game_selector: Union[str, Dict, GameSpec],
     logger.info("Loading models took: %s", datetime.now() - start)
 
     # setup reusable callbacks here once
+    results_folder = ResultsFolder(results_dir_path, player_models)
+    model_infos = Model.to_infos(player_models)
     callbacks = GameBenchmarkCallbackList([
-        InstanceFileSaver(results_dir_path, player_models),
-        ExperimentFileSaver(results_dir_path, player_models),
-        InteractionsFileSaver(results_dir_path, player_models),
-        ImageFileSaver(results_dir_path, player_models),
-        RunFileSaver(results_dir_path, player_models)]
-    )
+        InstanceFileSaver(results_folder),
+        ExperimentFileSaver(results_folder, model_infos),
+        InteractionsFileSaver(results_folder, model_infos),
+        ImageFileSaver(results_folder),
+        RunFileSaver(results_folder, model_infos)
+    ])
 
     all_start = datetime.now()
     for game_spec in game_specs:
