@@ -9,8 +9,8 @@ from typing import List, Dict, Union, Callable, Optional
 import clemcore.backends as backends
 from clemcore.backends import ModelRegistry, BackendRegistry, Model
 from clemcore.clemgame import GameRegistry, GameSpec, InstanceFileSaver, ExperimentFileSaver, \
-    InteractionsFileSaver, GameBenchmarkCallbackList, ImageFileSaver, RunFileSaver, GameInstanceIterator, ResultsFolder
-from clemcore.clemgame import benchmark
+    InteractionsFileSaver, GameBenchmarkCallbackList, ImageFileSaver, RunFileSaver, GameInstanceIterator, ResultsFolder, \
+    GameBenchmark
 from clemcore import clemeval, get_version
 from clemcore.clemgame.runners import dispatch
 from clemcore.clemgame.transcripts.builder import build_transcripts
@@ -167,7 +167,7 @@ def run(game_selector: Union[str, Dict, GameSpec],
                     game_ids = sub_selector(game_spec.game_name, experiment_name)
                     sub_selector = partial(experiment_filter, selected_experiment=experiment_name, game_ids=game_ids)
 
-            with benchmark.load_from_spec(game_spec) as game_benchmark:
+            with GameBenchmark.load_from_spec(game_spec) as game_benchmark:
                 time_start = datetime.now()
                 logger.info(f'Running {game_spec["game_name"]} (models={player_models})')
                 game_instance_iterator = GameInstanceIterator.from_game_spec(game_spec, sub_selector=sub_selector)
@@ -201,7 +201,7 @@ def score(game_selector: Union[str, Dict, GameSpec], results_dir: str = None):
     for game_spec in game_specs:
         try:
             time_start = datetime.now()
-            with benchmark.load_from_spec(game_spec) as game_benchmark:
+            with GameBenchmark.load_from_spec(game_spec) as game_benchmark:
                 game_benchmark.compute_scores(results_dir)
             logger.info(f"Scoring {game_benchmark.game_name} took: %s", datetime.now() - time_start)
         except Exception as e:

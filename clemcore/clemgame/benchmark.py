@@ -22,6 +22,18 @@ module_logger = logging.getLogger(__name__)
 stdout_logger = logging.getLogger("clemcore.run")
 
 
+def is_game_benchmark(obj):
+    """Check whether a class inherited from GameBenchmark.
+    Args:
+        obj: The object instance to check.
+    Returns:
+        True if the passed object is a subclass of GameBenchmark, False otherwise.
+    """
+    if inspect.isclass(obj) and issubclass(obj, GameBenchmark) and obj is not GameBenchmark:
+        return True
+    return False
+
+
 class GameBenchmark(GameResourceLocator):
     """Organizes the run of a particular collection of game instances which compose a benchmark for the game.
     Supports different experiment conditions for games.
@@ -34,11 +46,6 @@ class GameBenchmark(GameResourceLocator):
         """
         super().__init__(game_spec.game_name, game_spec.game_path)
         self.game_spec = game_spec
-        self.game_instance_iterator: Optional[GameInstanceIterator] = None
-        self.callbacks: GameBenchmarkCallbackList = GameBenchmarkCallbackList()
-
-    def add_callback(self, callback: GameBenchmarkCallback):
-        self.callbacks.append(callback)
 
     def compute_scores(self, results_dir: str):
         """Compute and store scores for each episode and player pair.
@@ -96,70 +103,59 @@ class GameBenchmark(GameResourceLocator):
         """
         raise NotImplementedError()
 
+    @staticmethod
+    @contextmanager
+    def load_from_spec(game_spec: GameSpec) -> ContextManager["GameBenchmark"]:
+        """Load a clemgame using a GameSpec.
+        Args:
+            game_spec: A GameSpec instance holding specific clemgame data.
+        """
+        stdout_logger.info("Loading game benchmark for %s", game_spec.game_name)
+        time_start = datetime.now()
+        # add parent directory to python path if matching naming convention to load additional files if necessary
+        parent_path = os.path.dirname(os.path.abspath(game_spec.game_path))
+        parent_dir_name = os.path.basename(os.path.normpath(parent_path))
+        game_dir_name = os.path.basename(os.path.normpath(game_spec.game_path))
+        if game_dir_name.startswith(parent_dir_name):
+            module_logger.debug("Temporarily added game parent directory to python path: %s", parent_path)
+            sys.path.insert(0, parent_path)
 
-def is_game_benchmark(obj):
-    """Check whether a class inherited from GameBenchmark.
-    Args:
-        obj: The object instance to check.
-    Returns:
-        True if the passed object is a subclass of GameBenchmark, False otherwise.
-    """
-    if inspect.isclass(obj) and issubclass(obj, GameBenchmark) and obj is not GameBenchmark:
-        return True
-    return False
+        # append game directory to system path for loading game specific dependencies
+        sys.path.insert(0, game_spec.game_path)
 
+        # keep track of potentially additional modules which must be unloaded after the run
+        before_load = set(sys.modules.keys())
 
-@contextmanager
-def load_from_spec(game_spec: GameSpec) -> ContextManager[GameBenchmark]:
-    """Load a clemgame using a GameSpec.
-    Args:
-        game_spec: A GameSpec instance holding specific clemgame data.
-    """
-    stdout_logger.info("Loading game benchmark for %s", game_spec.game_name)
-    time_start = datetime.now()
-    # add parent directory to python path if matching naming convention to load additional files if necessary
-    parent_path = os.path.dirname(os.path.abspath(game_spec.game_path))
-    parent_dir_name = os.path.basename(os.path.normpath(parent_path))
-    game_dir_name = os.path.basename(os.path.normpath(game_spec.game_path))
-    if game_dir_name.startswith(parent_dir_name):
-        module_logger.debug("Temporarily added game parent directory to python path: %s", parent_path)
-        sys.path.insert(0, parent_path)
+        # load game module from this master file
+        spec = importlib.util.spec_from_file_location(game_spec.game_name, game_spec.get_game_file())
+        game_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(game_module)
 
-    # append game directory to system path for loading game specific dependencies
-    sys.path.insert(0, game_spec.game_path)
+        # cleanup python path again
+        if game_dir_name.startswith(parent_dir_name):
+            sys.path.remove(parent_path)
+        sys.path.remove(game_spec.game_path)
+        module_logger.debug("Removed temporarily added python paths")
 
-    # keep track of potentially additional modules which must be unloaded after the run
-    before_load = set(sys.modules.keys())
+        after_load = set(sys.modules.keys())
+        extra_modules = after_load - before_load
+        if extra_modules:
+            module_logger.debug("Temporarily loaded additional game modules: %s", extra_modules)
 
-    # load game module from this master file
-    spec = importlib.util.spec_from_file_location(game_spec.game_name, game_spec.get_game_file())
-    game_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(game_module)
-
-    # cleanup python path again
-    if game_dir_name.startswith(parent_dir_name):
-        sys.path.remove(parent_path)
-    sys.path.remove(game_spec.game_path)
-    module_logger.debug("Removed temporarily added python paths")
-
-    after_load = set(sys.modules.keys())
-    extra_modules = after_load - before_load
-    if extra_modules:
-        module_logger.debug("Temporarily loaded additional game modules: %s", extra_modules)
-
-    try:
-        # extract game class from master.py (is_game checks inheritance from GameBenchmark)
-        game_subclasses = inspect.getmembers(game_module, predicate=is_game_benchmark)
-        if len(game_subclasses) == 0:
-            raise LookupError(f"There is no GameBenchmark defined in {game_module}. "
-                              f"Create such a class and try again.")
-        if len(game_subclasses) > 1:
-            raise LookupError(f"There is more than one Game defined in {game_module}.")
-        game_class_name, game_class = game_subclasses[0]
-        game_cls = game_class(game_spec)  # instantiate the specific game class
-        stdout_logger.info(f'Loading game benchmark for {game_spec["game_name"]} took: %s', datetime.now() - time_start)
-        yield game_cls
-    finally:
-        for mod in extra_modules:
-            del sys.modules[mod]
-        module_logger.debug("Removed temporarily loaded additional game modules")
+        try:
+            # extract game class from master.py (is_game checks inheritance from GameBenchmark)
+            game_subclasses = inspect.getmembers(game_module, predicate=is_game_benchmark)
+            if len(game_subclasses) == 0:
+                raise LookupError(f"There is no GameBenchmark defined in {game_module}. "
+                                  f"Create such a class and try again.")
+            if len(game_subclasses) > 1:
+                raise LookupError(f"There is more than one Game defined in {game_module}.")
+            game_class_name, game_class = game_subclasses[0]
+            game_cls = game_class(game_spec)  # instantiate the specific game class
+            stdout_logger.info(f'Loading game benchmark for {game_spec["game_name"]} took: %s',
+                               datetime.now() - time_start)
+            yield game_cls
+        finally:
+            for mod in extra_modules:
+                del sys.modules[mod]
+            module_logger.debug("Removed temporarily loaded additional game modules")
