@@ -29,6 +29,7 @@ From the results we constitute a [leaderboard](https://clembench.github.io/leade
 - [Quickstart](#quickstart)
 - [Installation](#installation)
 - [CLI Commands](#cli-commands)
+- [Games](#games)
 - [Models](#models)
 - [Backends](#backends)
 - [Contributing](#contributing)
@@ -37,7 +38,7 @@ From the results we constitute a [leaderboard](https://clembench.github.io/leade
 
 ## Overview
 
-The **clemcore** framework provides a systematic way of probing models' *situated language understanding* by framing them as agents in rule-governed games.
+The **clemcore** framework provides a systematic way of assessing *situated language understanding* of large language models by framing them as agents in rule-governed games.
 
 - **This repo (**clemcore**)** → core framework, installable via pip.
 - [**clembench repo**](https://github.com/clp-research/clembench) → set of official benchmark games built on top of clemcore.
@@ -55,13 +56,30 @@ The **clemcore** framework provides a systematic way of probing models' *situate
 Install and run your first game in a fresh virtual environment:
 
 ```bash
+# 1. Create and activate a virtual environment
 python3.10 -m venv venv
 source venv/bin/activate
+
+# 2. Install clemcore
 pip install clemcore
 
-# List available games and run one with a model
+# 3. Download clembench games and install requirements
+export CLEMBENCH_HOME=/path/to/clembench
+git clone https://github.com/clp-research/clembench $CLEMBENCH_HOME
+pip install -r $CLEMBENCH_HOME/requirements.txt
+
+# 4. List available games and try a dry-run with the mock model (programmatic player)
 clem list games
 clem run -g taboo -m mock mock
+
+# 5. Run llama3-8b against the text-only benchmark (version 2 game instances)
+clem run -g "{'benchmark': ['2.0']}" -m Meta-Llama-3.1-8B-Instruct
+
+# 6. Perform a quantitative evaluation of the results
+clem score && clem eval
+
+# 7. Inspect episodes of game play for qualitative evaluation
+clem transcribe
 ```
 
 ---
@@ -112,6 +130,66 @@ clem run -g <game> -m <model> # runs specified game using specified model
 clem transcribe               # translates interactions into html files
 clem score                    # computes individual performance measures
 clem eval                     # computes overall performances measures; requires scores
+```
+
+---
+
+## Games
+
+The [clembench repository](https://github.com/clp-research/clembench) provides a set of ready‑to‑use games.
+To make them available to the `-g <game-name>` option of `clem run`:
+1. Clone `clembench` to a directory of your choice.
+2. Either run `clem` from within that directory, **or** set the `CLEMBENCH_HOME` environment variable to point to it.
+
+Alternatively, you can place a `game_registry.json` file in your current working directory that points to the benchmark folder:
+
+```json
+[{
+  "benchmark_path": "path/to/clembench"
+}]
+```
+
+To check the available games, run the following command:
+
+```bash
+clem list games
+# Listing all available games (use -v option to see the whole specs)
+# Found '26' game specs that match the game_selector='all'
+# adventuregame:
+#         Interactive Fiction clemgame
+# cloudgame:
+#         A simple game in which a player has to decide whether they see clouds
+#         or not and a second player has to judge this response.
+# ...
+```
+
+If you want to list only a subset of games (not all, but more than one), you can use the `-s` (selector) option:
+
+```
+clem list games -s "{'benchmark':['2.0']}"
+# Listing all available games (use -v option to see the whole specs)
+# Found '14' game specs that match the game_selector='{'benchmark': ['2.0']}'
+# adventuregame:
+#         Interactive Fiction clemgame
+# codenames:
+#         Codenames game between a cluegiver and a guesser
+# ...
+```
+
+> **Note:** These selectors can also be passed to the `-g` option of the `clem run` command!
+> 
+To register custom games extent the `game_registry.json`. 
+A minimal entry looks like this:
+
+```json
+{
+  "game_name": "mygame",
+  "game_path": "path/to/mygame",
+  "description": "A brief description of mygame",
+  "player": 1,
+  "image": "none",
+  "languages": ["en"]
+}
 ```
 
 ---
