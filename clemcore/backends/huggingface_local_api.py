@@ -257,12 +257,38 @@ class HuggingfaceLocalModel(backends.BatchGenerativeModel):
         # parts of the inputs that are actually padded. However, this is usually not a problem for single
         # item batches, because here, the padding is not necessary anyway. In the following we first apply
         # the chat template and then use the tokenizer to receive the proper masks, also feasible for batches.
-        # Render each chat in the batch (list of messages) to a string prompt
-        rendered_chats = self.tokenizer.apply_chat_template(
-            batch_messages,
-            add_generation_prompt=True,  # append assistant prompt
-            tokenize=False  # get back the rendered string
-        )
+
+        # Bypassing CoT requires appending a message with empty CoT to the history, which is then completed by the model
+        # As this is incompatible with the add_generation_prompt argument, it's handled separately here
+        if 'cot_bypass' in self.model_spec.model_config and self.model_spec.model_config['cot_bypass']:
+            # Add last message containing CoT bypass string content to each message history in batch
+            for message_history in batch_messages:
+                message_history.append({"role": "assistant", "content": self.model_spec.model_config['cot_bypass']})
+            # Render each chat in the batch (list of messages) to a string prompt to continue after CoT bypass
+            rendered_chats = self.tokenizer.apply_chat_template(
+                batch_messages,
+                continue_final_message=True,  # continue after CoT bypass
+                tokenize=False  # get back the rendered string
+            )
+        elif 'cot_effort' in self.model_spec.model_config and self.model_spec.model_config['cot_effort']:
+            # Render each chat in the batch (list of messages) to a string prompt with generation prompt
+            # including setting CoT effort to value defined in model registry entry
+            # NOTE: Currently this is custom code to handle gpt-oss models! Other models that have CoT effort setting
+            # training might not pass the value to the model and thus template in the same way. Using this for those
+            # models will likely lead to errors!
+            rendered_chats = self.tokenizer.apply_chat_template(
+                batch_messages,
+                add_generation_prompt=True,  # append assistant prompt
+                tokenize=False,  # get back the rendered string
+                reasoning_effort=self.model_spec.model_config['cot_effort']  # use string from model config
+            )
+        else:
+            # Render each chat in the batch (list of messages) to a string prompt with generation prompt
+            rendered_chats = self.tokenizer.apply_chat_template(
+                batch_messages,
+                add_generation_prompt=True,  # append assistant prompt
+                tokenize=False  # get back the rendered string
+            )
 
         # The rendered chat (with system message already removed before) will, for example, look like:
         # <|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\nWho won the world series in 2020?<|eot_id|>
@@ -340,14 +366,14 @@ def split_and_clean_batch_outputs(
         response_text = model_output.replace(prompt_text, '').strip()
         # Apply model-specific output_split_prefix if present
         if 'output_split_prefix' in model.model_spec.model_config:
-            prefix = model.model_spec['model_config']['output_split_prefix']
+            prefix = model.model_spec.model_config['output_split_prefix']
             if prefix in response_text:
                 response_text = response_text.rsplit(prefix, maxsplit=1)[1]
         # Remove batch processing padding tokens
         if response_text.startswith(model.tokenizer.pad_token) or response_text.endswith(model.tokenizer.pad_token):
             response_text = response_text.replace(model.tokenizer.pad_token, "")
         # Remove EOS tokens and potential trailing tokens from response
-        eos_to_cull = model.model_spec['model_config']['eos_to_cull']  # This is a regEx to handle inconsistent outputs
+        eos_to_cull = model.model_spec.model_config['eos_to_cull']  # This is a regEx to handle inconsistent outputs
         response_text = re.sub(eos_to_cull, "", response_text)
 
         # Check for CoT output and split if present
@@ -391,12 +417,17 @@ def split_and_clean_cot_output(response_text: str, model: HuggingfaceLocalModel)
         - answer: The cleaned final answer content.
     """
     # Cull CoT start tag if model has it defined
-    if 'cot_start_tag' in model.model_spec.model_config and model.model_spec.model_config.cot_start_tag:
-        response_text = response_text.replace(model.model_spec.model_config.cot_start_tag, "")
+    if 'cot_start_tag' in model.model_spec.model_config and model.model_spec.model_config['cot_start_tag']:
+            response_text = response_text.replace(model.model_spec.model_config['cot_start_tag'], "")
     # Split response text at CoT end tag
-    split_cot_response = response_text.split(model.model_spec.model_config.cot_end_tag)
+    # split_cot_response = response_text.split(model.model_spec.model_config['cot_end_tag'])
+    split_cot_response = re.split(model.model_spec.model_config['cot_end_tag'], response_text)
     cot_content = split_cot_response[0]
-    answer = split_cot_response[1]
+    # Handle empty CoT outputs
+    if len(split_cot_response) >= 2:
+        answer = split_cot_response[-1]
+    else:
+        answer = ""
     # Retokenize and count CoT and final answer tokens
     # tokenized_cot_content = model.tokenizer(cot_content)
     # n_cot_content_tokens = len(tokenized_cot_content)
@@ -410,6 +441,8 @@ def split_and_clean_cot_output(response_text: str, model: HuggingfaceLocalModel)
         tokenized_answer = tokenized_answer[:model.max_tokens]
     # Decode retokenized and potentially cut answer
     answer = model.tokenizer.decode(tokenized_answer)
+    # Strip answer to assure proper clemgame parsing
+    answer = answer.strip()
 
     return cot_content, answer
 
