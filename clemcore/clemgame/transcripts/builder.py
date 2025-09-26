@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Dict, List
 from tqdm import tqdm
 import markdown as md
+import base64
+import mimetypes
 from pylatex.utils import escape_latex
 
 import clemcore.clemgame.transcripts.html_templates as html_templates
@@ -169,24 +171,46 @@ def build_transcript(interactions: Dict):
             if images:
                 transcript += f'<div speaker="{speaker_attr}" class="msg {class_name}" style="{style}">\n'
                 transcript += f'  <p>{msg_raw}</p>\n'
+
                 for image_src in images:
-                    if not image_src.startswith("http"):  # take the web url as it is
+                    original = image_src
+                    if image_src.startswith(("http://", "https://", "data:")):
+                        data_src = image_src
+                    else:
+                        # --- inline resolve & base64 embed ---
                         if "IMAGE_ROOT" in os.environ:
-                            image_src = os.path.join(os.environ["IMAGE_ROOT"], image_src)
+                            fs = os.path.join(os.environ["IMAGE_ROOT"], image_src)
                         elif image_src.startswith("/"):
-                            pass  # keep absolute path to image
+                            fs = image_src
                         else:
-                            # CAUTION: this only works when the project is checked out (dev mode)
-                            image_src = os.path.join(file_utils.project_root(), image_src)
-                    transcript += (f'  <a title="{image_src}">'
-                                   f'<img style="width:100%" src="{image_src}" alt="{image_src}" />'
-                                   f'</a>\n')
+                            fs = os.path.join(file_utils.project_root(), image_src)
+
+                        p = Path(fs)
+                        if p.exists() and p.is_file():
+                            mime, _ = mimetypes.guess_type(str(p))
+                            if not mime:
+                                mime = "image/jpeg"
+                            b64 = base64.b64encode(p.read_bytes()).decode("ascii")
+                            data_src = f"data:{mime};base64,{b64}"
+                        else:
+                            data_src = ""
+
+                    if data_src:
+                        transcript += (
+                            f'  <a href="{html.escape(original)}" title="{html.escape(original)}">'
+                            f'<img style="width:100%" src="{html.escape(data_src)}" alt="{html.escape(original)}" />'
+                            f'</a>\n'
+                        )
+                    else:
+                        transcript += f'<div><em>Image not found: {html.escape(fs)}</em></div>\n'
+
                 transcript += '</div>\n'
             else:
                 transcript += html_templates.EVENT_TEMPLATE.format(speaker_attr, class_name, style, msg_raw)
         transcript += "</div>"
     transcript += html_templates.FOOTER
     return transcript
+
 
 def build_tex(interactions: Dict):
     """Create a LaTeX .tex file with the interaction transcript.
